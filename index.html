@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Maison Gourmet Luxe Ultra</title>
+  <meta name="theme-color" content="#f6f3ee" />
+  <style>
+    :root{
+      --bg:#f7f3ee; --bg2:#ffffff; --panel:rgba(255,255,255,.84); --line:rgba(50,30,90,.12);
+      --text:#231a35; --muted:#6f6488; --gold:#c99c3a; --violet:#7f5cff; --shadow:0 18px 50px rgba(35,26,53,.10);
+      --ok:#2fa66f; --danger:#d65d72;
+    }
+    body.theme-dark{
+      --bg:#0a0b11; --bg2:#151724; --panel:rgba(255,255,255,.06); --line:rgba(255,255,255,.10);
+      --text:#f7f2eb; --muted:#c4bcaf; --gold:#d0a141; --violet:#8b68ff; --shadow:0 18px 60px rgba(0,0,0,.35);
+      --ok:#35c48a; --danger:#ff7888;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
+      radial-gradient(circle at top left, rgba(201,156,58,.10), transparent 20%),
+      radial-gradient(circle at top right, rgba(127,92,255,.12), transparent 24%),
+      var(--bg); color:var(--text)}
+    .app{max-width:1280px;margin:0 auto;padding:18px 16px 110px}
+    .glass{background:var(--panel);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .hero{border-radius:32px;padding:22px;background:linear-gradient(135deg, rgba(201,156,58,.10), rgba(127,92,255,.10), rgba(255,255,255,.02));overflow:hidden;position:relative}
+    .brand{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .leftBrand{display:flex;gap:14px;align-items:center}
+    .logo{width:58px;height:58px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg, rgba(201,156,58,.22), rgba(127,92,255,.22));font-size:30px;border:1px solid var(--line)}
+    h1,h2,h3,h4{margin:0}
+    .sub{color:var(--muted);margin-top:6px;line-height:1.45}
+    .headline{font-size:clamp(1.7rem,4vw,3rem);line-height:1.02;margin-top:18px;max-width:860px}
+    .headline span{background:linear-gradient(135deg,var(--gold),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .row{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:18px}
+    .grid{display:grid;gap:14px}
+    .grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+    .mini{padding:14px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .mini .k{font-size:.82rem;color:var(--muted)}
+    .mini .v{font-size:1.35rem;font-weight:800;margin-top:8px}
+    .chip,.btn,.tab,select,input,textarea{font:inherit}
+    .toolbar,.taglist,.quick{display:flex;gap:10px;flex-wrap:wrap}
+    .chip,.btn,.tab{border:none;cursor:pointer;border-radius:999px;padding:11px 14px;color:var(--text);background:rgba(255,255,255,.08);border:1px solid var(--line)}
+    .btn.primary{background:linear-gradient(135deg, rgba(201,156,58,.22), rgba(127,92,255,.22));font-weight:800}
+    .btn.danger{background:linear-gradient(135deg, rgba(214,93,114,.18), rgba(127,92,255,.12))}
+    .phone{max-width:340px;margin:0 auto;border-radius:32px;padding:14px;background:linear-gradient(180deg,var(--bg2),rgba(127,92,255,.05));border:1px solid var(--line)}
+    .notch{width:40%;height:18px;background:rgba(0,0,0,.35);border-radius:999px;margin:2px auto 12px}
+    .pCard{padding:12px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid var(--line);margin-top:10px}
+    .section{margin-top:24px}
+    .title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .card{border-radius:26px;padding:16px}
+    .muted{color:var(--muted)}
+    .list{display:grid;gap:10px}
+    .item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .item.done .name{text-decoration:line-through;opacity:.55}
+    .check{width:24px;height:24px;border-radius:9px;border:1px solid var(--line);background:transparent;color:transparent;cursor:pointer}
+    .item.done .check{background:linear-gradient(135deg,var(--ok),#5dd7a0);color:#082217;border-color:transparent}
+    .pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(201,156,58,.14);border:1px solid rgba(201,156,58,.22);font-size:.78rem}
+    input,select,textarea{width:100%;padding:12px 13px;border-radius:15px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--text);outline:none}
+    textarea{min-height:120px;resize:vertical}
+    .form{display:grid;gap:10px}
+    .form2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .recipes{display:grid;gap:14px}
+    .recipe{display:grid;grid-template-columns:130px 1fr;gap:12px;padding:0;overflow:hidden}
+    .recipe img{width:100%;height:100%;object-fit:cover;min-height:170px;display:block}
+    .recipeBody{padding:14px 14px 14px 0}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .meta span{font-size:.78rem;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+    .schedule{display:grid;gap:10px}
+    .day{display:grid;grid-template-columns:100px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:40;width:min(1180px,calc(100vw - 20px));display:grid;grid-template-columns:repeat(8,1fr);gap:8px;padding:10px;border-radius:24px;background:rgba(18,18,26,.82);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08)}
+    .tab{display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;background:transparent}
+    .tab.active{background:linear-gradient(135deg, rgba(201,156,58,.18), rgba(127,92,255,.18))}
+    .view.hidden,.hidden{display:none !important}
+    .chat{display:grid;gap:10px;max-height:360px;overflow:auto}
+    .bubble{max-width:84%;padding:12px 14px;border-radius:18px;line-height:1.45}
+    .bubble.me{justify-self:end;background:linear-gradient(135deg, rgba(201,156,58,.22), rgba(127,92,255,.22));border:1px solid var(--line)}
+    .bubble.bot{justify-self:start;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .overlay{position:fixed;inset:0;background:rgba(12,10,18,.65);backdrop-filter:blur(10px);display:grid;place-items:center;padding:18px;z-index:80}
+    .modal{width:min(1020px,100%);max-height:92vh;overflow:auto;border-radius:30px;padding:18px}
+    .steps{display:flex;gap:8px;justify-content:center;margin-top:12px}
+    .dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.18)}
+    .dot.active{width:26px;background:linear-gradient(135deg,var(--gold),var(--violet))}
+    .welcomeGrid{display:grid;grid-template-columns:1fr .9fr;gap:16px}
+    .quizQ{padding:12px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .small{font-size:.88rem}
+    .topBadge{position:fixed;top:12px;left:12px;z-index:45;background:rgba(255,255,255,.7);border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:800}
+    body.theme-dark .topBadge{background:rgba(16,18,24,.82)}
+    .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);padding:12px 16px;border-radius:14px;background:rgba(20,22,30,.92);color:#fff;border:1px solid rgba(255,255,255,.10);opacity:0;pointer-events:none;transition:.22s;z-index:90}
+    .toast.show{opacity:1}
+    .historyCard{padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .historyCard h4{margin:0 0 6px;font-size:1rem}
+    .catalogCols{display:grid;grid-template-columns:280px 1fr;gap:14px}
+    .catalogList{display:grid;gap:8px;max-height:420px;overflow:auto}
+    .catalogItem{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .settingsBox{display:grid;gap:12px}
+    @media (max-width:980px){
+      .row,.welcomeGrid,.grid3,.grid2,.form2,.stats,.catalogCols{grid-template-columns:1fr}
+      .recipe{grid-template-columns:1fr}
+      .recipeBody{padding:14px}
+      .tabs{grid-template-columns:repeat(4,1fr)}
+    }
+  </style>
+</head>
+<body class="theme-dark">
+<div class="topBadge">Maison Gourmet Luxe Ultra</div>
+
+<div id="guideOverlay" class="overlay hidden">
+  <div class="modal glass">
+    <div class="welcomeGrid">
+      <div>
+        <div class="pill">GUIDE DE DÉMARRAGE</div>
+        <h2 style="font-size:2rem;margin-top:14px">Bienvenue dans ton app <span style="background:linear-gradient(135deg,var(--gold),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent">courses + recettes + menus</span></h2>
+        <p class="sub">Tu peux passer ce guide, ou le suivre pour comprendre l’app et personnaliser chaque profil.</p>
+        <div id="guideStep0" class="guideStep">
+          <div class="grid" style="margin-top:16px">
+            <div class="item"><div>👤</div><div><div class="name"><b>1. Crée ou choisis un profil</b></div><div class="small muted">Chaque profil peut avoir ses goûts, allergies, âge, taille, poids et préférences.</div></div></div>
+            <div class="item"><div>📦</div><div><div class="name"><b>2. Maison</b></div><div class="small muted">Tu coches ce qui manque à la maison et ça part dans la liste de courses.</div></div></div>
+            <div class="item"><div>🛒</div><div><div class="name"><b>3. Courses</b></div><div class="small muted">Au magasin, tu coches ce que tu as pris. L’historique garde une trace.</div></div></div>
+          </div>
+        </div>
+        <div id="guideStep1" class="guideStep hidden">
+          <div class="grid" style="margin-top:16px">
+            <div class="quizQ"><b>Catalogue</b><div class="small muted">Une grande base de produits par catégorie pour éviter de tout écrire à la main.</div></div>
+            <div class="quizQ"><b>Maison</b><div class="small muted">Tu peux ajouter manuellement ou cocher des produits prédéfinis.</div></div>
+            <div class="quizQ"><b>Recettes</b><div class="small muted">Photos, temps, budget, ingrédients, étapes et favoris.</div></div>
+            <div class="quizQ"><b>Paramètres</b><div class="small muted">La roue ⚙️ permet de rouvrir le guide, changer le thème et gérer quelques réglages.</div></div>
+          </div>
+        </div>
+        <div id="guideStep2" class="guideStep hidden">
+          <div class="grid" style="margin-top:16px">
+            <div class="quizQ"><b>Budget</b><div class="small muted">Le panier estimé se met à jour selon la liste active.</div></div>
+            <div class="quizQ"><b>Favoris de listes</b><div class="small muted">Tu peux enregistrer une liste type et la recharger plus tard.</div></div>
+            <div class="quizQ"><b>Notifications</b><div class="small muted">L’app te signale les manquants les plus importants.</div></div>
+          </div>
+        </div>
+        <div class="steps">
+          <span class="dot active" data-dot="0"></span>
+          <span class="dot" data-dot="1"></span>
+          <span class="dot" data-dot="2"></span>
+        </div>
+        <div class="quick" style="margin-top:16px">
+          <button class="btn" id="skipGuide">Passer</button>
+          <button class="btn" id="prevGuide">Retour</button>
+          <button class="btn primary" id="nextGuide">Suivant</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Aperçu</h3>
+        <p class="sub">2 thèmes, profils, quiz, recettes photo, maison, catalogue, courses, budget et historique.</p>
+        <div class="phone" style="margin-top:12px">
+          <div class="notch"></div>
+          <div class="pCard"><b>Catalogue</b><div class="small muted">Grand choix par catégorie</div></div>
+          <div class="pCard"><b>Maison</b><div class="small muted">Tu coches seulement ce qui manque</div></div>
+          <div class="pCard"><b>Historique</b><div class="small muted">Tu gardes une trace de tes listes et favoris</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="quizOverlay" class="overlay hidden">
+  <div class="modal glass">
+    <div class="title">
+      <div>
+        <h2>Mini quiz du profil</h2>
+        <p class="sub">Tu peux tout remplir ou passer. Ces infos servent à mieux orienter les menus et suggestions.</p>
+      </div>
+      <div class="quick">
+        <button class="btn" id="skipQuiz">Passer</button>
+        <button class="btn primary" id="saveQuiz">Enregistrer</button>
+      </div>
+    </div>
+    <div class="form">
+      <div class="form2">
+        <input id="qName" placeholder="Nom du profil" />
+        <input id="qAge" type="number" placeholder="Âge" />
+      </div>
+      <div class="form2">
+        <input id="qHeight" type="number" placeholder="Taille (cm)" />
+        <input id="qWeight" type="number" placeholder="Poids (kg)" />
+      </div>
+      <textarea id="qAllergies" placeholder="Allergies ou intolérances"></textarea>
+      <textarea id="qLikes" placeholder="Ce que tu aimes"></textarea>
+      <textarea id="qDislikes" placeholder="Ce que tu n’aimes pas"></textarea>
+      <select id="qGoal">
+        <option value="">Objectif principal</option>
+        <option>Équilibré</option>
+        <option>Petit budget</option>
+        <option>Rapide</option>
+        <option>Protéiné</option>
+        <option>Perte de poids</option>
+        <option>Confort / plaisir</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div id="recipeOverlay" class="overlay hidden">
+  <div class="modal glass" id="recipeModalContent"></div>
+</div>
+
+<div id="settingsOverlay" class="overlay hidden">
+  <div class="modal glass">
+    <div class="title">
+      <div>
+        <h2>Paramètres</h2>
+        <p class="sub">Réglages principaux inspirés de ton ancienne app.</p>
+      </div>
+      <button class="btn" id="closeSettings">Fermer</button>
+    </div>
+    <div class="settingsBox">
+      <div class="card glass">
+        <h3>Affichage</h3>
+        <div class="quick" style="margin-top:12px">
+          <button class="btn" id="settingsTheme">Changer de thème</button>
+          <button class="btn" id="settingsGuide">Rouvrir le guide</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Données</h3>
+        <div class="quick" style="margin-top:12px">
+          <button class="btn" id="exportData">Exporter JSON</button>
+          <button class="btn danger" id="resetLists">Vider la liste active</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Chef IA</h3>
+        <div class="form" style="margin-top:12px">
+          <input id="settingsApiKey" placeholder="Clé API Gemini" />
+          <select id="settingsModel">
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+          </select>
+          <div class="quick">
+            <button class="btn primary" id="saveApiKey">Enregistrer la clé</button>
+            <button class="btn" id="clearApiKey">Effacer la clé</button>
+          </div>
+          <div class="small muted">La clé sert au chef pour répondre en vrai via Gemini. Pour un usage perso local, ça peut aller.</div>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Rappels rapides</h3>
+        <div class="small muted">– la roue ⚙️ reste en haut pour accéder rapidement aux paramètres<br>– le quiz profil permet d’orienter menus et suggestions<br>– les favoris de listes te font gagner du temps<br>– les profils peuvent avoir un code PIN</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <section class="hero glass">
+    <div class="brand">
+      <div class="leftBrand">
+        <div class="logo">👑</div>
+        <div>
+          <h1>Maison Gourmet Luxe Ultra</h1>
+          <div class="sub" id="subtitle">Choisis un thème, un profil, puis construis tes menus et tes courses.</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="chip" id="toggleTheme">🎨 Changer le thème</button>
+        <button class="chip" id="openGuide">❓ Guide</button>
+        <button class="chip" id="openQuiz">🧾 Quiz profil</button>
+        <button class="chip" id="openSettings">⚙️ Paramètres</button>
+      </div>
+    </div>
+    <div class="headline">Une app <span>blanc / violet / or</span> ou <span>sombre premium</span>, avec catalogue, maison, recettes, budget, favoris de listes et historique.</div>
+    <div class="stats">
+      <div class="mini"><div class="k">Profil actif</div><div class="v" id="kProfile">Maison</div></div>
+      <div class="mini"><div class="k">Budget semaine</div><div class="v" id="kBudget">80 €</div></div>
+      <div class="mini"><div class="k">Dans le frigo</div><div class="v" id="kFridge">0</div></div>
+      <div class="mini"><div class="k">À acheter</div><div class="v" id="kList">0</div></div>
+      <div class="mini"><div class="k">Panier estimé</div><div class="v" id="kCart">0 €</div></div>
+    </div>
+    <div class="row">
+      <div>
+        <div class="quick">
+          <button class="btn primary" id="quickTonight">🍽️ Que manger ce soir ?</button>
+          <button class="btn" id="quickWeek">🗓️ Générer ma semaine</button>
+          <button class="btn" id="quickRestes">♻️ Utiliser mes restes</button>
+        </div>
+        <div class="card glass" style="margin-top:16px">
+          <h3>Conseil intelligent</h3>
+          <p class="sub" id="smartAdvice"></p>
+          <div class="taglist" id="missingAlerts" style="margin-top:12px"></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="pCard"><b>Suggestion</b><div class="small muted" id="phoneSuggestion">Bowl poulet citron</div></div>
+        <div class="pCard"><b>Liste rapide</b><div class="small muted" id="phoneListPreview"></div></div>
+        <div class="pCard"><b>Profil</b><div class="small muted" id="phoneProfile">Quiz non rempli</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-home" class="view section">
+    <div class="title"><div><h2>Accueil</h2><p class="sub">Raccourcis, suggestions, profils et résumé.</p></div></div>
+    <div class="grid grid2">
+      <div class="card glass">
+        <h3>Profils</h3>
+        <div class="form2" style="margin-top:12px">
+          <input id="newProfileName" placeholder="Nouveau profil" />
+          <button class="btn primary" id="addProfile">Ajouter</button>
+        </div>
+        <div class="list" id="profilesList" style="margin-top:12px"></div>
+      </div>
+      <div class="card glass">
+        <h3>Achats récurrents</h3>
+        <div class="taglist" id="recurringTags" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-catalog" class="view section hidden">
+    <div class="title">
+      <div><h2>Catalogue produits</h2><p class="sub">Une grande base prédéfinie pour éviter d’écrire à la main.</p></div>
+      <div class="quick">
+        <input id="catalogSearch" placeholder="Rechercher un produit" style="min-width:240px" />
+      </div>
+    </div>
+    <div class="catalogCols">
+      <div class="card glass">
+        <h3>Catégories</h3>
+        <div class="list" id="catalogCats" style="margin-top:12px"></div>
+      </div>
+      <div class="card glass">
+        <div class="title">
+          <div><h3 id="catalogTitle">Produits</h3><p class="sub">Clique pour ajouter soit à Maison, soit directement à Courses.</p></div>
+          <div class="quick">
+            <button class="btn" id="catalogToHome">Ajouter à Maison</button>
+            <button class="btn primary" id="catalogToList">Ajouter à Courses</button>
+          </div>
+        </div>
+        <div class="catalogList" id="catalogItems"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-homecheck" class="view section hidden">
+    <div class="title">
+      <div><h2>Vérification maison</h2><p class="sub">Tu vois tes articles de base et tu coches seulement ce qu’il manque à la maison.</p></div>
+      <div class="quick">
+        <button class="btn" id="sendMissingToList">Envoyer les manquants dans la liste</button>
+        <button class="btn" id="clearMissing">Réinitialiser les manquants</button>
+      </div>
+    </div>
+    <div class="grid grid2">
+      <div class="card glass">
+        <h3>Ajouter manuellement</h3>
+        <div class="form">
+          <input id="homeName" placeholder="Ex. lait, œufs, café..." />
+          <div class="form2">
+            <input id="homeQty" placeholder="Qté habituelle" />
+            <select id="homeCat"><option>Épicerie</option><option>Fruits & légumes</option><option>Produits frais</option><option>Viandes / poissons</option><option>Maison</option></select>
+          </div>
+          <button class="btn primary" id="addHomeItem">Ajouter à ma base maison</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Résumé maison</h3>
+        <div class="taglist" id="homeSummary" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card glass" style="margin-top:14px">
+      <h3>Mes articles de base</h3>
+      <div class="list" id="homeCheckList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section id="view-fridge" class="view section hidden">
+    <div class="title"><div><h2>Frigo intelligent</h2><p class="sub">Ce que tu as chez toi et recettes compatibles.</p></div></div>
+    <div class="grid grid2">
+      <div class="card glass">
+        <h3>Ajouter au frigo</h3>
+        <div class="form">
+          <input id="fridgeName" placeholder="Produit" />
+          <div class="form2">
+            <input id="fridgeQty" placeholder="Quantité" />
+            <select id="fridgeType"><option>Frigo</option><option>Placard</option><option>Congélateur</option><option>À utiliser vite</option></select>
+          </div>
+          <button class="btn primary" id="addFridge">Ajouter</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Suggestions</h3>
+        <p class="sub">Trouve des recettes selon ce qu’il reste à la maison.</p>
+        <button class="btn primary" id="findFromFridge">Trouver des recettes</button>
+        <div class="list" id="fridgeIdeas" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card glass" style="margin-top:14px">
+      <h3>Mon stock</h3>
+      <div class="list" id="fridgeList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section id="view-menu" class="view section hidden">
+    <div class="title">
+      <div><h2>Menu de la semaine</h2><p class="sub">Sélectionne ou génère tes repas.</p></div>
+      <div class="quick">
+        <select id="weekMode" style="max-width:220px">
+          <option value="Équilibré">Équilibré</option>
+          <option value="Petit budget">Petit budget</option>
+          <option value="Rapide">Rapide</option>
+          <option value="Protéiné">Protéiné</option>
+          <option value="Confort / plaisir">Confort / plaisir</option>
+        </select>
+        <button class="btn primary" id="generateWeek">Générer</button>
+        <button class="btn" id="weekToList">Ajouter à la liste</button>
+      </div>
+    </div>
+    <div class="card glass">
+      <div class="schedule" id="schedule"></div>
+    </div>
+  </section>
+
+  <section id="view-list" class="view section hidden">
+    <div class="title">
+      <div><h2>Liste de courses</h2><p class="sub">Ajouts manuels, depuis recettes, planning ou vérification maison.</p></div>
+      <div class="quick">
+        <button class="btn" id="shareList">Partager</button>
+        <button class="btn" id="saveFavoriteList">Enregistrer en favori</button>
+        <button class="btn" id="archiveCurrentList">Archiver la liste actuelle</button>
+      </div>
+    </div>
+    <div class="grid grid2">
+      <div class="card glass">
+        <h3>Ajouter un article</h3>
+        <div class="form">
+          <input id="itemName" placeholder="Nom de l’article" />
+          <div class="form2">
+            <input id="itemQty" placeholder="Quantité" />
+            <select id="itemCat"><option>Épicerie</option><option>Fruits & légumes</option><option>Produits frais</option><option>Viandes / poissons</option><option>Maison</option></select>
+          </div>
+          <button class="btn primary" id="addItem">Ajouter</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>Résumé</h3>
+        <div class="taglist" id="summaryTags" style="margin-top:12px"></div>
+        <div class="sub" style="margin-top:10px">Panier estimé : <b id="cartEstimateText">0 €</b></div>
+      </div>
+    </div>
+    <div class="card glass" style="margin-top:14px"><div class="list" id="shoppingList"></div></div>
+    <div class="grid grid2" style="margin-top:14px">
+      <div class="card glass">
+        <h3>Favoris de listes</h3>
+        <div class="list" id="favoriteLists" style="margin-top:12px"></div>
+      </div>
+      <div class="card glass">
+        <h3>Actions rapides</h3>
+        <div class="quick" style="margin-top:12px">
+          <button class="btn" id="removeDone">Retirer cochés</button>
+          <button class="btn danger" id="clearActiveList">Vider la liste active</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-recipes" class="view section hidden">
+    <div class="title">
+      <div><h2>Recettes</h2><p class="sub">Photos, temps, budget, étapes, ingrédients, favoris.</p></div>
+      <div class="quick"><input id="recipeSearch" placeholder="Recherche recette ou ingrédient" style="min-width:260px" /></div>
+    </div>
+    <div class="recipes" id="recipes"></div>
+  </section>
+
+  <section id="view-history" class="view section hidden">
+    <div class="title">
+      <div><h2>Historique des courses</h2><p class="sub">Tes anciennes listes terminées ou archivées restent ici.</p></div>
+    </div>
+    <div class="grid" id="historyList"></div>
+  </section>
+
+  <section id="view-ai" class="view section hidden">
+    <div class="title"><div><h2>Assistant IA</h2><p class="sub">Version locale pour tester les idées rapidement.</p></div></div>
+    <div class="card glass">
+      <div class="chat" id="chat"></div>
+      <div class="form2" style="margin-top:12px">
+        <input id="chatInput" placeholder="Ex. propose un menu rapide pour 2 personnes" />
+        <button class="btn primary" id="sendChat">Envoyer</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-view="home">🏠<span>Accueil</span></button>
+  <button class="tab" data-view="catalog">🏪<span>Catalogue</span></button>
+  <button class="tab" data-view="homecheck">📦<span>Maison</span></button>
+  <button class="tab" data-view="fridge">🧊<span>Frigo</span></button>
+  <button class="tab" data-view="menu">🗓️<span>Menu</span></button>
+  <button class="tab" data-view="list">🛒<span>Courses</span></button>
+  <button class="tab" data-view="recipes">🍝<span>Recettes</span></button>
+  <button class="tab" data-view="history">🕘<span>Historique</span></button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const LS={get:(k,f)=>{try{const v=localStorage.getItem("mglu_"+k);return v?JSON.parse(v):f}catch(e){return f}},set:(k,v)=>localStorage.setItem("mglu_"+k,JSON.stringify(v))};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const PRICE_MAP={"Épicerie":2.5,"Fruits & légumes":1.8,"Produits frais":2.2,"Viandes / poissons":4.9,"Maison":3.5};
+
+const CATALOG = {
+  "Fruits & légumes":["Tomates","Concombres","Carottes","Courgettes","Pommes de terre","Oignons","Ail","Échalotes","Poivrons","Salade","Épinards","Champignons","Brocoli","Chou-fleur","Haricots verts","Radis","Avocats","Citron","Bananes","Pommes","Poires","Oranges","Clémentines","Fraises","Raisins","Kiwi","Melon","Pastèque"],
+  "Produits frais":["Lait","Œufs","Beurre","Crème","Yaourts","Fromage râpé","Mozzarella","Parmesan","Feta","Fromage de chèvre","Jambon","Blanc de poulet","Saumon fumé","Lardons","Pâte feuilletée","Pâte brisée","Tofu"],
+  "Épicerie":["Pâtes","Riz","Quinoa","Semoule","Lentilles","Pois chiches","Haricots rouges","Farine","Sucre","Sel","Poivre","Huile d'olive","Vinaigre","Moutarde","Mayonnaise","Ketchup","Sauce tomate","Coulis tomate","Lait de coco","Curry","Paprika","Herbes de Provence","Basilic","Café","Thé","Chocolat","Biscuits","Céréales","Thon en boîte"],
+  "Viandes / poissons":["Poulet","Steak haché","Escalopes de dinde","Saucisses","Saumon","Cabillaud","Crevettes","Bœuf mijoté","Poisson pané"],
+  "Maison":["Papier toilette","Essuie-tout","Liquide vaisselle","Éponge","Lessive","Sacs poubelle","Savon main","Dentifrice","Shampoing","Nettoyant sol"]
+};
+
+const state={
+  theme: LS.get("theme","dark"),
+  profiles: LS.get("profiles",[
+    {id:uid(),name:"Maison",pin:"1234",quiz:{age:"",height:"",weight:"",allergies:"",likes:"poulet, pâtes, légumes",dislikes:"",goal:"Équilibré"}},
+    {id:uid(),name:"Solo",pin:"",quiz:{age:"",height:"",weight:"",allergies:"",likes:"rapide",dislikes:"poisson",goal:"Rapide"}}
+  ]),
+  activeProfileId: LS.get("activeProfileId",null),
+  recurring: LS.get("recurring",["œufs","bananes","café","yaourts"]),
+  list: LS.get("list",[]),
+  fridge: LS.get("fridge",[{id:uid(),name:"œufs",qty:"6",type:"Frigo"},{id:uid(),name:"riz",qty:"1 sachet",type:"Placard"},{id:uid(),name:"tomates",qty:"3",type:"À utiliser vite"}]),
+  favs: LS.get("favs",["r1","r5"]),
+  chats: LS.get("chats",[{role:"bot",text:"Bonjour ✨ Je peux t’aider à choisir un repas, un menu semaine ou une idée selon ton frigo."}]),
+  schedule: LS.get("schedule",["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"].map(day=>({day,recipeId:null}))),
+  homeBase: LS.get("homeBase",[{id:uid(),name:"Lait",qty:"1",cat:"Produits frais",missing:false},{id:uid(),name:"Œufs",qty:"6",cat:"Produits frais",missing:false},{id:uid(),name:"Café",qty:"1",cat:"Épicerie",missing:true}]),
+  history: LS.get("history",[]),
+  favoriteLists: LS.get("favoriteLists",[]),
+  catalogCategory: LS.get("catalogCategory","Fruits & légumes"),
+  catalogTarget: LS.get("catalogTarget","home"),
+  selectedCatalog: {},
+  apiKey: LS.get("apiKey",""),
+  aiModel: LS.get("aiModel","gemini-2.5-flash")
+};
+state.profiles = state.profiles.map(p => ({pin:"", ...p, quiz: p.quiz || {}}));
+if(!state.activeProfileId && state.profiles.length) state.activeProfileId=state.profiles[0].id;
+
+const recipes=[
+  {id:"r1",name:"Bowl poulet citron",time:18,budget:"Petit budget",difficulty:"Facile",kcal:520,image:"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80",ingredients:["poulet","riz","citron","concombre","yaourt","épices"],steps:["Cuire le riz.","Poêler le poulet avec citron et épices.","Dresser avec concombre et sauce yaourt."],tags:["rapide","protéiné","équilibré"]},
+  {id:"r2",name:"Pâtes crémeuses tomates basilic",time:16,budget:"Petit budget",difficulty:"Facile",kcal:610,image:"https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?auto=format&fit=crop&w=900&q=80",ingredients:["pâtes","tomates","crème","basilic","parmesan"],steps:["Cuire les pâtes.","Faire une sauce tomate-crème.","Mélanger et servir."],tags:["rapide","comfort","végétarien"]},
+  {id:"r3",name:"Saumon four & légumes rôtis",time:28,budget:"Plaisir",difficulty:"Moyen",kcal:490,image:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",ingredients:["saumon","courgette","carotte","huile d'olive","citron"],steps:["Couper les légumes.","Rôtir au four.","Ajouter le saumon sur la fin."],tags:["healthy","four","soir"]},
+  {id:"r4",name:"Omelette anti-gaspi",time:10,budget:"Petit budget",difficulty:"Très facile",kcal:370,image:"https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=900&q=80",ingredients:["œufs","fromage","légumes restants","herbes"],steps:["Battre les œufs.","Ajouter les restes.","Cuire à feu doux."],tags:["anti-gaspi","rapide"]},
+  {id:"r5",name:"Curry coco pois chiches",time:22,budget:"Petit budget",difficulty:"Facile",kcal:560,image:"https://images.unsplash.com/photo-1512058564366-c9e7b19b7141?auto=format&fit=crop&w=900&q=80",ingredients:["pois chiches","lait de coco","curry","riz","oignon"],steps:["Faire revenir l'oignon.","Ajouter curry et coco.","Terminer avec pois chiches puis servir avec riz."],tags:["végétarien","batch cooking"]},
+  {id:"r6",name:"Wrap poulet avocat",time:14,budget:"Moyen",difficulty:"Facile",kcal:510,image:"https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80",ingredients:["tortillas","poulet","avocat","salade","tomate"],steps:["Garnir les tortillas.","Rouler serré.","Couper en deux."],tags:["rapide","déjeuner"]},
+  {id:"r7",name:"Gratin du dimanche",time:40,budget:"Plaisir",difficulty:"Moyen",kcal:650,image:"https://images.unsplash.com/photo-1603079846312-6c5ecf0842ea?auto=format&fit=crop&w=900&q=80",ingredients:["pommes de terre","crème","fromage","ail"],steps:["Couper les pommes de terre.","Monter le gratin.","Cuire jusqu'à doré."],tags:["family","comfort"]},
+  {id:"r8",name:"Salade quinoa feta",time:15,budget:"Équilibré",difficulty:"Facile",kcal:430,image:"https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=80",ingredients:["quinoa","feta","tomates","concombre","menthe"],steps:["Cuire le quinoa.","Ajouter les légumes.","Assaisonner."],tags:["healthy","light"]}
+];
+
+function activeProfile(){ return state.profiles.find(p=>p.id===state.activeProfileId) || state.profiles[0]; }
+function save(){ for(const k of ["theme","profiles","activeProfileId","recurring","list","fridge","favs","chats","schedule","homeBase","history","favoriteLists","catalogCategory","catalogTarget","apiKey","aiModel"]) LS.set(k,state[k]); }
+function showToast(t){ const e=$("#toast"); e.textContent=t; e.classList.add("show"); setTimeout(()=>e.classList.remove("show"),1800); }
+function esc(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function applyTheme(){ document.body.classList.toggle("theme-dark", state.theme==="dark"); }
+function smartSuggestion(){
+  const p=activeProfile(); const likes=(p?.quiz?.likes||"").toLowerCase(); const allergies=(p?.quiz?.allergies||"").toLowerCase();
+  let pool=recipes.filter(r=>!allergies || !r.ingredients.some(i=>allergies.includes(i)));
+  if(likes) pool=pool.sort((a,b)=>(b.ingredients.join(" ").toLowerCase().includes(likes)?1:0)-(a.ingredients.join(" ").toLowerCase().includes(likes)?1:0));
+  return pool[0] || recipes[0];
+}
+function cartEstimate(){
+  return state.list.filter(x=>!x.done).reduce((s,i)=>s+(PRICE_MAP[i.cat]||2.5),0);
+}
+function renderHero(){
+  const p=activeProfile();
+  $("#kProfile").textContent=p?.name||"Profil";
+  $("#kBudget").textContent=(p?.quiz?.goal==="Petit budget"?"60":"80")+" €";
+  $("#kFridge").textContent=state.fridge.length;
+  $("#kList").textContent=state.list.filter(x=>!x.done).length;
+  $("#kCart").textContent=cartEstimate().toFixed(0)+" €";
+  $("#phoneSuggestion").textContent=smartSuggestion().name+" · "+smartSuggestion().time+" min";
+  $("#phoneListPreview").textContent=state.list.filter(x=>!x.done).slice(0,3).map(x=>x.name).join(" · ") || "Liste vide";
+  $("#phoneProfile").textContent=p?.quiz?.likes ? ("Aime : "+p.quiz.likes) : "Quiz non rempli";
+  $("#subtitle").textContent = p?.quiz?.goal ? `Profil ${p.name} · objectif ${p.quiz.goal}` : `Profil ${p?.name||"Maison"} · personnalise tes menus`;
+  const all=p?.quiz?.allergies?.trim(); const goal=p?.quiz?.goal?.trim();
+  $("#smartAdvice").textContent = all ? `Je prends en compte : ${all}. ${goal ? "Objectif : "+goal+"." : ""} Suggestion du moment : ${smartSuggestion().name}.`
+                                 : `Remplis le quiz du profil pour obtenir des menus plus adaptés. En attendant, je te conseille ${smartSuggestion().name}.`;
+  const missing = state.homeBase.filter(x=>x.missing).slice(0,6);
+  $("#missingAlerts").innerHTML = missing.length ? missing.map(x=>`<span class="pill">Il manque ${esc(x.name)}</span>`).join("") : `<span class="pill">Tout semble en stock à la maison</span>`;
+}
+
+function renderProfiles(){
+  $("#profilesList").innerHTML = state.profiles.map(p=>`
+    <div class="item">
+      <button class="check" data-pick="${p.id}" style="color:${p.id===state.activeProfileId?'#fff':'transparent'}">${p.id===state.activeProfileId?'✓':''}</button>
+      <div>
+        <div class="name"><b>${esc(p.name)}</b> ${p.pin ? '<span class="pill">PIN</span>' : ''}</div>
+        <div class="small muted">${p.quiz.goal||'Sans objectif'}${p.quiz.allergies ? " · Allergies : "+esc(p.quiz.allergies) : ""}</div>
+      </div>
+      <div class="quick">
+        <button class="btn" data-editquiz="${p.id}">Quiz</button>
+        <button class="btn" data-setpin="${p.id}">Code</button>
+        <button class="btn danger" data-delprofile="${p.id}">Suppr.</button>
+      </div>
+    </div>
+  `).join("");
+  $("#recurringTags").innerHTML = state.recurring.map(x=>`<span class="pill">${esc(x)}</span>`).join("");
+}
+
+function renderCatalog(){
+  $("#catalogCats").innerHTML = Object.keys(CATALOG).map(cat=>`<button class="btn ${cat===state.catalogCategory?'primary':''}" data-cat="${esc(cat)}">${esc(cat)}</button>`).join("");
+  $("#catalogTitle").textContent = state.catalogCategory;
+  $("#catalogToHome").classList.toggle("primary", state.catalogTarget==="home");
+  $("#catalogToList").classList.toggle("primary", state.catalogTarget==="list");
+  const q=$("#catalogSearch").value.trim().toLowerCase();
+  const items = CATALOG[state.catalogCategory].filter(x=>!q || x.toLowerCase().includes(q));
+  $("#catalogItems").innerHTML = items.map(name=>`
+    <label class="catalogItem">
+      <input type="checkbox" data-catalogname="${esc(name)}" ${state.selectedCatalog[name]?'checked':''}/>
+      <div>${esc(name)}</div>
+      <button type="button" class="btn" data-addsingle="${esc(name)}">Ajouter</button>
+    </label>
+  `).join("") || `<div class="muted">Aucun produit trouvé.</div>`;
+}
+function renderHomeCheck(){
+  $("#homeCheckList").innerHTML = state.homeBase.map(h=>`
+    <div class="item ${h.missing?'done':''}">
+      <button class="check" data-togglehome="${h.id}">✓</button>
+      <div>
+        <div class="name"><b>${esc(h.name)}</b></div>
+        <div class="small muted">${esc(h.qty)} · ${esc(h.cat)}${h.missing ? " · manque" : " · en stock"}</div>
+      </div>
+      <button class="btn danger" data-delhome="${h.id}">Suppr.</button>
+    </div>
+  `).join("") || `<div class="card glass">Aucun article de base pour l’instant.</div>`;
+  const miss = state.homeBase.filter(x=>x.missing).length;
+  const total = state.homeBase.length;
+  $("#homeSummary").innerHTML = `<span class="pill">${miss} manquant(s)</span><span class="pill">${total} article(s) de base</span>`;
+}
+function renderFridge(){
+  $("#fridgeList").innerHTML = state.fridge.map(f=>`
+    <div class="item">
+      <div>🧊</div>
+      <div><div class="name"><b>${esc(f.name)}</b></div><div class="small muted">${esc(f.qty)} · ${esc(f.type)}</div></div>
+      <button class="btn danger" data-delfridge="${f.id}">Suppr.</button>
+    </div>
+  `).join("") || `<div class="card glass">Aucun produit pour l’instant.</div>`;
+}
+function renderSchedule(){
+  $("#schedule").innerHTML = state.schedule.map(s=>{
+    const r=recipes.find(x=>x.id===s.recipeId);
+    return `<div class="day">
+      <div><b>${s.day}</b><div class="small muted">${r ? r.time+" min" : "Aucun repas"}</div></div>
+      <div>${r ? `<b>${esc(r.name)}</b><div class="small muted">${esc(r.budget)} · ${esc(r.difficulty)}</div>` : `<span class="muted">Choisis une recette</span>`}</div>
+      <div><select data-day="${esc(s.day)}"><option value="">— choisir —</option>${recipes.map(r=>`<option value="${r.id}" ${s.recipeId===r.id?'selected':''}>${esc(r.name)}</option>`).join("")}</select></div>
+    </div>`;
+  }).join("");
+}
+function renderList(){
+  $("#shoppingList").innerHTML = state.list.map(i=>`
+    <div class="item ${i.done?'done':''}">
+      <button class="check" data-toggleitem="${i.id}">✓</button>
+      <div><div class="name"><b>${esc(i.name)}</b></div><div class="small muted">${esc(i.qty)} · ${esc(i.cat)}${i.source ? " · "+esc(i.source) : ""}</div></div>
+      <button class="btn danger" data-delitem="${i.id}">Suppr.</button>
+    </div>
+  `).join("") || `<div class="card glass">Liste vide.</div>`;
+  const count={}; state.list.filter(x=>!x.done).forEach(i=>count[i.cat]=(count[i.cat]||0)+1);
+  $("#summaryTags").innerHTML = Object.entries(count).map(([k,v])=>`<span class="pill">${esc(k)} · ${v}</span>`).join("") || `<span class="pill">0 article</span>`;
+  $("#cartEstimateText").textContent = cartEstimate().toFixed(2)+" €";
+}
+function renderFavoriteLists(){
+  $("#favoriteLists").innerHTML = state.favoriteLists.map(f=>`
+    <div class="item">
+      <div>⭐</div>
+      <div><div class="name"><b>${esc(f.title)}</b></div><div class="small muted">${f.items.length} article(s)</div></div>
+      <div class="quick">
+        <button class="btn" data-loadfav="${f.id}">Charger</button>
+        <button class="btn danger" data-delfav="${f.id}">Suppr.</button>
+      </div>
+    </div>
+  `).join("") || `<div class="muted">Aucun favori de liste pour le moment.</div>`;
+}
+function renderRecipes(){
+  const q=$("#recipeSearch").value.trim().toLowerCase();
+  const p=activeProfile();
+  const allergies=(p?.quiz?.allergies||"").toLowerCase();
+  const dislikes=(p?.quiz?.dislikes||"").toLowerCase();
+  const list=recipes.filter(r=>{
+    const hay=(r.name+" "+r.ingredients.join(" ")+" "+r.tags.join(" ")+" "+r.budget).toLowerCase();
+    if(q && !hay.includes(q)) return false;
+    if(allergies && r.ingredients.some(i=>allergies.includes(i))) return false;
+    if(dislikes && r.ingredients.some(i=>dislikes.includes(i))) return false;
+    return true;
+  });
+  $("#recipes").innerHTML = list.map(r=>`
+    <div class="card glass recipe">
+      <img src="${r.image}" alt="${esc(r.name)}">
+      <div class="recipeBody">
+        <div class="title">
+          <div><h3>${esc(r.name)}</h3><div class="small muted">${esc(r.difficulty)} · ${esc(r.budget)}</div></div>
+          <button class="btn" data-fav="${r.id}">${state.favs.includes(r.id)?'💛':'🤍'}</button>
+        </div>
+        <div class="meta"><span>${r.time} min</span><span>${r.kcal} kcal</span><span>${esc(r.budget)}</span></div>
+        <div class="small">${esc(r.ingredients.join(" · "))}</div>
+        <div class="taglist" style="margin-top:10px">${r.tags.map(t=>`<span class="pill">${esc(t)}</span>`).join("")}</div>
+        <div class="quick" style="margin-top:12px">
+          <button class="btn primary" data-openrecipe="${r.id}">Voir la fiche</button>
+          <button class="btn" data-addtolist="${r.id}">Ajouter ingrédients</button>
+          <button class="btn" data-addtomenu="${r.id}">Ajouter au menu</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+function renderHistory(){
+  $("#historyList").innerHTML = state.history.map(h=>`
+    <div class="historyCard glass">
+      <h4>${esc(h.title)}</h4>
+      <div class="small muted">${esc(h.date)}</div>
+      <div class="taglist" style="margin-top:10px">${h.items.slice(0,8).map(i=>`<span class="pill">${esc(i.name)}</span>`).join("")}${h.items.length>8?`<span class="pill">+${h.items.length-8}</span>`:""}</div>
+      <div class="quick" style="margin-top:12px">
+        <button class="btn" data-reloadhistory="${h.id}">Recharger</button>
+        <button class="btn danger" data-delhistory="${h.id}">Suppr.</button>
+      </div>
+    </div>
+  `).join("") || `<div class="card glass">Aucun historique pour le moment.</div>`;
+}
+function renderChat(){
+  $("#chat").innerHTML = state.chats.map(c=>`<div class="bubble ${c.role}">${esc(c.text).replace(/\n/g,"<br>")}</div>`).join("");
+  $("#chat").scrollTop=$("#chat").scrollHeight;
+}
+function openRecipe(idr){
+  const r=recipes.find(x=>x.id===idr); if(!r) return;
+  $("#recipeModalContent").innerHTML = `
+    <div class="title">
+      <div><h2>${esc(r.name)}</h2><p class="sub">${r.time} min · ${esc(r.difficulty)} · ${esc(r.budget)}</p></div>
+      <button class="btn" id="closeRecipe">Fermer</button>
+    </div>
+    <div class="grid grid2" style="margin-top:12px">
+      <div><img src="${r.image}" alt="${esc(r.name)}" style="width:100%;border-radius:22px;display:block;max-height:380px;object-fit:cover;border:1px solid var(--line)"></div>
+      <div class="card glass">
+        <h3>Ingrédients</h3>
+        <div class="taglist" style="margin-top:10px">${r.ingredients.map(i=>`<span class="pill">${esc(i)}</span>`).join("")}</div>
+        <h3 style="margin-top:18px">Préparation</h3>
+        <div class="list" style="margin-top:10px">${r.steps.map((s,i)=>`<div class="item"><div>${i+1}</div><div><div class="small">${esc(s)}</div></div></div>`).join("")}</div>
+        <div class="quick" style="margin-top:14px">
+          <button class="btn primary" data-addtolist="${r.id}">Ajouter à la liste</button>
+          <button class="btn" data-addtomenu="${r.id}">Ajouter au menu</button>
+        </div>
+      </div>
+    </div>`;
+  $("#recipeOverlay").classList.remove("hidden");
+  $("#closeRecipe").onclick=()=>$("#recipeOverlay").classList.add("hidden");
+}
+function addToList(name, qty="", cat="Épicerie", source="manuel"){
+  const existing = state.list.find(x=>x.name.toLowerCase()===name.toLowerCase() && !x.done);
+  if(existing){
+    existing.qty = existing.qty || qty || "";
+    return;
+  }
+  state.list.push({id:uid(),name,qty,cat,done:false,source});
+}
+function addToHome(name, qty="", cat="Épicerie"){
+  if(state.homeBase.find(x=>x.name.toLowerCase()===name.toLowerCase())) return;
+  state.homeBase.push({id:uid(),name,qty,cat,missing:false});
+}
+function addIngredients(recipeId){
+  const r=recipes.find(x=>x.id===recipeId); if(!r) return;
+  r.ingredients.forEach(i=>addToList(i.charAt(0).toUpperCase()+i.slice(1),"",guessCat(i),"recette"));
+  if(!state.recurring.includes(r.name.toLowerCase())) state.recurring.push(r.name.toLowerCase());
+  save(); renderList(); renderHero(); renderFavoriteLists(); showToast("Ingrédients ajoutés");
+}
+function guessCat(i){
+  i=i.toLowerCase();
+  if(["tomates","concombre","citron","courgette","carotte","oignon","ail","épinards","salade","avocat","bananes","pommes","oranges","clémentines"].some(k=>i.includes(k))) return "Fruits & légumes";
+  if(["poulet","saumon","steak","dinde","saucisse","cabillaud","crevettes","thon"].some(k=>i.includes(k))) return "Viandes / poissons";
+  if(["yaourt","crème","feta","parmesan","fromage","lait","œufs","mozzarella","beurre"].some(k=>i.includes(k))) return "Produits frais";
+  return "Épicerie";
+}
+function generateWeek(mode){
+  let pool=[...recipes];
+  pool.sort((a,b)=>scoreRecipe(b,mode)-scoreRecipe(a,mode));
+  state.schedule=state.schedule.map((s,idx)=>({...s,recipeId:pool[idx%pool.length].id}));
+  save(); renderSchedule(); showToast("Semaine générée");
+}
+function scoreRecipe(r,mode){
+  const p=activeProfile(); let sc=0;
+  if(mode==="Rapide" && r.time<=18) sc+=4;
+  if(mode==="Petit budget" && r.budget.toLowerCase().includes("petit")) sc+=4;
+  if(mode==="Protéiné" && r.tags.includes("protéiné")) sc+=4;
+  if(mode==="Équilibré" && (r.tags.includes("healthy")||r.tags.includes("équilibré"))) sc+=3;
+  if(mode==="Confort / plaisir" && r.tags.includes("comfort")) sc+=4;
+  const likes=(p?.quiz?.likes||"").toLowerCase();
+  if(likes && (r.name.toLowerCase().includes(likes)||r.ingredients.join(" ").toLowerCase().includes(likes))) sc+=2;
+  return sc;
+}
+function findFromFridge(){
+  const words=state.fridge.map(x=>x.name.toLowerCase());
+  const hits=recipes.map(r=>({r,common:r.ingredients.filter(i=>words.some(w=>i.includes(w)||w.includes(i)))})).sort((a,b)=>b.common.length-a.common.length).slice(0,4);
+  $("#fridgeIdeas").innerHTML = hits.map(h=>`<div class="item"><div>🥘</div><div><div class="name"><b>${esc(h.r.name)}</b></div><div class="small muted">${h.common.length ? "Tu as déjà : "+esc(h.common.join(", ")) : "Peu d'ingrédients en commun, mais idée possible"}</div></div><button class="btn" data-openrecipe="${h.r.id}">Voir</button></div>`).join("");
+}
+
+async function askChefWithGemini(userText){
+  if(!state.apiKey) return fakeReply(userText);
+  const p = activeProfile();
+  const profileContext = [
+    p?.name ? `Profil: ${p.name}` : "",
+    p?.quiz?.goal ? `Objectif: ${p.quiz.goal}` : "",
+    p?.quiz?.allergies ? `Allergies: ${p.quiz.allergies}` : "",
+    p?.quiz?.likes ? `Aime: ${p.quiz.likes}` : "",
+    p?.quiz?.dislikes ? `N'aime pas: ${p.quiz.dislikes}` : ""
+  ].filter(Boolean).join("\n");
+  const prompt = `Tu es un chef cuisine utile, clair et concret. Réponds en français.\n${profileContext}\nQuestion: ${userText}`;
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${state.aiModel}:generateContent?key=${encodeURIComponent(state.apiKey)}`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      contents:[{parts:[{text: prompt}]}],
+      generationConfig:{temperature:0.7, maxOutputTokens:600}
+    })
+  });
+  if(!res.ok){
+    throw new Error("Erreur API");
+  }
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("\n").trim() || "Je n'ai pas pu répondre correctement.";
+}
+
+function fakeReply(t){
+  const p=activeProfile(); const goal=p?.quiz?.goal||""; const likes=p?.quiz?.likes||"";
+  if(t.toLowerCase().includes("soir")) return `Ce soir, je te conseille ${smartSuggestion().name}. ${goal ? "Je me base aussi sur ton objectif : "+goal+"." : ""}`;
+  if(t.toLowerCase().includes("frigo")) return `Avec ton frigo actuel, l’omelette anti-gaspi et le bowl poulet citron sont de bonnes pistes.`;
+  if(t.toLowerCase().includes("menu")) return `Je peux te générer une semaine ${goal || "équilibrée"} avec une préférence pour ${likes || "tes goûts enregistrés"}.`;
+  return `Je te propose ${smartSuggestion().name}. Dis-moi si tu veux quelque chose de rapide, petit budget ou selon ton frigo.`;
+}
+function openGuide(){ $("#guideOverlay").classList.remove("hidden"); guideStep=0; drawGuide(); }
+let guideStep=0;
+function drawGuide(){
+  $$(".guideStep").forEach((e,i)=>e.classList.toggle("hidden",i!==guideStep));
+  $$("[data-dot]").forEach((d,i)=>d.classList.toggle("active",i===guideStep));
+  $("#prevGuide").style.visibility = guideStep===0?"hidden":"visible";
+  $("#nextGuide").textContent = guideStep===2?"Commencer":"Suivant";
+}
+function openQuiz(profileId=null){
+  editingProfileId = profileId || state.activeProfileId;
+  const p = state.profiles.find(x=>x.id===editingProfileId) || activeProfile();
+  $("#qName").value=p?.name||"";
+  $("#qAge").value=p?.quiz?.age||"";
+  $("#qHeight").value=p?.quiz?.height||"";
+  $("#qWeight").value=p?.quiz?.weight||"";
+  $("#qAllergies").value=p?.quiz?.allergies||"";
+  $("#qLikes").value=p?.quiz?.likes||"";
+  $("#qDislikes").value=p?.quiz?.dislikes||"";
+  $("#qGoal").value=p?.quiz?.goal||"";
+  $("#quizOverlay").classList.remove("hidden");
+}
+let editingProfileId=null;
+
+function archiveCurrentList(title="Liste courses"){
+  if(!state.list.length){ showToast("La liste est vide"); return; }
+  state.history.unshift({
+    id:uid(),
+    title,
+    date:new Date().toLocaleString("fr-FR"),
+    items: state.list.map(i=>({name:i.name,qty:i.qty,cat:i.cat,done:i.done,source:i.source||""}))
+  });
+  save();
+  renderHistory();
+}
+function moveDoneToHistoryIfAllDone(){
+  if(state.list.length && state.list.every(i=>i.done)){
+    archiveCurrentList("Liste terminée");
+    state.list = [];
+    save();
+    renderList();
+    renderHero();
+    showToast("Liste terminée archivée");
+  }
+}
+
+function bind(){
+  $("#toggleTheme").onclick=()=>{ state.theme = state.theme==="dark" ? "light" : "dark"; applyTheme(); save(); showToast("Thème changé"); };
+  $("#openGuide").onclick=openGuide;
+  $("#openQuiz").onclick=()=>openQuiz();
+  $("#openSettings").onclick=()=>{ $("#settingsOverlay").classList.remove("hidden"); $("#settingsApiKey").value = state.apiKey || ""; $("#settingsModel").value = state.aiModel || "gemini-2.5-flash"; };
+  $("#closeSettings").onclick=()=>$("#settingsOverlay").classList.add("hidden");
+  $("#settingsTheme").onclick=()=>$("#toggleTheme").click();
+  $("#settingsApiKey").value = state.apiKey || "";
+  $("#settingsModel").value = state.aiModel || "gemini-2.5-flash";
+  $("#saveApiKey").onclick=()=>{ state.apiKey = $("#settingsApiKey").value.trim(); state.aiModel = $("#settingsModel").value; save(); showToast("Clé API enregistrée"); };
+  $("#clearApiKey").onclick=()=>{ state.apiKey = ""; save(); $("#settingsApiKey").value=""; showToast("Clé API effacée"); };
+  $("#settingsGuide").onclick=()=>{ $("#settingsOverlay").classList.add("hidden"); openGuide(); };
+  $("#exportData").onclick=()=>{
+    const blob = new Blob([JSON.stringify({profiles:state.profiles,list:state.list,homeBase:state.homeBase,history:state.history,fridge:state.fridge,favoriteLists:state.favoriteLists,aiModel:state.aiModel},null,2)], {type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='maison-gourmet-export.json'; a.click(); URL.revokeObjectURL(a.href);
+  };
+  $("#resetLists").onclick=()=>{ state.list=[]; save(); renderList(); renderHero(); showToast("Liste vidée"); };
+
+  $("#skipGuide").onclick=()=>$("#guideOverlay").classList.add("hidden");
+  $("#prevGuide").onclick=()=>{ if(guideStep>0){guideStep--; drawGuide();} };
+  $("#nextGuide").onclick=()=>{ if(guideStep<2){guideStep++; drawGuide();} else { $("#guideOverlay").classList.add("hidden"); localStorage.setItem("mglu_guide_seen","1"); } };
+  $("#skipQuiz").onclick=()=>$("#quizOverlay").classList.add("hidden");
+  $("#saveQuiz").onclick=()=>{
+    let p=state.profiles.find(x=>x.id===editingProfileId);
+    if(!p){ p={id:uid(),name:"Profil",quiz:{}}; state.profiles.push(p); editingProfileId=p.id; }
+    p.name=$("#qName").value.trim() || p.name;
+    p.quiz={age:$("#qAge").value,height:$("#qHeight").value,weight:$("#qWeight").value,allergies:$("#qAllergies").value.trim(),likes:$("#qLikes").value.trim(),dislikes:$("#qDislikes").value.trim(),goal:$("#qGoal").value};
+    state.activeProfileId=p.id;
+    save(); renderAll(); $("#quizOverlay").classList.add("hidden"); showToast("Quiz enregistré");
+  };
+  $("#addProfile").onclick=()=>{
+    const n=$("#newProfileName").value.trim(); if(!n) return showToast("Entre un nom");
+    const p={id:uid(),name:n,pin:"",quiz:{age:"",height:"",weight:"",allergies:"",likes:"",dislikes:"",goal:""}}; state.profiles.push(p); state.activeProfileId=p.id; $("#newProfileName").value=""; save(); renderAll(); openQuiz(p.id);
+  };
+  $("#profilesList").onclick=e=>{
+    const pick=e.target.closest("[data-pick]"); const del=e.target.closest("[data-delprofile]"); const q=e.target.closest("[data-editquiz]"); const pinBtn=e.target.closest("[data-setpin]");
+    if(pick){
+      const target = state.profiles.find(x=>x.id===pick.dataset.pick);
+      if(target?.pin){
+        const entered = prompt(`Entre le code du profil ${target.name}`);
+        if(entered !== target.pin){ showToast("Code incorrect"); return; }
+      }
+      state.activeProfileId=pick.dataset.pick; save(); renderAll();
+    }
+    if(q){ openQuiz(q.dataset.editquiz); }
+    if(pinBtn){
+      const target = state.profiles.find(x=>x.id===pinBtn.dataset.setpin);
+      const newPin = prompt(`Code PIN pour ${target.name} (laisser vide pour supprimer)`, target.pin || "");
+      if(newPin===null) return;
+      target.pin = newPin.trim();
+      save(); renderProfiles(); showToast("Code mis à jour");
+    }
+    if(del){
+      if(state.profiles.length===1) return showToast("Il faut garder au moins un profil");
+      state.profiles=state.profiles.filter(x=>x.id!==del.dataset.delprofile);
+      if(!state.profiles.find(x=>x.id===state.activeProfileId)) state.activeProfileId=state.profiles[0].id;
+      save(); renderAll();
+    }
+  };
+
+  $("#catalogCats").onclick=e=>{
+    const b=e.target.closest("[data-cat]"); if(!b) return;
+    state.catalogCategory=b.dataset.cat; save(); renderCatalog();
+  };
+  $("#catalogToHome").onclick=()=>{ state.catalogTarget="home"; save(); renderCatalog(); };
+  $("#catalogToList").onclick=()=>{ state.catalogTarget="list"; save(); renderCatalog(); };
+  $("#catalogSearch").oninput=renderCatalog;
+  $("#catalogItems").onclick=e=>{
+    const add=e.target.closest("[data-addsingle]");
+    if(add){
+      const name=add.dataset.addsingle;
+      if(state.catalogTarget==="home"){ addToHome(name,"",state.catalogCategory); renderHomeCheck(); showToast(name+" ajouté à Maison"); }
+      else { addToList(name,"",state.catalogCategory,"catalogue"); renderList(); renderHero(); showToast(name+" ajouté à Courses"); }
+      save();
+    }
+  };
+  $("#catalogItems").onchange=e=>{
+    const c=e.target.closest("[data-catalogname]"); if(!c) return;
+    state.selectedCatalog[c.dataset.catalogname]=c.checked;
+  };
+
+  $("#addHomeItem").onclick=()=>{
+    const n=$("#homeName").value.trim(); if(!n) return showToast("Ajoute un article");
+    addToHome(n,$("#homeQty").value.trim(),$("#homeCat").value);
+    $("#homeName").value=""; $("#homeQty").value="";
+    save(); renderHomeCheck(); showToast("Ajouté à ta base maison");
+  };
+  $("#homeCheckList").onclick=e=>{
+    const t=e.target.closest("[data-togglehome]"); const d=e.target.closest("[data-delhome]");
+    if(t){ const it=state.homeBase.find(x=>x.id===t.dataset.togglehome); it.missing=!it.missing; save(); renderHomeCheck(); renderHero(); }
+    if(d){ state.homeBase=state.homeBase.filter(x=>x.id!==d.dataset.delhome); save(); renderHomeCheck(); renderHero(); }
+  };
+  $("#sendMissingToList").onclick=()=>{
+    const missing = state.homeBase.filter(x=>x.missing);
+    if(!missing.length) return showToast("Aucun article manquant");
+    missing.forEach(m=>addToList(m.name,m.qty,m.cat,"maison"));
+    save(); renderList(); renderHero(); showToast("Les manquants ont été ajoutés à la liste");
+  };
+  $("#clearMissing").onclick=()=>{
+    state.homeBase.forEach(x=>x.missing=false); save(); renderHomeCheck(); renderHero(); showToast("Manquants réinitialisés");
+  };
+
+  $("#addFridge").onclick=()=>{
+    const name=$("#fridgeName").value.trim(); if(!name) return showToast("Ajoute un produit");
+    state.fridge.unshift({id:uid(),name,qty:$("#fridgeQty").value.trim(),type:$("#fridgeType").value}); $("#fridgeName").value=""; $("#fridgeQty").value=""; save(); renderFridge(); renderHero(); showToast("Ajouté au frigo");
+  };
+  $("#findFromFridge").onclick=findFromFridge;
+  $("#fridgeList").onclick=e=>{
+    const b=e.target.closest("[data-delfridge]"); if(!b) return;
+    state.fridge=state.fridge.filter(x=>x.id!==b.dataset.delfridge); save(); renderFridge(); renderHero();
+  };
+
+  $("#generateWeek").onclick=()=>generateWeek($("#weekMode").value);
+  $("#weekToList").onclick=()=>{ state.schedule.forEach(s=>{ if(s.recipeId) addIngredients(s.recipeId); }); };
+  $("#schedule").onchange=e=>{
+    const s=e.target.closest("select[data-day]"); if(!s) return;
+    const day=state.schedule.find(x=>x.day===s.dataset.day); day.recipeId=s.value||null; save(); renderSchedule();
+  };
+
+  $("#addItem").onclick=()=>{
+    const n=$("#itemName").value.trim(); if(!n) return showToast("Ajoute un article");
+    addToList(n,$("#itemQty").value.trim(),$("#itemCat").value,"manuel");
+    if(!state.recurring.includes(n.toLowerCase())) state.recurring.push(n.toLowerCase());
+    $("#itemName").value=""; $("#itemQty").value=""; save(); renderList(); renderProfiles(); renderHero();
+  };
+  $("#shoppingList").onclick=e=>{
+    const t=e.target.closest("[data-toggleitem]"); const d=e.target.closest("[data-delitem]");
+    if(t){ const it=state.list.find(x=>x.id===t.dataset.toggleitem); it.done=!it.done; save(); renderList(); renderHero(); moveDoneToHistoryIfAllDone(); }
+    if(d){ state.list=state.list.filter(x=>x.id!==d.dataset.delitem); save(); renderList(); renderHero(); }
+  };
+  $("#removeDone").onclick=()=>{
+    const done = state.list.filter(x=>x.done);
+    if(done.length){
+      state.history.unshift({id:uid(), title:"Articles cochés retirés", date:new Date().toLocaleString("fr-FR"), items:done.map(i=>({name:i.name,qty:i.qty,cat:i.cat,done:true,source:i.source||""}))});
+    }
+    state.list=state.list.filter(x=>!x.done); save(); renderList(); renderHero(); renderHistory(); };
+  $("#clearActiveList").onclick=()=>{ state.list=[]; save(); renderList(); renderHero(); showToast("Liste active vidée"); };
+  $("#archiveCurrentList").onclick=()=>{ archiveCurrentList("Liste archivée manuellement"); state.list=[]; save(); renderList(); renderHero(); renderHistory(); showToast("Liste archivée"); };
+  $("#saveFavoriteList").onclick=()=>{
+    if(!state.list.length) return showToast("La liste est vide");
+    const title = prompt("Nom du favori de liste :", "Ma liste favorite");
+    if(!title) return;
+    state.favoriteLists.unshift({id:uid(), title, items: state.list.map(i=>({name:i.name,qty:i.qty,cat:i.cat}))});
+    save(); renderFavoriteLists(); showToast("Favori enregistré");
+  };
+  $("#favoriteLists").onclick=e=>{
+    const l=e.target.closest("[data-loadfav]"), d=e.target.closest("[data-delfav]");
+    if(l){
+      const fav=state.favoriteLists.find(x=>x.id===l.dataset.loadfav);
+      fav.items.forEach(i=>addToList(i.name,i.qty,i.cat,"favori"));
+      save(); renderList(); renderHero(); showToast("Favori chargé dans la liste");
+    }
+    if(d){
+      state.favoriteLists=state.favoriteLists.filter(x=>x.id!==d.dataset.delfav);
+      save(); renderFavoriteLists();
+    }
+  };
+  $("#shareList").onclick=()=>{
+    const text="Ma liste de courses\n\n"+state.list.map(i=>`${i.done?'✓':'•'} ${i.name}${i.qty?" ("+i.qty+")":""}`).join("\n");
+    if(navigator.share) navigator.share({title:"Liste de courses",text}).catch(()=>{});
+    else if(navigator.clipboard) navigator.clipboard.writeText(text).then(()=>showToast("Liste copiée"));
+    else alert(text);
+  };
+
+  $("#recipeSearch").oninput=renderRecipes;
+  $("#recipes").onclick=e=>{
+    const f=e.target.closest("[data-fav]"), o=e.target.closest("[data-openrecipe]"), l=e.target.closest("[data-addtolist]"), m=e.target.closest("[data-addtomenu]");
+    if(f){ const idr=f.dataset.fav; state.favs=state.favs.includes(idr)?state.favs.filter(x=>x!==idr):[...state.favs,idr]; save(); renderRecipes(); }
+    if(o) openRecipe(o.dataset.openrecipe);
+    if(l) addIngredients(l.dataset.addtolist);
+    if(m){ const free=state.schedule.find(x=>!x.recipeId) || state.schedule[0]; free.recipeId=m.dataset.addtomenu; save(); renderSchedule(); showToast("Ajouté au menu"); }
+  };
+  $("#recipeOverlay").onclick=e=>{ if(e.target.id==="recipeOverlay") $("#recipeOverlay").classList.add("hidden"); };
+
+  $("#historyList").onclick=e=>{
+    const r=e.target.closest("[data-reloadhistory]"); const d=e.target.closest("[data-delhistory]");
+    if(r){
+      const h=state.history.find(x=>x.id===r.dataset.reloadhistory);
+      if(!h) return;
+      h.items.forEach(i=>addToList(i.name,i.qty,i.cat,"historique"));
+      save(); renderList(); renderHero(); showToast("Historique rechargé dans la liste");
+    }
+    if(d){
+      state.history = state.history.filter(x=>x.id!==d.dataset.delhistory);
+      save(); renderHistory();
+    }
+  };
+
+  $("#quickTonight").onclick=()=>{ switchView("recipes"); $("#recipeSearch").value=smartSuggestion().name.split(" ")[0]; renderRecipes(); };
+  $("#quickWeek").onclick=()=>{ switchView("menu"); generateWeek(activeProfile()?.quiz?.goal || "Équilibré"); };
+  $("#quickRestes").onclick=()=>{ switchView("fridge"); findFromFridge(); };
+
+  $("#sendChat").onclick=async ()=>{ 
+    const t=$("#chatInput").value.trim(); if(!t) return; 
+    state.chats.push({role:"me",text:t}); 
+    $("#chatInput").value=""; 
+    state.chats.push({role:"bot",text:"Le chef réfléchit..."});
+    save(); renderChat();
+    try{
+      const reply = await askChefWithGemini(t);
+      state.chats[state.chats.length-1] = {role:"bot", text: reply};
+    }catch(err){
+      state.chats[state.chats.length-1] = {role:"bot", text: fakeReply(t)};
+      showToast("Réponse locale utilisée");
+    }
+    save(); renderChat(); 
+  };
+  $("#chatInput").onkeydown=e=>{ if(e.key==="Enter") $("#sendChat").click(); };
+
+  $$(".tab").forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+}
+function switchView(v){
+  $$(".view").forEach(x=>x.classList.add("hidden")); $("#view-"+v).classList.remove("hidden");
+  $$(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
+}
+function renderAll(){
+  applyTheme(); renderHero(); renderProfiles(); renderCatalog(); renderHomeCheck(); renderFridge(); renderSchedule(); renderList(); renderFavoriteLists(); renderRecipes(); renderHistory(); renderChat();
+}
+bind(); renderAll(); drawGuide();
+if(localStorage.getItem("mglu_guide_seen")!=="1") $("#guideOverlay").classList.remove("hidden");
+</script>
+</body>
+</html>

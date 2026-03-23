@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Maison Gourmet Mobile V5</title>
+  <title>Maison Gourmet Mobile V7</title>
   <meta name="theme-color" content="#0e1830">
   <style>
     :root{
@@ -22,7 +22,10 @@
       --radius:24px;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;background:radial-gradient(circle at top right, rgba(137,171,255,.13), transparent 28%),radial-gradient(circle at top left, rgba(216,178,96,.12), transparent 20%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+    html,body{margin:0;background:
+      radial-gradient(circle at top right, rgba(137,171,255,.13), transparent 28%),
+      radial-gradient(circle at top left, rgba(216,178,96,.12), transparent 20%),
+      var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
     body{min-height:100vh}
     button,input,select,textarea{font:inherit}
     .app{max-width:460px;margin:0 auto;padding:10px 12px 90px}
@@ -81,19 +84,18 @@
     .dots{display:flex;justify-content:center;gap:8px;margin:14px 0}
     .dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.18)}
     .dot.active{width:24px;background:linear-gradient(135deg,var(--gold),var(--blue))}
-    .profileCard{padding:14px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer}
-    .profileCard.active{background:linear-gradient(135deg, rgba(216,178,96,.22), rgba(137,171,255,.18));border-color:rgba(216,178,96,.34)}
-    .profileCard .name{font-size:1rem;font-weight:700}
+    .profileCard,.typeCard{padding:14px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer}
+    .profileCard.active,.typeCard.active{background:linear-gradient(135deg, rgba(216,178,96,.22), rgba(137,171,255,.18));border-color:rgba(216,178,96,.34)}
+    .profileCard .name,.typeCard .name{font-size:1rem;font-weight:700}
     .profileMeta{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
     .pill{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.72rem}
-    .introCard{padding:16px;border-radius:22px;background:rgba(255,255,255,.05);border:1px solid var(--line);min-height:180px}
+    .introCard{padding:16px;border-radius:22px;background:rgba(255,255,255,.05);border:1px solid var(--line);min-height:210px}
     .introIllu{font-size:2rem;margin-bottom:10px}
     .catalogRow,.shoppingRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
     .catalogActions,.shoppingActions{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
     .qtyBox{display:inline-flex;align-items:center;gap:8px;padding:6px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
     .qtyBtn{width:28px;height:28px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
     .qtyValue{min-width:22px;text-align:center}
-    .toggle{display:inline-flex;gap:8px;align-items:center}
     .weekHeader{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding-bottom:4px}
     .weekHeader::-webkit-scrollbar{display:none}
     .dayChip{white-space:nowrap}
@@ -105,7 +107,20 @@
     .recipeCard img,.recipeHero img{width:100%;height:150px;object-fit:cover;border-radius:16px;border:1px solid var(--line);margin-top:10px}
     .recipeTags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
     .recipeTags span{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.72rem}
-    .chatList{display:grid;gap:10px;max-height:360px;overflow:auto;margin-top:10px}
+    .chatList{display:grid;gap:10px;max-height:430px;min-height:240px;overflow:auto;margin-top:10px;padding-right:2px}
+    .promptRail{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding-bottom:4px}
+    .promptRail::-webkit-scrollbar{display:none}
+    .miniChip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.76rem;white-space:nowrap;cursor:pointer}
+    .miniChip.active{background:linear-gradient(135deg, rgba(216,178,96,.24), rgba(137,171,255,.22));border-color:rgba(216,178,96,.34)}
+    .coachCardCompact{padding:12px}
+    .coachTools{display:grid;gap:10px}
+    .coachCollapsed #coachPromptsWrap,.coachCollapsed #coachInputWrap{display:none}
+    .coachCollapsed .chatList{max-height:520px}
+    .fridgeTop{display:grid;gap:10px}
+    .togglePill{padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:.72rem}
+    .togglePill.fast{background:rgba(216,178,96,.14);border-color:rgba(216,178,96,.32)}
+    .item.soft{background:rgba(255,255,255,.03)}
+
     .bubble{max-width:88%;padding:12px 14px;border-radius:18px;line-height:1.45}
     .bubble.me{justify-self:end;background:linear-gradient(135deg, rgba(216,178,96,.25), rgba(137,171,255,.22));border:1px solid var(--line)}
     .bubble.bot{justify-self:start;background:rgba(255,255,255,.05);border:1px solid var(--line)}
@@ -120,99 +135,121 @@
     .sourceTag{padding:5px 8px;border-radius:999px;background:rgba(137,171,255,.14);border:1px solid rgba(137,171,255,.22);font-size:.72rem}
     .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:140;padding:12px 15px;border-radius:14px;background:rgba(8,13,24,.96);border:1px solid rgba(255,255,255,.08);color:#fff;opacity:0;pointer-events:none;transition:.2s}
     .toast.show{opacity:1}
+    .stepHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .stepLabel{color:var(--muted);font-size:.8rem}
+    .bigNumber{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:.95rem}
+    .quizTab{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:.78rem;cursor:pointer}
+    .quizTab.active{background:linear-gradient(135deg, rgba(216,178,96,.24), rgba(137,171,255,.22));border-color:rgba(216,178,96,.34)}
+    .groupTitle{font-size:.85rem;color:var(--muted);margin-top:4px}
+    .tip{padding:12px;border-radius:18px;background:rgba(137,171,255,.08);border:1px solid rgba(137,171,255,.18)}
+    .sectionTitleRow{display:flex;justify-content:space-between;gap:8px;align-items:center}
   </style>
 </head>
 <body>
   <div class="overlay" id="onboardingOverlay">
     <div class="sheet">
-      <div class="between">
+      <div class="stepHead">
         <div>
-          <div class="badge">DÉMARRAGE MOBILE</div>
-          <h2 style="margin-top:10px">Recettes, semaine, courses et coach dans une seule app</h2>
-          <p class="sub" style="margin-top:6px">On commence par le profil, puis on t’explique en 30 secondes ce que l’app va vraiment t’apporter.</p>
+          <div class="badge" id="obBadge">DÉCOUVERTE</div>
+          <h2 style="margin-top:10px" id="obTitle">Bienvenue dans l’application</h2>
+          <p class="sub" style="margin-top:6px" id="obLead">Repas, recettes, programme semaine, liste de courses et coach IA dans une seule app mobile.</p>
         </div>
-        <button class="iconBtn" id="skipOnboardingBtn">✕</button>
+        <button class="iconBtn" id="closeOnboardingBtn">✕</button>
       </div>
-      <div class="dots">
-        <span class="dot active" data-ob-dot="0"></span>
-        <span class="dot" data-ob-dot="1"></span>
-        <span class="dot" data-ob-dot="2"></span>
-      </div>
+      <div class="dots" id="onboardingDots"></div>
 
-      <div id="obStep0">
-        <div id="profilesStart" class="grid"></div>
-        <div class="divider"></div>
-        <div class="grid">
-          <input class="input" id="newProfileName" placeholder="Nom du nouveau profil">
-          <div class="grid2">
-            <select class="select" id="newProfileType">
-              <option>Solo</option>
-              <option>Duo</option>
-              <option>Famille</option>
-              <option>Sur mesure</option>
-            </select>
-            <input class="input" id="newProfilePin" placeholder="Code PIN optionnel">
+      <div id="step-intro">
+        <div class="introCard" id="introSlideCard"></div>
+        <div class="between" style="margin-top:14px">
+          <button class="btn ghost" id="introGuestBtn">Mode invité</button>
+          <div class="row">
+            <button class="btn" id="introPrevBtn">Retour</button>
+            <button class="btn primary" id="introNextBtn">Suivant</button>
           </div>
-          <button class="btn primary full" id="createProfileBtn">Créer le profil</button>
-        </div>
-        <div class="between" style="margin-top:14px">
-          <button class="btn ghost" id="enterDirectBtn">Entrer directement</button>
-          <button class="btn primary" id="toIntroBtn">Continuer</button>
         </div>
       </div>
 
-      <div id="obStep1" class="hidden">
-        <div class="introCard" id="introCard"></div>
-        <div class="between" style="margin-top:14px">
-          <button class="btn" id="introPrevBtn">Retour</button>
-          <button class="btn primary" id="introNextBtn">Suivant</button>
-        </div>
-      </div>
-
-      <div id="obStep2" class="hidden">
+      <div id="step-account" class="hidden">
         <div class="grid">
+          <div class="tip">
+            <div class="small">Crée ton compte pour tout personnaliser, ou utilise le mode invité si tu veux juste découvrir l’application.</div>
+          </div>
+          <div class="sectionTitleRow">
+            <h3>Profils enregistrés</h3>
+            <span class="pill" id="profilesCountPill">0 profil</span>
+          </div>
+          <div id="profilesStart" class="grid"></div>
+          <div class="grid2" style="margin-top:6px">
+            <button class="btn primary full" id="startCreateBtn">Créer un compte</button>
+            <button class="btn full" id="accountGuestBtn">Mode invité</button>
+          </div>
+          <div class="grid2" id="existingProfileActions" style="display:none">
+            <button class="btn full" id="useSelectedProfileBtn">Utiliser ce profil</button>
+            <button class="btn full" id="editSelectedProfileBtn">Modifier ce profil</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-type" class="hidden">
+        <div class="grid">
+          <div class="tip">
+            <div class="small">Choisis d’abord le type de foyer. Ensuite on lance un quiz court, mais complet, pour tout personnaliser.</div>
+          </div>
+          <div class="grid" id="typeCards"></div>
+        </div>
+        <div class="between" style="margin-top:14px">
+          <button class="btn" id="typeBackBtn">Retour</button>
+          <button class="btn primary" id="typeNextBtn">Continuer</button>
+        </div>
+      </div>
+
+      <div id="step-quiz" class="hidden">
+        <div class="chips" id="quizTabs"></div>
+        <div id="quizPanel0" class="grid" style="margin-top:12px">
           <div class="grid2">
             <input class="input" id="qName" placeholder="Nom du profil">
-            <select class="select" id="qType">
-              <option>Solo</option>
-              <option>Duo</option>
-              <option>Famille</option>
-              <option>Sur mesure</option>
+            <input class="input" id="qPin" placeholder="Code PIN optionnel">
+          </div>
+          <div class="grid2">
+            <select class="select" id="qType"></select>
+            <input class="input" id="qPersons" type="number" min="1" placeholder="Nombre de personnes">
+          </div>
+          <div class="grid2">
+            <input class="input" id="qAge" type="number" min="0" placeholder="Âge de référence">
+            <select class="select" id="qCookingLevel">
+              <option value="débutant">Cuisine débutant</option>
+              <option value="intermédiaire">Cuisine intermédiaire</option>
+              <option value="à l’aise">Cuisine à l’aise</option>
             </select>
           </div>
-          <div class="grid2">
-            <input class="input" id="qPersons" type="number" min="1" placeholder="Nombre de personnes">
-            <input class="input" id="qAge" type="number" min="0" placeholder="Âge">
-          </div>
-          <div class="grid2">
-            <input class="input" id="qHeight" type="number" min="0" placeholder="Taille (cm)">
-            <input class="input" id="qWeight" type="number" min="0" placeholder="Poids (kg)">
-          </div>
+        </div>
+        <div id="quizPanel1" class="grid hidden" style="margin-top:12px">
           <div class="grid2">
             <select class="select" id="qGoal">
               <option>Équilibre</option>
+              <option>Forme</option>
               <option>Petit budget</option>
-              <option>Rapide</option>
               <option>Perte de poids</option>
               <option>Prise de muscle</option>
+              <option>Organisation</option>
               <option>Gourmand</option>
             </select>
             <select class="select" id="qStyle">
-              <option>Classique</option>
+              <option>Rapide</option>
+              <option>Familial</option>
               <option>Protéiné</option>
               <option>Équilibré</option>
               <option>Végétarien</option>
-              <option>Sans lactose</option>
               <option>Halal</option>
               <option>Anti-gaspi</option>
-              <option>Express</option>
+              <option>Batch cooking</option>
             </select>
           </div>
           <div class="grid2">
             <select class="select" id="qBudget">
               <option value="serre">Budget serré</option>
               <option value="normal">Budget normal</option>
-              <option value="plaisir">Budget plaisir</option>
+              <option value="plaisir">Budget confort</option>
             </select>
             <select class="select" id="qTime">
               <option value="15">15 min max</option>
@@ -221,18 +258,44 @@
               <option value="60">60 min max</option>
             </select>
           </div>
-          <select class="select" id="qSport">
-            <option value="doux">Sport doux</option>
-            <option value="modere">Sport modéré</option>
-            <option value="intense">Sport intense</option>
-          </select>
+          <div class="grid2">
+            <input class="input" id="qHeight" type="number" min="0" placeholder="Taille (cm)">
+            <input class="input" id="qWeight" type="number" min="0" placeholder="Poids (kg)">
+          </div>
+          <div class="grid2">
+            <select class="select" id="qSport">
+              <option value="doux">Sport doux</option>
+              <option value="modere">Sport modéré</option>
+              <option value="intense">Sport intense</option>
+            </select>
+            <select class="select" id="qNutrition">
+              <option value="equilibre">Besoin : équilibre</option>
+              <option value="proteines">Besoin : plus de protéines</option>
+              <option value="leger">Besoin : léger le soir</option>
+              <option value="fibres">Besoin : plus de fibres</option>
+              <option value="energie">Besoin : plus d’énergie</option>
+            </select>
+          </div>
+        </div>
+        <div id="quizPanel2" class="grid hidden" style="margin-top:12px">
           <textarea class="textarea" id="qAllergies" placeholder="Allergies ou intolérances"></textarea>
           <textarea class="textarea" id="qLikes" placeholder="Ce que tu aimes manger"></textarea>
           <textarea class="textarea" id="qDislikes" placeholder="Ce que tu ne veux jamais voir"></textarea>
         </div>
         <div class="between" style="margin-top:14px">
-          <button class="btn" id="backToIntroBtn">Retour</button>
-          <button class="btn primary" id="finishOnboardingBtn">Entrer dans l’app</button>
+          <button class="btn" id="quizBackBtn">Retour</button>
+          <div class="row">
+            <button class="btn" id="quizPrevBtn">Étape précédente</button>
+            <button class="btn primary" id="quizNextBtn">Étape suivante</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-tutorial" class="hidden">
+        <div class="introCard" id="tutorialSlideCard"></div>
+        <div class="between" style="margin-top:14px">
+          <button class="btn" id="tutorialPrevBtn">Retour</button>
+          <button class="btn primary" id="tutorialNextBtn">Commencer</button>
         </div>
       </div>
     </div>
@@ -251,6 +314,7 @@
       <div class="drawerLinks">
         <button class="drawerLink active" data-view="home">Accueil</button>
         <button class="drawerLink" data-view="catalog">Catalogue</button>
+        <button class="drawerLink" data-view="fridge">Frigo</button>
         <button class="drawerLink" data-view="shopping">Liste de courses</button>
         <button class="drawerLink" data-view="week">Programme semaine</button>
         <button class="drawerLink" data-view="recipes">Recettes</button>
@@ -277,7 +341,6 @@
         </div>
         <button class="iconBtn" data-close="weekPickerModal">✕</button>
       </div>
-      <div class="chips" id="weekPickerFilters" style="margin-top:12px"></div>
       <div class="list" id="weekPickerList" style="margin-top:12px"></div>
     </div>
   </div>
@@ -318,9 +381,9 @@
       <button class="iconBtn" id="openDrawerBtn">☰</button>
       <div class="headerTitle">
         <h1>Maison Gourmet</h1>
-        <div class="headerMeta"><span id="headerPage">Accueil</span> · <span id="headerProfile">Solo</span></div>
+        <div class="headerMeta"><span id="headerPage">Accueil</span> · <span id="headerProfile">Invité</span></div>
       </div>
-      <div class="badge" id="headerGoal">Équilibre</div>
+      <div class="badge" id="headerGoal">Découverte</div>
     </header>
 
     <section class="section view active" id="view-home">
@@ -335,34 +398,54 @@
         <div class="stats">
           <div class="stat"><div class="k">Repas planifiés</div><div class="v" id="homePlanned">0</div></div>
           <div class="stat"><div class="k">Articles à acheter</div><div class="v" id="homeShoppingCount">0</div></div>
-          <div class="stat"><div class="k">Budget estimé</div><div class="v" id="homeBudget">0 €</div></div>
+          <div class="stat"><div class="k">Recettes visibles</div><div class="v" id="homeRecipeCount">0</div></div>
         </div>
       </div>
-      <div class="actions3">
-        <button class="quickBtn" id="homeWeekBtn">Programme semaine<small>Petit-déjeuner, déjeuner, goûter, repas du soir</small></button>
-        <button class="quickBtn" id="homeRecipesBtn">Recettes<small>Choisis, crée, masque, ajoute selon le nombre de personnes</small></button>
-        <button class="quickBtn" id="homeShoppingBtn">Liste de courses<small>Mode simple pour le supermarché, avec quantités</small></button>
+      <div class="card section">
+        <div class="between">
+          <div>
+            <h3>Ma semaine</h3>
+            <p class="sub small">Le cœur de l’app : tu planifies, puis tu passes en liste de courses.</p>
+          </div>
+          <button class="btn" id="homeCoachBtn">Coach IA</button>
+        </div>
+        <div class="actions3">
+          <button class="quickBtn" id="homeWeekBtn">Programme semaine<small>Petit-déjeuner, déjeuner, goûter, repas du soir</small></button>
+          <button class="quickBtn" id="homeRecipesBtn">Recettes<small>50 recettes classées + recettes perso + quantités ajustables</small></button>
+          <button class="quickBtn" id="homeShoppingBtn">Liste de courses<small>Mode supermarché, quantités, cases à cocher et doublons fusionnés</small></button>
+        </div>
       </div>
       <div class="card section">
         <div class="between">
           <div>
             <h3>Suggestion du jour</h3>
-            <p class="sub small">Une idée simple selon ton profil actif.</p>
+            <p class="sub small">Une idée cohérente avec ton profil actif.</p>
           </div>
-          <button class="btn" id="homeCoachBtn">Coach IA</button>
+          <button class="btn" id="homeOpenIntroBtn">Guide</button>
         </div>
         <div id="homeSuggestion" style="margin-top:12px"></div>
       </div>
     </section>
 
-    <section class="section view" id="view-catalog">
+    
+<section class="section view" id="view-catalog">
       <div class="card">
         <div class="between">
           <div>
             <h2>Catalogue</h2>
-            <p class="sub small">Masque ce que tu n’achètes jamais, puis remets-le quand tu veux.</p>
+            <p class="sub small">Tout démarre à 0. Tu ajoutes tes quantités, tu peux créer tes propres produits, les masquer, puis les remettre quand tu veux.</p>
           </div>
-          <button class="btn" id="toggleHiddenProductsBtn">Articles masqués</button>
+          <button class="btn" id="toggleHiddenProductsBtn">Masqués</button>
+        </div>
+        <div id="addProductWrap" class="fridgeTop" style="margin-top:12px">
+          <div class="grid2">
+            <input class="input" id="newCatalogItemName" placeholder="Créer un produit">
+            <select class="select" id="newCatalogItemCategory"></select>
+          </div>
+          <div class="grid2">
+            <input class="input" id="newCatalogItemUnit" placeholder="Unité (pièce, g, L...)">
+            <button class="btn primary" id="saveCatalogItemBtn">Ajouter au catalogue</button>
+          </div>
         </div>
         <div class="chips" id="catalogTabs" style="margin-top:12px"></div>
         <input class="input" id="catalogSearch" placeholder="Rechercher un article" style="margin-top:12px">
@@ -374,12 +457,36 @@
       </div>
     </section>
 
+    <section class="section view" id="view-fridge">
+      <div class="card">
+        <div class="between">
+          <div>
+            <h2>Frigo</h2>
+            <p class="sub small">Ajoute simplement ce que tu as chez toi, sans dates compliquées. Tu peux aussi marquer certains produits à utiliser vite.</p>
+          </div>
+          <button class="btn" id="fridgeIdeasBtn">Idées repas</button>
+        </div>
+        <div class="fridgeTop" style="margin-top:12px">
+          <div class="grid2">
+            <input class="input" id="fridgeItemName" placeholder="Produit du frigo">
+            <input class="input" id="fridgeItemQty" type="number" min="1" value="1" placeholder="Qté">
+          </div>
+          <div class="grid2">
+            <input class="input" id="fridgeItemUnit" placeholder="Unité (pièce, g, pot...)">
+            <button class="btn primary" id="saveFridgeItemBtn">Ajouter au frigo</button>
+          </div>
+        </div>
+        <div class="chips" id="fridgeQuickAdd" style="margin-top:12px"></div>
+        <div class="list" id="fridgeList" style="margin-top:12px"></div>
+      </div>
+    </section>
+
     <section class="section view" id="view-shopping">
       <div class="card">
         <div class="between">
           <div>
             <h2>Liste de courses</h2>
-            <p class="sub small">Pensée pour le supermarché, avec quantités, cases à cocher et doublons fusionnés.</p>
+            <p class="sub small">Pensée pour le supermarché, avec quantités, cases à cocher et tri par rayons.</p>
           </div>
           <button class="btn" id="clearDoneShoppingBtn">Retirer cochés</button>
         </div>
@@ -393,7 +500,7 @@
         <div class="between">
           <div>
             <h2>Programme semaine</h2>
-            <p class="sub small">4 moments par jour. Tu peux choisir, générer ou vider.</p>
+            <p class="sub small">4 moments par jour. Tu peux choisir, générer, ou tout envoyer dans la liste.</p>
           </div>
           <button class="btn" id="clearWeekBtn">Vider</button>
         </div>
@@ -421,7 +528,7 @@
         <div class="between">
           <div>
             <h2>Recettes</h2>
-            <p class="sub small">Sans porc, sans alcool, avec détails complets et quantités ajustables.</p>
+            <p class="sub small">50 recettes classées, détaillées, sans porc ni alcool, avec quantités ajustables.</p>
           </div>
           <button class="btn primary" id="openCustomRecipeBtn">＋</button>
         </div>
@@ -438,20 +545,29 @@
       </div>
     </section>
 
-    <section class="section view" id="view-coach">
-      <div class="card">
+    
+<section class="section view" id="view-coach">
+      <div class="card coachCardCompact" id="coachCard">
         <div class="between">
           <div>
             <h2>Coach IA</h2>
-            <p class="sub small">Cuisine, nutrition, diététique et sport. Toujours sans porc et sans alcool.</p>
+            <p class="sub small">Compact, avec historique léger, options rapides et zone de chat plus lisible sur téléphone.</p>
           </div>
-          <div class="badge">Expert</div>
+          <div class="row">
+            <button class="btn" id="toggleCoachCompactBtn">Réduire</button>
+            <button class="btn" id="clearCoachHistoryBtn">Effacer</button>
+          </div>
         </div>
-        <div class="chips" id="coachPrompts" style="margin-top:12px"></div>
-        <div class="chatList" id="chatList"></div>
-        <div class="grid" style="margin-top:12px">
-          <textarea class="textarea" id="coachInput" placeholder="Exemple : fais-moi une semaine équilibrée petit budget pour 2 personnes"></textarea>
-          <button class="btn primary full" id="sendCoachBtn">Envoyer</button>
+        <div class="coachTools" style="margin-top:12px">
+          <div id="coachPromptsWrap">
+            <div class="small muted" style="margin-bottom:8px">Choix rapides</div>
+            <div class="promptRail" id="coachPrompts"></div>
+          </div>
+          <div class="chatList" id="chatList"></div>
+          <div id="coachInputWrap" class="grid">
+            <textarea class="textarea" id="coachInput" placeholder="Exemple : propose-moi un dîner avec ce qu’il y a dans mon frigo"></textarea>
+            <button class="btn primary full" id="sendCoachBtn">Envoyer</button>
+          </div>
         </div>
       </div>
     </section>
@@ -460,9 +576,12 @@
       <div class="card grid">
         <div>
           <h2>Paramètres</h2>
-          <p class="sub small">Tu peux relancer le profil, changer la clé API ou remettre la démo à zéro.</p>
+          <p class="sub small">Tu peux revoir l’explication de l’app, le guide d’utilisation, le profil actif, ou réinitialiser la démo.</p>
         </div>
-        <button class="btn" id="reopenOnboardingBtn">Modifier le profil</button>
+        <button class="btn" id="reopenIntroBtn">Revoir l’explication de l’app</button>
+        <button class="btn" id="reopenTutorialBtn">Revoir comment utiliser l’app</button>
+        <button class="btn" id="reopenQuizBtn">Modifier le profil actif</button>
+        <button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button>
         <div class="grid2">
           <input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle">
           <button class="btn primary" id="saveApiKeyBtn">Enregistrer</button>
@@ -476,389 +595,667 @@
     const $ = s => document.querySelector(s);
     const $$ = s => [...document.querySelectorAll(s)];
     const uid = () => Math.random().toString(36).slice(2,10);
-    const STORE_KEY = 'maison-gourmet-mobile-v5';
+    const STORE_KEY = 'maison-gourmet-mobile-v7';
     const MEALS = ['Petit-déjeuner','Déjeuner','Goûter','Repas du soir'];
     const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-    const INTRO = [
-      {emoji:'🍽️', title:'Tu gagnes du temps tous les jours', text:'L’app t’aide à choisir quoi manger, quoi acheter et comment t’organiser sans réfléchir pendant des heures.'},
-      {emoji:'🗓️', title:'Tu programmes ta semaine facilement', text:'Petit-déjeuner, déjeuner, goûter, repas du soir : tu poses tes repas, tu ajustes et tu peux générer une liste automatiquement.'},
-      {emoji:'🧠', title:'Tu as un coach utile et cohérent', text:'Recettes, nutrition, diététique, sport : le coach t’aide avec des réponses claires, toujours sans porc et sans alcool.'}
-    ];
-    const PRICE_BY_CAT = {'Fruits & légumes':1.8,'Produits frais':2.5,'Épicerie':2.2,'Boissons sans alcool':1.6,'Surgelés':3.2};
-    const CATALOG_BASE = {
-      'Fruits & légumes':[
-        {name:'Pommes', unit:'pièce', defaultQty:4},{name:'Bananes', unit:'pièce', defaultQty:4},{name:'Oranges', unit:'pièce', defaultQty:4},{name:'Fraises', unit:'barquette', defaultQty:1},
-        {name:'Avocats', unit:'pièce', defaultQty:2},{name:'Tomates', unit:'pièce', defaultQty:6},{name:'Concombres', unit:'pièce', defaultQty:1},{name:'Salade', unit:'pièce', defaultQty:1},
-        {name:'Carottes', unit:'pièce', defaultQty:6},{name:'Courgettes', unit:'pièce', defaultQty:3},{name:'Brocoli', unit:'pièce', defaultQty:1},{name:'Poivrons', unit:'pièce', defaultQty:3},
-        {name:'Pommes de terre', unit:'pièce', defaultQty:6},{name:'Oignons', unit:'pièce', defaultQty:4},{name:'Citron', unit:'pièce', defaultQty:2},{name:'Champignons', unit:'barquette', defaultQty:1}
-      ],
-      'Produits frais':[
-        {name:'Œufs', unit:'pièce', defaultQty:6},{name:'Lait', unit:'L', defaultQty:1},{name:'Yaourts nature', unit:'pot', defaultQty:4},{name:'Fromage blanc', unit:'pot', defaultQty:1},
-        {name:'Mozzarella', unit:'boule', defaultQty:1},{name:'Feta', unit:'bloc', defaultQty:1},{name:'Parmesan', unit:'g', defaultQty:100},{name:'Beurre', unit:'g', defaultQty:250},
-        {name:'Poulet', unit:'g', defaultQty:400},{name:'Dinde', unit:'g', defaultQty:400},{name:'Tofu', unit:'g', defaultQty:200},{name:'Saumon', unit:'g', defaultQty:300}
-      ],
-      'Épicerie':[
-        {name:'Pâtes', unit:'g', defaultQty:500},{name:'Riz', unit:'g', defaultQty:500},{name:'Quinoa', unit:'g', defaultQty:400},{name:'Flocons d’avoine', unit:'g', defaultQty:500},
-        {name:'Semoule', unit:'g', defaultQty:500},{name:'Lentilles corail', unit:'g', defaultQty:400},{name:'Pois chiches', unit:'boîte', defaultQty:1},{name:'Haricots rouges', unit:'boîte', defaultQty:1},
-        {name:'Pain complet', unit:'paquet', defaultQty:1},{name:'Farine', unit:'g', defaultQty:500},{name:'Miel', unit:'pot', defaultQty:1},{name:'Huile d’olive', unit:'bouteille', defaultQty:1}
-      ],
-      'Boissons sans alcool':[
-        {name:'Eau pétillante', unit:'bouteille', defaultQty:2},{name:'Jus d’orange', unit:'L', defaultQty:1},{name:'Lait végétal', unit:'L', defaultQty:1},{name:'Thé glacé maison', unit:'bouteille', defaultQty:1}
-      ],
-      'Surgelés':[
-        {name:'Fruits rouges', unit:'sachet', defaultQty:1},{name:'Épinards', unit:'sachet', defaultQty:1},{name:'Mélange de légumes', unit:'sachet', defaultQty:1},{name:'Filets de poisson', unit:'pièce', defaultQty:2}
-      ]
-    };
+    const PROFILE_TYPES = ['Solo','Duo','Famille','Sur mesure'];
+    const INTRO_SLIDES = [{"emoji": "🍽️", "title": "Une app qui t’aide vraiment au quotidien", "text": "Tu sais plus facilement quoi manger, quoi acheter et comment t’organiser, sans perdre du temps."}, {"emoji": "🗓️", "title": "Repas, semaine et courses au même endroit", "text": "Tu choisis tes recettes, tu construis ton programme semaine et tu génères automatiquement ta liste de courses."}, {"emoji": "🧠", "title": "Un coach IA cuisine, nutrition et sport", "text": "L’IA te conseille de façon simple et cohérente, toujours sans porc et sans alcool."}];
+    const TUTORIAL_SLIDES = [{"emoji": "1", "title": "Choisis un profil ou crée ton compte", "text": "Solo, Duo, Famille ou Sur mesure : l’app s’adapte à ton foyer et à ton objectif."}, {"emoji": "2", "title": "Ajoute des recettes à ton programme semaine", "text": "Petit-déjeuner, déjeuner, goûter et repas du soir : tu organises toute ta semaine en quelques clics."}, {"emoji": "3", "title": "Génère ta liste de courses", "text": "Les ingrédients sont ajoutés avec les bonnes quantités, sans doublon, pour le supermarché."}, {"emoji": "4", "title": "Utilise le coach IA quand tu veux", "text": "Idées repas, nutrition, rééquilibrage, sport, substitutions : tu peux tout lui demander, toujours sans porc ni alcool."}];
+    const PRICE_BY_CAT = {"Fruits & légumes": 1.8, "Produits frais & protéines": 3.0, "Épicerie salée": 2.1, "Épicerie petit-déjeuner & goûter": 2.4, "Boissons sans alcool & surgelés": 2.2, "Hygiène": 3.2, "Ménage & papier": 3.4, "Autres": 2.0};
+    const CATALOG_BASE = {"Fruits & légumes": [{"name": "Pommes", "unit": "pièce", "defaultQty": 0}, {"name": "Bananes", "unit": "pièce", "defaultQty": 0}, {"name": "Oranges", "unit": "pièce", "defaultQty": 0}, {"name": "Fraises", "unit": "barquette", "defaultQty": 0}, {"name": "Mangue", "unit": "pièce", "defaultQty": 0}, {"name": "Poires", "unit": "pièce", "defaultQty": 0}, {"name": "Kiwi", "unit": "pièce", "defaultQty": 0}, {"name": "Avocats", "unit": "pièce", "defaultQty": 0}, {"name": "Tomates", "unit": "pièce", "defaultQty": 0}, {"name": "Concombres", "unit": "pièce", "defaultQty": 0}, {"name": "Salade", "unit": "pièce", "defaultQty": 0}, {"name": "Carottes", "unit": "pièce", "defaultQty": 0}, {"name": "Courgettes", "unit": "pièce", "defaultQty": 0}, {"name": "Brocoli", "unit": "pièce", "defaultQty": 0}, {"name": "Poivrons", "unit": "pièce", "defaultQty": 0}, {"name": "Pommes de terre", "unit": "pièce", "defaultQty": 0}, {"name": "Oignons", "unit": "pièce", "defaultQty": 0}, {"name": "Citron", "unit": "pièce", "defaultQty": 0}, {"name": "Champignons", "unit": "barquette", "defaultQty": 0}, {"name": "Épinards", "unit": "g", "defaultQty": 0}, {"name": "Petits pois", "unit": "g", "defaultQty": 0}, {"name": "Ail", "unit": "tête", "defaultQty": 0}, {"name": "Basilic", "unit": "botte", "defaultQty": 0}, {"name": "Persil", "unit": "botte", "defaultQty": 0}, {"name": "Patates douces", "unit": "pièce", "defaultQty": 0}, {"name": "Aubergines", "unit": "pièce", "defaultQty": 0}, {"name": "Haricots verts", "unit": "g", "defaultQty": 0}, {"name": "Maïs", "unit": "boîte", "defaultQty": 0}, {"name": "Céleri", "unit": "branche", "defaultQty": 0}, {"name": "Menthe", "unit": "botte", "defaultQty": 0}, {"name": "Fruits rouges", "unit": "g", "defaultQty": 0}], "Produits frais & protéines": [{"name": "Œufs", "unit": "pièce", "defaultQty": 0}, {"name": "Lait", "unit": "L", "defaultQty": 0}, {"name": "Yaourts nature", "unit": "pot", "defaultQty": 0}, {"name": "Fromage blanc", "unit": "pot", "defaultQty": 0}, {"name": "Mozzarella", "unit": "boule", "defaultQty": 0}, {"name": "Feta", "unit": "bloc", "defaultQty": 0}, {"name": "Parmesan", "unit": "g", "defaultQty": 0}, {"name": "Ricotta", "unit": "pot", "defaultQty": 0}, {"name": "Beurre", "unit": "g", "defaultQty": 0}, {"name": "Poulet", "unit": "g", "defaultQty": 0}, {"name": "Dinde", "unit": "g", "defaultQty": 0}, {"name": "Tofu", "unit": "g", "defaultQty": 0}, {"name": "Saumon", "unit": "g", "defaultQty": 0}, {"name": "Cabillaud", "unit": "g", "defaultQty": 0}, {"name": "Thon", "unit": "boîte", "defaultQty": 0}, {"name": "Crème légère", "unit": "cl", "defaultQty": 0}, {"name": "Crème fraîche", "unit": "pot", "defaultQty": 0}, {"name": "Lait de coco", "unit": "cl", "defaultQty": 0}, {"name": "Fromage râpé", "unit": "g", "defaultQty": 0}, {"name": "Emmental râpé", "unit": "g", "defaultQty": 0}, {"name": "Dinde fumée", "unit": "g", "defaultQty": 0}, {"name": "Pois chiches", "unit": "boîte", "defaultQty": 0}, {"name": "Lentilles corail", "unit": "g", "defaultQty": 0}, {"name": "Steak haché de bœuf", "unit": "g", "defaultQty": 0}, {"name": "Crevettes", "unit": "g", "defaultQty": 0}], "Épicerie salée": [{"name": "Pâtes", "unit": "g", "defaultQty": 0}, {"name": "Riz", "unit": "g", "defaultQty": 0}, {"name": "Quinoa", "unit": "g", "defaultQty": 0}, {"name": "Semoule", "unit": "g", "defaultQty": 0}, {"name": "Lentilles corail", "unit": "g", "defaultQty": 0}, {"name": "Pois chiches", "unit": "boîte", "defaultQty": 0}, {"name": "Maïs", "unit": "g", "defaultQty": 0}, {"name": "Nouilles", "unit": "g", "defaultQty": 0}, {"name": "Galettes de blé", "unit": "pièce", "defaultQty": 0}, {"name": "Pain complet", "unit": "paquet", "defaultQty": 0}, {"name": "Huile d’olive", "unit": "bouteille", "defaultQty": 0}, {"name": "Penne", "unit": "g", "defaultQty": 0}, {"name": "Spaghetti", "unit": "g", "defaultQty": 0}, {"name": "Fusilli", "unit": "g", "defaultQty": 0}, {"name": "Tagliatelles", "unit": "g", "defaultQty": 0}, {"name": "Macaronis", "unit": "g", "defaultQty": 0}, {"name": "Coquillettes", "unit": "g", "defaultQty": 0}, {"name": "Farine", "unit": "g", "defaultQty": 0}, {"name": "Bouillon", "unit": "cube", "defaultQty": 0}, {"name": "Tomates concassées", "unit": "boîte", "defaultQty": 0}, {"name": "Sauce tomate", "unit": "pot", "defaultQty": 0}, {"name": "Pesto", "unit": "pot", "defaultQty": 0}, {"name": "Wraps", "unit": "pièce", "defaultQty": 0}, {"name": "Lentilles", "unit": "g", "defaultQty": 0}, {"name": "Pois cassés", "unit": "g", "defaultQty": 0}, {"name": "Curry", "unit": "c.à.c", "defaultQty": 0}, {"name": "Paprika", "unit": "c.à.c", "defaultQty": 0}, {"name": "Cumin", "unit": "c.à.c", "defaultQty": 0}], "Épicerie petit-déjeuner & goûter": [{"name": "Flocons d’avoine", "unit": "g", "defaultQty": 0}, {"name": "Farine", "unit": "g", "defaultQty": 0}, {"name": "Miel", "unit": "pot", "defaultQty": 0}, {"name": "Granola", "unit": "g", "defaultQty": 0}, {"name": "Amandes", "unit": "g", "defaultQty": 0}, {"name": "Dattes", "unit": "g", "defaultQty": 0}, {"name": "Cannelle", "unit": "pot", "defaultQty": 0}, {"name": "Cacao", "unit": "g", "defaultQty": 0}, {"name": "Beurre de cacahuète", "unit": "pot", "defaultQty": 0}, {"name": "Graines de chia", "unit": "g", "defaultQty": 0}, {"name": "Confiture", "unit": "pot", "defaultQty": 0}, {"name": "Chocolat noir", "unit": "tablette", "defaultQty": 0}, {"name": "Biscuits", "unit": "paquet", "defaultQty": 0}, {"name": "Compote", "unit": "pot", "defaultQty": 0}, {"name": "Sucre", "unit": "g", "defaultQty": 0}], "Boissons sans alcool & surgelés": [{"name": "Eau pétillante", "unit": "bouteille", "defaultQty": 0}, {"name": "Jus d’orange", "unit": "L", "defaultQty": 0}, {"name": "Lait végétal", "unit": "L", "defaultQty": 0}, {"name": "Lait de coco", "unit": "cl", "defaultQty": 0}, {"name": "Fruits rouges", "unit": "g", "defaultQty": 0}, {"name": "Eau gazeuse", "unit": "bouteille", "defaultQty": 0}, {"name": "Thé glacé", "unit": "bouteille", "defaultQty": 0}, {"name": "Glace vanille", "unit": "bac", "defaultQty": 0}, {"name": "Légumes surgelés", "unit": "sachet", "defaultQty": 0}], "Hygiène": [{"name": "Savon mains", "unit": "flacon", "defaultQty": 0}, {"name": "Gel douche", "unit": "flacon", "defaultQty": 0}, {"name": "Shampoing", "unit": "flacon", "defaultQty": 0}, {"name": "Après-shampoing", "unit": "flacon", "defaultQty": 0}, {"name": "Dentifrice", "unit": "tube", "defaultQty": 0}, {"name": "Brosse à dents", "unit": "pièce", "defaultQty": 0}, {"name": "Déodorant", "unit": "flacon", "defaultQty": 0}, {"name": "Coton", "unit": "paquet", "defaultQty": 0}, {"name": "Mouchoirs", "unit": "boîte", "defaultQty": 0}, {"name": "Protections hygiéniques", "unit": "paquet", "defaultQty": 0}, {"name": "Rasoirs", "unit": "paquet", "defaultQty": 0}], "Ménage & papier": [{"name": "Papier toilette", "unit": "paquet", "defaultQty": 0}, {"name": "Essuie-tout", "unit": "rouleau", "defaultQty": 0}, {"name": "Sacs poubelle", "unit": "rouleau", "defaultQty": 0}, {"name": "Liquide vaisselle", "unit": "flacon", "defaultQty": 0}, {"name": "Éponge", "unit": "pièce", "defaultQty": 0}, {"name": "Lessive", "unit": "bidon", "defaultQty": 0}, {"name": "Adoucissant", "unit": "bidon", "defaultQty": 0}, {"name": "Nettoyant sol", "unit": "flacon", "defaultQty": 0}, {"name": "Spray multi-usage", "unit": "flacon", "defaultQty": 0}, {"name": "Javel", "unit": "flacon", "defaultQty": 0}, {"name": "Produit vitres", "unit": "flacon", "defaultQty": 0}, {"name": "Gants ménagers", "unit": "paire", "defaultQty": 0}], "Autres": [{"name": "Produit personnalisé", "unit": "pièce", "defaultQty": 0}]};
+    const RECIPES_BASE = [{"id": "r1", "name": "Porridge banane cannelle", "meal": "Petit-déjeuner", "goal": "Équilibre", "servings": 2, "time": 10, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "énergisant"], "ingredients": [["Flocons d’avoine", 100, "g"], ["Lait", 40, "cl"], ["Bananes", 2, "pièce"], ["Miel", 1, "c.à.s"]], "steps": ["Fais chauffer le lait dans une casserole.", "Ajoute les flocons et mélange 5 minutes.", "Termine avec la banane coupée et un filet de miel."]}, {"id": "r2", "name": "Toast avocat œufs", "meal": "Petit-déjeuner", "goal": "Protéiné", "servings": 2, "time": 12, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "simple"], "ingredients": [["Pain complet", 4, "tranche"], ["Avocats", 1, "pièce"], ["Œufs", 4, "pièce"], ["Citron", 0.5, "pièce"]], "steps": ["Fais cuire les œufs selon la texture souhaitée.", "Écrase l’avocat avec un peu de citron.", "Tartine le pain et ajoute les œufs par-dessus."]}, {"id": "r3", "name": "Bowl yaourt fruits rouges", "meal": "Petit-déjeuner", "goal": "Équilibre", "servings": 2, "time": 8, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["frais", "léger"], "ingredients": [["Fromage blanc", 300, "g"], ["Fruits rouges", 150, "g"], ["Flocons d’avoine", 60, "g"], ["Miel", 1, "c.à.s"]], "steps": ["Verse le fromage blanc dans deux bols.", "Ajoute les fruits rouges et les flocons.", "Termine avec un peu de miel."]}, {"id": "r4", "name": "Pancakes express", "meal": "Petit-déjeuner", "goal": "Gourmand", "servings": 2, "time": 15, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["gourmand", "maison"], "ingredients": [["Œufs", 2, "pièce"], ["Farine", 120, "g"], ["Lait", 18, "cl"], ["Bananes", 1, "pièce"]], "steps": ["Mélange les œufs, la farine et le lait.", "Fais cuire des petits pancakes dans une poêle chaude.", "Sers avec des rondelles de banane."]}, {"id": "r5", "name": "Overnight oats pomme", "meal": "Petit-déjeuner", "goal": "Petit budget", "servings": 2, "time": 6, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["petit budget", "batch"], "ingredients": [["Flocons d’avoine", 100, "g"], ["Lait végétal", 30, "cl"], ["Pommes", 2, "pièce"], ["Cannelle", 1, "c.à.c"]], "steps": ["Mélange les flocons et le lait dans un bocal.", "Laisse reposer une nuit au frais.", "Ajoute la pomme coupée et la cannelle avant de servir."]}, {"id": "r6", "name": "Omelette tomates feta", "meal": "Petit-déjeuner", "goal": "Protéiné", "servings": 2, "time": 14, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["salé", "protéiné"], "ingredients": [["Œufs", 4, "pièce"], ["Tomates", 2, "pièce"], ["Feta", 60, "g"], ["Oignons", 0.5, "pièce"]], "steps": ["Coupe les tomates et l’oignon finement.", "Verse les œufs battus dans la poêle.", "Ajoute la feta en fin de cuisson."]}, {"id": "r7", "name": "Granola maison au four", "meal": "Petit-déjeuner", "goal": "Organisation", "servings": 4, "time": 20, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["batch", "croquant"], "ingredients": [["Flocons d’avoine", 200, "g"], ["Miel", 2, "c.à.s"], ["Amandes", 60, "g"], ["Huile d’olive", 1, "c.à.s"]], "steps": ["Mélange les flocons avec le miel, les amandes et l’huile.", "Étale sur une plaque.", "Fais dorer 15 minutes à 170°C en remuant à mi-cuisson."]}, {"id": "r8", "name": "Tartines ricotta miel poire", "meal": "Petit-déjeuner", "goal": "Gourmand", "servings": 2, "time": 9, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["doux", "rapide"], "ingredients": [["Pain complet", 4, "tranche"], ["Ricotta", 120, "g"], ["Poires", 2, "pièce"], ["Miel", 1, "c.à.s"]], "steps": ["Toaste légèrement le pain.", "Étale la ricotta sur les tartines.", "Ajoute la poire en fines lamelles et le miel."]}, {"id": "r9", "name": "Smoothie bowl mangue banane", "meal": "Petit-déjeuner", "goal": "Équilibre", "servings": 2, "time": 7, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["frais", "vitaminé"], "ingredients": [["Mangue", 1, "pièce"], ["Bananes", 1, "pièce"], ["Yaourts nature", 2, "pot"], ["Flocons d’avoine", 40, "g"]], "steps": ["Mixe la mangue, la banane et les yaourts.", "Verse dans deux bols.", "Ajoute les flocons sur le dessus."]}, {"id": "r10", "name": "Pain perdu léger", "meal": "Petit-déjeuner", "goal": "Petit budget", "servings": 2, "time": 12, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["anti-gaspi", "maison"], "ingredients": [["Pain complet", 4, "tranche"], ["Œufs", 2, "pièce"], ["Lait", 15, "cl"], ["Cannelle", 1, "c.à.c"]], "steps": ["Bats les œufs avec le lait et la cannelle.", "Trempe le pain rapidement.", "Fais dorer les tranches dans une poêle chaude."]}, {"id": "r11", "name": "Muesli pomme amandes", "meal": "Petit-déjeuner", "goal": "Équilibre", "servings": 2, "time": 5, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["croquant", "rapide"], "ingredients": [["Flocons d’avoine", 80, "g"], ["Pommes", 1, "pièce"], ["Amandes", 30, "g"], ["Yaourts nature", 2, "pot"]], "steps": ["Verse les yaourts dans les bols.", "Ajoute les flocons et les amandes.", "Termine avec la pomme coupée."]}, {"id": "r12", "name": "Œufs brouillés épinards", "meal": "Petit-déjeuner", "goal": "Protéiné", "servings": 2, "time": 10, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["salé", "léger"], "ingredients": [["Œufs", 4, "pièce"], ["Épinards", 120, "g"], ["Pain complet", 2, "tranche"], ["Beurre", 10, "g"]], "steps": ["Fais tomber les épinards dans une poêle avec un peu de beurre.", "Ajoute les œufs battus.", "Sers avec le pain toasté."]}, {"id": "r13", "name": "Crème chia coco fruits rouges", "meal": "Petit-déjeuner", "goal": "Forme", "servings": 2, "time": 8, "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "préparé la veille"], "ingredients": [["Graines de chia", 40, "g"], ["Lait de coco", 25, "cl"], ["Fruits rouges", 120, "g"], ["Miel", 1, "c.à.c"]], "steps": ["Mélange les graines de chia, le lait de coco et le miel.", "Laisse gonfler au frais au moins 4 heures.", "Ajoute les fruits rouges au moment de servir."]}, {"id": "r14", "name": "Poulet riz citron", "meal": "Déjeuner", "goal": "Équilibre", "servings": 2, "time": 25, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["complet", "familial"], "ingredients": [["Poulet", 300, "g"], ["Riz", 140, "g"], ["Citron", 1, "pièce"], ["Brocoli", 1, "pièce"]], "steps": ["Fais cuire le riz.", "Poêle le poulet avec le citron.", "Sers avec le brocoli vapeur."]}, {"id": "r15", "name": "Salade quinoa feta", "meal": "Déjeuner", "goal": "Équilibre", "servings": 2, "time": 20, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["frais", "facile"], "ingredients": [["Quinoa", 140, "g"], ["Concombres", 1, "pièce"], ["Tomates", 3, "pièce"], ["Feta", 120, "g"]], "steps": ["Fais cuire le quinoa puis laisse-le tiédir.", "Coupe les légumes.", "Assemble le tout avec la feta émiettée."]}, {"id": "r16", "name": "Wrap dinde crudités", "meal": "Déjeuner", "goal": "Rapide", "servings": 2, "time": 15, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "nomade"], "ingredients": [["Galettes de blé", 4, "pièce"], ["Dinde", 220, "g"], ["Salade", 0.5, "pièce"], ["Tomates", 2, "pièce"]], "steps": ["Réchauffe rapidement les galettes.", "Garnis avec la dinde et les crudités.", "Roules les wraps bien serrés."]}, {"id": "r17", "name": "Pâtes tomates mozzarella", "meal": "Déjeuner", "goal": "Gourmand", "servings": 2, "time": 18, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["réconfort", "simple"], "ingredients": [["Pâtes", 180, "g"], ["Tomates", 4, "pièce"], ["Mozzarella", 1, "boule"], ["Huile d’olive", 1, "c.à.s"]], "steps": ["Fais cuire les pâtes.", "Prépare une poêlée de tomates avec un peu d’huile.", "Ajoute la mozzarella sur les pâtes chaudes."]}, {"id": "r18", "name": "Bowl lentilles légumes", "meal": "Déjeuner", "goal": "Petit budget", "servings": 2, "time": 22, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["petit budget", "végé"], "ingredients": [["Lentilles corail", 160, "g"], ["Carottes", 2, "pièce"], ["Oignons", 1, "pièce"], ["Courgettes", 1, "pièce"]], "steps": ["Fais cuire les lentilles corail.", "Poêle les légumes coupés en petits dés.", "Assemble le tout dans un grand bol."]}, {"id": "r19", "name": "Saumon pommes de terre", "meal": "Déjeuner", "goal": "Protéiné", "servings": 2, "time": 28, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "rassasiant"], "ingredients": [["Saumon", 280, "g"], ["Pommes de terre", 4, "pièce"], ["Salade", 0.5, "pièce"], ["Citron", 1, "pièce"]], "steps": ["Fais cuire les pommes de terre.", "Poêle le saumon avec un trait de citron.", "Sers avec une salade croquante."]}, {"id": "r20", "name": "Couscous végétal pois chiches", "meal": "Déjeuner", "goal": "Équilibre", "servings": 2, "time": 20, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["végé", "familial"], "ingredients": [["Semoule", 140, "g"], ["Pois chiches", 1, "boîte"], ["Carottes", 2, "pièce"], ["Courgettes", 2, "pièce"]], "steps": ["Prépare la semoule avec de l’eau chaude.", "Fais revenir les légumes en morceaux.", "Ajoute les pois chiches et sers avec la semoule."]}, {"id": "r21", "name": "Riz sauté poulet légumes", "meal": "Déjeuner", "goal": "Rapide", "servings": 2, "time": 18, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "complet"], "ingredients": [["Riz", 150, "g"], ["Poulet", 250, "g"], ["Poivrons", 1, "pièce"], ["Petits pois", 120, "g"]], "steps": ["Fais cuire le riz puis réserve-le.", "Poêle le poulet et les légumes.", "Ajoute le riz en fin de cuisson et mélange."]}, {"id": "r22", "name": "Salade pâtes thon maïs", "meal": "Déjeuner", "goal": "Organisation", "servings": 2, "time": 14, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["froid", "pratique"], "ingredients": [["Pâtes", 160, "g"], ["Thon", 1, "boîte"], ["Maïs", 120, "g"], ["Tomates", 2, "pièce"]], "steps": ["Fais cuire les pâtes puis refroidis-les.", "Égoutte le thon et le maïs.", "Mélange avec les tomates coupées."]}, {"id": "r23", "name": "Omelette champignons salade", "meal": "Déjeuner", "goal": "Léger", "servings": 2, "time": 12, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["léger", "simple"], "ingredients": [["Œufs", 4, "pièce"], ["Champignons", 1, "barquette"], ["Salade", 0.5, "pièce"], ["Parmesan", 20, "g"]], "steps": ["Poêle les champignons émincés.", "Verse les œufs battus.", "Sers avec une salade et un peu de parmesan."]}, {"id": "r24", "name": "Dinde semoule légumes rôtis", "meal": "Déjeuner", "goal": "Forme", "servings": 2, "time": 24, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "équilibré"], "ingredients": [["Dinde", 260, "g"], ["Semoule", 140, "g"], ["Courgettes", 1, "pièce"], ["Poivrons", 1, "pièce"]], "steps": ["Fais rôtir les légumes au four.", "Poêle la dinde coupée en lanières.", "Prépare la semoule et assemble le tout."]}, {"id": "r25", "name": "Buddha bowl tofu avocat", "meal": "Déjeuner", "goal": "Équilibre", "servings": 2, "time": 18, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["végé", "frais"], "ingredients": [["Tofu", 200, "g"], ["Quinoa", 140, "g"], ["Avocats", 1, "pièce"], ["Concombres", 1, "pièce"]], "steps": ["Fais cuire le quinoa.", "Poêle le tofu pour le dorer.", "Assemble avec l’avocat et le concombre."]}, {"id": "r26", "name": "Gratin courgettes riz fromage", "meal": "Déjeuner", "goal": "Gourmand", "servings": 2, "time": 30, "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80", "tags": ["gratin", "familial"], "ingredients": [["Riz", 140, "g"], ["Courgettes", 2, "pièce"], ["Lait", 20, "cl"], ["Parmesan", 40, "g"]], "steps": ["Fais cuire le riz et précuis les courgettes.", "Dispose le tout dans un plat.", "Ajoute le lait et le parmesan puis gratine."]}, {"id": "r27", "name": "Yaourt granola maison", "meal": "Goûter", "goal": "Équilibre", "servings": 2, "time": 8, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["léger", "croquant"], "ingredients": [["Yaourts nature", 2, "pot"], ["Granola", 80, "g"], ["Fraises", 1, "barquette"], ["Miel", 1, "c.à.c"]], "steps": ["Verse les yaourts dans des bols.", "Ajoute le granola et les fraises.", "Termine avec un filet de miel."]}, {"id": "r28", "name": "Smoothie banane fruits rouges", "meal": "Goûter", "goal": "Rapide", "servings": 2, "time": 6, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "frais"], "ingredients": [["Bananes", 1, "pièce"], ["Fruits rouges", 120, "g"], ["Lait végétal", 30, "cl"], ["Miel", 1, "c.à.c"]], "steps": ["Mixe tous les ingrédients ensemble.", "Sers bien frais dans deux verres.", "Ajuste la texture avec un peu de lait si besoin."]}, {"id": "r29", "name": "Compote pomme cannelle toast", "meal": "Goûter", "goal": "Petit budget", "servings": 2, "time": 12, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["petit budget", "maison"], "ingredients": [["Pommes", 3, "pièce"], ["Pain complet", 2, "tranche"], ["Cannelle", 1, "c.à.c"], ["Miel", 1, "c.à.c"]], "steps": ["Fais compoter les pommes à feu doux.", "Ajoute un peu de cannelle.", "Sers avec le pain toasté."]}, {"id": "r30", "name": "Muffins avoine banane", "meal": "Goûter", "goal": "Gourmand", "servings": 4, "time": 22, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["batch", "maison"], "ingredients": [["Bananes", 2, "pièce"], ["Flocons d’avoine", 120, "g"], ["Œufs", 2, "pièce"], ["Miel", 1, "c.à.s"]], "steps": ["Écrase les bananes dans un saladier.", "Ajoute les œufs, le miel et les flocons.", "Répartis dans des moules et cuis 18 minutes."]}, {"id": "r31", "name": "Fromage blanc kiwi miel", "meal": "Goûter", "goal": "Protéiné", "servings": 2, "time": 5, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "ultra simple"], "ingredients": [["Fromage blanc", 250, "g"], ["Kiwi", 2, "pièce"], ["Miel", 1, "c.à.c"], ["Amandes", 20, "g"]], "steps": ["Verse le fromage blanc dans deux bols.", "Ajoute le kiwi coupé.", "Termine avec le miel et quelques amandes."]}, {"id": "r32", "name": "Cookies dattes avoine", "meal": "Goûter", "goal": "Équilibre", "servings": 4, "time": 18, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["batch", "énergie"], "ingredients": [["Flocons d’avoine", 120, "g"], ["Dattes", 120, "g"], ["Farine", 60, "g"], ["Beurre", 30, "g"]], "steps": ["Mixe ou coupe les dattes en petits morceaux.", "Mélange avec la farine, le beurre et les flocons.", "Forme les cookies et cuis 12 minutes."]}, {"id": "r33", "name": "Energy balls cacao amandes", "meal": "Goûter", "goal": "Forme", "servings": 4, "time": 12, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["sans cuisson", "énergie"], "ingredients": [["Dattes", 140, "g"], ["Amandes", 60, "g"], ["Cacao", 15, "g"], ["Flocons d’avoine", 40, "g"]], "steps": ["Mixe les dattes et les amandes.", "Ajoute le cacao et les flocons.", "Forme des petites boules et réserve au frais."]}, {"id": "r34", "name": "Toast pomme beurre de cacahuète", "meal": "Goûter", "goal": "Rapide", "servings": 2, "time": 6, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "rassasiant"], "ingredients": [["Pain complet", 2, "tranche"], ["Pommes", 1, "pièce"], ["Beurre de cacahuète", 2, "c.à.s"], ["Cannelle", 1, "pincée"]], "steps": ["Toaste les tranches de pain.", "Étale le beurre de cacahuète.", "Ajoute la pomme en fines lamelles et une pointe de cannelle."]}, {"id": "r35", "name": "Verrine yaourt mangue", "meal": "Goûter", "goal": "Équilibre", "servings": 2, "time": 7, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["frais", "doux"], "ingredients": [["Yaourts nature", 2, "pot"], ["Mangue", 1, "pièce"], ["Granola", 60, "g"], ["Miel", 1, "c.à.c"]], "steps": ["Coupe la mangue en petits dés.", "Monte les verrines avec le yaourt et le granola.", "Termine avec la mangue et un trait de miel."]}, {"id": "r36", "name": "Banana bread express", "meal": "Goûter", "goal": "Gourmand", "servings": 6, "time": 28, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["maison", "batch"], "ingredients": [["Bananes", 3, "pièce"], ["Farine", 180, "g"], ["Œufs", 2, "pièce"], ["Miel", 2, "c.à.s"]], "steps": ["Écrase les bananes puis ajoute les autres ingrédients.", "Verse dans un petit moule.", "Fais cuire environ 22 minutes à 180°C."]}, {"id": "r37", "name": "Crêpes minute fromage blanc", "meal": "Goûter", "goal": "Protéiné", "servings": 2, "time": 10, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "simple"], "ingredients": [["Œufs", 2, "pièce"], ["Fromage blanc", 120, "g"], ["Farine", 60, "g"], ["Miel", 1, "c.à.c"]], "steps": ["Mélange les ingrédients jusqu’à obtenir une pâte lisse.", "Verse de petites portions dans la poêle.", "Fais cuire rapidement des deux côtés."]}, {"id": "r38", "name": "Salade de fruits croquante", "meal": "Goûter", "goal": "Léger", "servings": 2, "time": 9, "image": "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80", "tags": ["léger", "vitaminé"], "ingredients": [["Pommes", 1, "pièce"], ["Poires", 1, "pièce"], ["Oranges", 2, "pièce"], ["Amandes", 20, "g"]], "steps": ["Coupe les fruits en morceaux.", "Ajoute les quartiers d’orange.", "Parseme d’amandes juste avant de servir."]}, {"id": "r39", "name": "Soupe courgette feta", "meal": "Repas du soir", "goal": "Léger", "servings": 2, "time": 20, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["léger", "digeste"], "ingredients": [["Courgettes", 3, "pièce"], ["Oignons", 1, "pièce"], ["Feta", 60, "g"], ["Huile d’olive", 1, "c.à.c"]], "steps": ["Fais cuire les courgettes et l’oignon dans un peu d’eau.", "Mixe finement la soupe.", "Ajoute la feta émiettée au moment de servir."]}, {"id": "r40", "name": "Poêlée dinde légumes", "meal": "Repas du soir", "goal": "Protéiné", "servings": 2, "time": 18, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "rapide"], "ingredients": [["Dinde", 280, "g"], ["Poivrons", 2, "pièce"], ["Courgettes", 1, "pièce"], ["Oignons", 1, "pièce"]], "steps": ["Émince la dinde et les légumes.", "Fais revenir le tout dans une grande poêle.", "Sers bien chaud avec des herbes."]}, {"id": "r41", "name": "Gratin pommes de terre brocoli", "meal": "Repas du soir", "goal": "Gourmand", "servings": 2, "time": 32, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["familial", "gratin"], "ingredients": [["Pommes de terre", 5, "pièce"], ["Brocoli", 1, "pièce"], ["Lait", 20, "cl"], ["Parmesan", 40, "g"]], "steps": ["Précuis les pommes de terre et le brocoli.", "Dispose dans un plat.", "Verse le lait, ajoute le parmesan et gratine."]}, {"id": "r42", "name": "Bol tofu riz légumes", "meal": "Repas du soir", "goal": "Équilibre", "servings": 2, "time": 22, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["végé", "complet"], "ingredients": [["Tofu", 200, "g"], ["Riz", 140, "g"], ["Carottes", 2, "pièce"], ["Poivrons", 1, "pièce"]], "steps": ["Fais cuire le riz.", "Poêle le tofu avec les légumes.", "Assemble le tout dans un bol."]}, {"id": "r43", "name": "Tortilla pommes de terre", "meal": "Repas du soir", "goal": "Petit budget", "servings": 2, "time": 24, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["petit budget", "simple"], "ingredients": [["Œufs", 4, "pièce"], ["Pommes de terre", 4, "pièce"], ["Oignons", 1, "pièce"], ["Salade", 0.5, "pièce"]], "steps": ["Fais revenir les pommes de terre et l’oignon.", "Verse les œufs battus par-dessus.", "Laisse prendre puis sers avec une salade."]}, {"id": "r44", "name": "Cabillaud citron semoule", "meal": "Repas du soir", "goal": "Équilibre", "servings": 2, "time": 20, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["digeste", "léger"], "ingredients": [["Cabillaud", 280, "g"], ["Semoule", 140, "g"], ["Citron", 1, "pièce"], ["Salade", 0.5, "pièce"]], "steps": ["Prépare la semoule.", "Fais cuire le cabillaud avec un peu de citron.", "Sers avec la salade croquante."]}, {"id": "r45", "name": "Wok nouilles légumes poulet", "meal": "Repas du soir", "goal": "Rapide", "servings": 2, "time": 20, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["rapide", "complet"], "ingredients": [["Nouilles", 160, "g"], ["Poulet", 240, "g"], ["Poivrons", 1, "pièce"], ["Champignons", 1, "barquette"]], "steps": ["Fais cuire les nouilles.", "Poêle le poulet puis ajoute les légumes.", "Mélange les nouilles en fin de cuisson."]}, {"id": "r46", "name": "Soupe lentilles corail coco", "meal": "Repas du soir", "goal": "Léger", "servings": 2, "time": 22, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["réconfort", "végé"], "ingredients": [["Lentilles corail", 160, "g"], ["Lait de coco", 20, "cl"], ["Carottes", 2, "pièce"], ["Oignons", 1, "pièce"]], "steps": ["Fais revenir l’oignon et les carottes.", "Ajoute les lentilles puis couvre d’eau.", "Verse le lait de coco en fin de cuisson et mixe partiellement."]}, {"id": "r47", "name": "Galettes de courgettes salade", "meal": "Repas du soir", "goal": "Équilibre", "servings": 2, "time": 18, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["simple", "maison"], "ingredients": [["Courgettes", 2, "pièce"], ["Œufs", 2, "pièce"], ["Farine", 70, "g"], ["Salade", 0.5, "pièce"]], "steps": ["Râpe les courgettes puis mélange avec l’œuf et la farine.", "Fais cuire des petites galettes à la poêle.", "Sers avec une salade verte."]}, {"id": "r48", "name": "Riz crémeux épinards saumon", "meal": "Repas du soir", "goal": "Protéiné", "servings": 2, "time": 24, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["protéiné", "doux"], "ingredients": [["Riz", 150, "g"], ["Saumon", 240, "g"], ["Épinards", 120, "g"], ["Lait", 12, "cl"]], "steps": ["Fais cuire le riz.", "Poêle le saumon et ajoute les épinards.", "Verse un peu de lait pour lier l’ensemble."]}, {"id": "r49", "name": "Poivrons farcis quinoa", "meal": "Repas du soir", "goal": "Forme", "servings": 2, "time": 28, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["végé", "four"], "ingredients": [["Poivrons", 2, "pièce"], ["Quinoa", 140, "g"], ["Tomates", 2, "pièce"], ["Feta", 80, "g"]], "steps": ["Fais cuire le quinoa.", "Mélange avec les tomates coupées et la feta.", "Farcis les poivrons et enfourne 20 minutes."]}, {"id": "r50", "name": "Curry doux pois chiches riz", "meal": "Repas du soir", "goal": "Petit budget", "servings": 2, "time": 23, "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80", "tags": ["végé", "petit budget"], "ingredients": [["Pois chiches", 1, "boîte"], ["Riz", 140, "g"], ["Lait de coco", 20, "cl"], ["Carottes", 2, "pièce"]], "steps": ["Fais cuire le riz.", "Poêle les carottes puis ajoute les pois chiches.", "Verse le lait de coco et laisse mijoter quelques minutes."]}, {"id": "r51", "name": "Penne poulet crème champignons", "meal": "Repas du soir", "family": "Pâtes", "goal": "Protéiné", "servings": 3, "time": 25, "image": "", "tags": ["pâtes", "crémeux", "familial"], "ingredients": [["Penne", 240, "g"], ["Poulet", 300, "g"], ["Champignons", 1, "barquette"], ["Crème légère", 18, "cl"], ["Parmesan", 40, "g"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r52", "name": "Spaghetti tomate basilic parmesan", "meal": "Déjeuner", "family": "Pâtes", "goal": "Équilibre", "servings": 2, "time": 20, "image": "", "tags": ["pâtes", "tomate", "simple"], "ingredients": [["Spaghetti", 180, "g"], ["Tomates concassées", 1, "boîte"], ["Basilic", 0.5, "botte"], ["Parmesan", 35, "g"], ["Ail", 1, "tête"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r53", "name": "Fusilli thon citron courgette", "meal": "Déjeuner", "family": "Pâtes", "goal": "Rapide", "servings": 2, "time": 18, "image": "", "tags": ["pâtes", "rapide", "léger"], "ingredients": [["Fusilli", 180, "g"], ["Thon", 1, "boîte"], ["Courgettes", 2, "pièce"], ["Citron", 1, "pièce"], ["Crème légère", 10, "cl"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r54", "name": "Tagliatelles saumon citron", "meal": "Repas du soir", "family": "Pâtes", "goal": "Forme", "servings": 2, "time": 22, "image": "", "tags": ["pâtes", "poisson", "crémeux"], "ingredients": [["Tagliatelles", 200, "g"], ["Saumon", 260, "g"], ["Citron", 1, "pièce"], ["Crème légère", 12, "cl"], ["Épinards", 100, "g"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r55", "name": "Macaronis gratin épinards mozzarella", "meal": "Repas du soir", "family": "Pâtes", "goal": "Gourmand", "servings": 3, "time": 30, "image": "", "tags": ["pâtes", "gratin", "réconfort"], "ingredients": [["Macaronis", 240, "g"], ["Mozzarella", 1, "boule"], ["Épinards", 160, "g"], ["Lait", 20, "cl"], ["Fromage râpé", 60, "g"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r56", "name": "One pot pasta courgette feta", "meal": "Repas du soir", "family": "Pâtes", "goal": "Rapide", "servings": 2, "time": 20, "image": "", "tags": ["pâtes", "one pot", "rapide"], "ingredients": [["Penne", 180, "g"], ["Courgettes", 2, "pièce"], ["Feta", 120, "g"], ["Tomates", 3, "pièce"], ["Bouillon", 1, "cube"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r57", "name": "Coquillettes dinde fromage", "meal": "Déjeuner", "family": "Pâtes", "goal": "Petit budget", "servings": 2, "time": 17, "image": "", "tags": ["pâtes", "petit budget", "gourmand"], "ingredients": [["Coquillettes", 180, "g"], ["Dinde", 220, "g"], ["Fromage râpé", 50, "g"], ["Crème légère", 8, "cl"], ["Poivrons", 1, "pièce"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}, {"id": "r58", "name": "Pâtes légumes rôtis feta", "meal": "Repas du soir", "family": "Pâtes", "goal": "Équilibre", "servings": 2, "time": 28, "image": "", "tags": ["pâtes", "légumes", "four"], "ingredients": [["Fusilli", 180, "g"], ["Poivrons", 2, "pièce"], ["Courgettes", 1, "pièce"], ["Feta", 100, "g"], ["Tomates", 2, "pièce"]], "steps": ["Prépare tous les ingrédients.", "Lance la cuisson des pâtes.", "Prépare la sauce ou la garniture.", "Assemble et sers chaud."]}];
+    const FORBIDDEN = ['porc','jambon','lardon','lardons','bacon','charcuterie','saucisson','saucisse de porc','vin','bière','champagne','rhum','whisky','alcool','cidre'];
 
-    const IMG = {
-      breakfast:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80',
-      lunch:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80',
-      snack:'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80',
-      dinner:'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80'
-    };
+    const esc = (s='') => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const formatQty = n => Number.isInteger(Number(n)) ? String(Number(n)) : String(Math.round(Number(n)*100)/100).replace('.', ',');
+    const normalize = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const hasForbidden = text => FORBIDDEN.some(w => normalize(text).includes(normalize(w)));
 
-    const RECIPES_BASE = [
-      {id:'r1',name:'Porridge banane cannelle',meal:'Petit-déjeuner',goal:'Équilibre',servings:2,time:10,image:IMG.breakfast,tags:['rapide','énergisant'],ingredients:[['Flocons d’avoine',100,'g'],['Lait',40,'cl'],['Bananes',2,'pièce'],['Miel',1,'c.à.s']],steps:['Fais chauffer le lait.','Ajoute les flocons et mélange 5 minutes.','Termine avec banane coupée et miel.']},
-      {id:'r2',name:'Toast avocat œufs',meal:'Petit-déjeuner',goal:'Protéiné',servings:2,time:12,image:IMG.breakfast,tags:['protéiné','simple'],ingredients:[['Pain complet',4,'tranche'],['Avocats',1,'pièce'],['Œufs',4,'pièce'],['Citron',0.5,'pièce']],steps:['Fais cuire les œufs.','Écrase l’avocat avec citron.','Tartine et ajoute les œufs.']},
-      {id:'r3',name:'Bowl yaourt fruits rouges',meal:'Petit-déjeuner',goal:'Équilibre',servings:2,time:8,image:IMG.breakfast,tags:['frais'],ingredients:[['Fromage blanc',300,'g'],['Fruits rouges',150,'g'],['Flocons d’avoine',60,'g'],['Miel',1,'c.à.s']],steps:['Verse le fromage blanc dans deux bols.','Ajoute fruits rouges et flocons.','Termine avec un filet de miel.']},
-      {id:'r4',name:'Pancakes express',meal:'Petit-déjeuner',goal:'Gourmand',servings:2,time:15,image:IMG.breakfast,tags:['gourmand'],ingredients:[['Œufs',2,'pièce'],['Farine',120,'g'],['Lait',18,'cl'],['Bananes',1,'pièce']],steps:['Mélange œufs, farine et lait.','Fais cuire les pancakes.','Sers avec banane.']},
-      {id:'r5',name:'Overnight oats pomme',meal:'Petit-déjeuner',goal:'Petit budget',servings:2,time:6,image:IMG.breakfast,tags:['petit budget'],ingredients:[['Flocons d’avoine',100,'g'],['Lait végétal',30,'cl'],['Pommes',2,'pièce'],['Cannelle',1,'c.à.c']],steps:['Mélange les flocons et le lait.','Laisse reposer une nuit.','Ajoute pomme et cannelle avant de servir.']},
-      {id:'r6',name:'Omelette légumes',meal:'Petit-déjeuner',goal:'Protéiné',servings:2,time:14,image:IMG.breakfast,tags:['protéiné','salé'],ingredients:[['Œufs',4,'pièce'],['Tomates',2,'pièce'],['Poivrons',1,'pièce'],['Parmesan',20,'g']],steps:['Coupe les légumes.','Fais revenir rapidement.','Verse les œufs battus et ajoute parmesan.']},
+    const FRIDGE_QUICK = ['Œufs','Lait','Yaourts nature','Tomates','Poulet','Fromage râpé','Salade','Bananes','Pain complet','Fruits rouges'];
 
-      {id:'r7',name:'Poulet riz citron',meal:'Déjeuner',goal:'Équilibre',servings:2,time:25,image:IMG.lunch,tags:['complet'],ingredients:[['Poulet',300,'g'],['Riz',140,'g'],['Citron',1,'pièce'],['Brocoli',1,'pièce']],steps:['Fais cuire le riz.','Poêle le poulet avec citron.','Sers avec brocoli vapeur.']},
-      {id:'r8',name:'Salade quinoa feta',meal:'Déjeuner',goal:'Équilibre',servings:2,time:20,image:IMG.lunch,tags:['frais'],ingredients:[['Quinoa',140,'g'],['Concombres',1,'pièce'],['Tomates',3,'pièce'],['Feta',120,'g']],steps:['Fais cuire le quinoa.','Coupe les légumes.','Mélange avec feta émiettée.']},
-      {id:'r9',name:'Wrap poulet crudités',meal:'Déjeuner',goal:'Rapide',servings:2,time:15,image:IMG.lunch,tags:['rapide'],ingredients:[['Poulet',250,'g'],['Pain complet',4,'tranche'],['Salade',0.5,'pièce'],['Tomates',2,'pièce']],steps:['Cuire le poulet.','Préparer les crudités.','Rouler les wraps et servir.']},
-      {id:'r10',name:'Pâtes tomates mozzarella',meal:'Déjeuner',goal:'Gourmand',servings:2,time:18,image:IMG.lunch,tags:['réconfort'],ingredients:[['Pâtes',180,'g'],['Tomates',4,'pièce'],['Mozzarella',1,'boule'],['Huile d’olive',1,'c.à.s']],steps:['Fais cuire les pâtes.','Prépare une poêlée de tomates.','Ajoute mozzarella au moment de servir.']},
-      {id:'r11',name:'Bowl lentilles légumes',meal:'Déjeuner',goal:'Petit budget',servings:2,time:22,image:IMG.lunch,tags:['petit budget','végé'],ingredients:[['Lentilles corail',160,'g'],['Carottes',2,'pièce'],['Oignons',1,'pièce'],['Courgettes',1,'pièce']],steps:['Cuire les lentilles.','Poêler les légumes.','Assembler dans un bowl.']},
-      {id:'r12',name:'Saumon pommes de terre',meal:'Déjeuner',goal:'Protéiné',servings:2,time:28,image:IMG.lunch,tags:['protéiné'],ingredients:[['Saumon',280,'g'],['Pommes de terre',4,'pièce'],['Salade',0.5,'pièce'],['Citron',1,'pièce']],steps:['Cuire les pommes de terre.','Poêler le saumon.','Servir avec salade citronnée.']},
+    function recipeFamily(recipe){
+      if(recipe.family) return recipe.family;
+      return recipe.meal || 'Toutes';
+    }
 
-      {id:'r13',name:'Yaourt granola maison',meal:'Goûter',goal:'Équilibre',servings:2,time:8,image:IMG.snack,tags:['léger'],ingredients:[['Yaourts nature',2,'pot'],['Flocons d’avoine',60,'g'],['Miel',1,'c.à.s'],['Fraises',1,'barquette']],steps:['Verse les yaourts.','Ajoute flocons et miel.','Termine avec les fraises.']},
-      {id:'r14',name:'Smoothie banane fruits rouges',meal:'Goûter',goal:'Rapide',servings:2,time:6,image:IMG.snack,tags:['rapide'],ingredients:[['Bananes',1,'pièce'],['Fruits rouges',120,'g'],['Lait végétal',30,'cl'],['Miel',1,'c.à.c']],steps:['Mixe tous les ingrédients.','Sers bien frais.']},
-      {id:'r15',name:'Compote pomme cannelle toast',meal:'Goûter',goal:'Petit budget',servings:2,time:12,image:IMG.snack,tags:['petit budget'],ingredients:[['Pommes',3,'pièce'],['Pain complet',2,'tranche'],['Cannelle',1,'c.à.c']],steps:['Fais compoter les pommes.','Toaste le pain.','Sers ensemble.']},
-      {id:'r16',name:'Muffins avoine banane',meal:'Goûter',goal:'Gourmand',servings:4,time:22,image:IMG.snack,tags:['maison'],ingredients:[['Bananes',2,'pièce'],['Flocons d’avoine',120,'g'],['Œufs',2,'pièce'],['Miel',1,'c.à.s']],steps:['Écrase les bananes.','Ajoute le reste.','Cuire 18 minutes à 180°C.']},
-      {id:'r17',name:'Fromage blanc kiwi miel',meal:'Goûter',goal:'Protéiné',servings:2,time:5,image:IMG.snack,tags:['protéiné'],ingredients:[['Fromage blanc',250,'g'],['Kiwi',2,'pièce'],['Miel',1,'c.à.c']],steps:['Verse le fromage blanc.','Ajoute kiwi et miel.']},
-      {id:'r18',name:'Cookies dattes avoine',meal:'Goûter',goal:'Équilibre',servings:4,time:18,image:IMG.snack,tags:['batch'],ingredients:[['Flocons d’avoine',120,'g'],['Bananes',2,'pièce'],['Farine',60,'g'],['Miel',1,'c.à.s']],steps:['Mélange tous les ingrédients.','Forme les cookies.','Cuire 12 minutes à 180°C.']},
+    function recipeEmoji(recipe){
+      const blob = normalize(`${recipe.name} ${(recipe.tags||[]).join(' ')}`);
+      if(recipeFamily(recipe)==='Pâtes' || blob.includes('pates') || blob.includes('spaghetti') || blob.includes('penne') || blob.includes('tagliatelles') || blob.includes('coquillettes') || blob.includes('fusilli')) return '🍝';
+      if(blob.includes('pancake')) return '🥞';
+      if(blob.includes('toast') || blob.includes('tartine')) return '🍞';
+      if(blob.includes('yaourt') || blob.includes('porridge') || blob.includes('bowl') || blob.includes('oats')) return '🥣';
+      if(blob.includes('omelette') || blob.includes('oeuf') || blob.includes('tortilla')) return '🍳';
+      if(blob.includes('salade')) return '🥗';
+      if(blob.includes('soupe') || blob.includes('veloute') || blob.includes('curry')) return '🍲';
+      if(blob.includes('saumon') || blob.includes('cabillaud') || blob.includes('thon')) return '🐟';
+      if(blob.includes('poulet') || blob.includes('dinde')) return '🍗';
+      if(blob.includes('cookie') || blob.includes('cake') || blob.includes('muffin') || blob.includes('compote')) return '🧁';
+      return recipe.meal==='Goûter' ? '🍪' : recipe.meal==='Petit-déjeuner' ? '🥣' : '🍽️';
+    }
 
-      {id:'r19',name:'Soupe courgette feta',meal:'Repas du soir',goal:'Léger',servings:2,time:20,image:IMG.dinner,tags:['léger'],ingredients:[['Courgettes',3,'pièce'],['Oignons',1,'pièce'],['Feta',60,'g'],['Huile d’olive',1,'c.à.c']],steps:['Fais cuire courgettes et oignon.','Mixe la soupe.','Ajoute feta au moment de servir.']},
-      {id:'r20',name:'Poêlée dinde légumes',meal:'Repas du soir',goal:'Protéiné',servings:2,time:18,image:IMG.dinner,tags:['protéiné','rapide'],ingredients:[['Dinde',280,'g'],['Poivrons',2,'pièce'],['Courgettes',1,'pièce'],['Oignons',1,'pièce']],steps:['Émince la dinde.','Poêle avec les légumes.','Sers bien chaud.']},
-      {id:'r21',name:'Gratin pommes de terre brocoli',meal:'Repas du soir',goal:'Gourmand',servings:2,time:32,image:IMG.dinner,tags:['gourmand'],ingredients:[['Pommes de terre',5,'pièce'],['Brocoli',1,'pièce'],['Lait',20,'cl'],['Parmesan',40,'g']],steps:['Précuis pommes de terre et brocoli.','Assemble dans un plat.','Verse lait et parmesan, puis gratine.']},
-      {id:'r22',name:'Bol tofu riz légumes',meal:'Repas du soir',goal:'Équilibre',servings:2,time:22,image:IMG.dinner,tags:['végé'],ingredients:[['Tofu',200,'g'],['Riz',140,'g'],['Carottes',2,'pièce'],['Poivrons',1,'pièce']],steps:['Cuire le riz.','Poêler tofu et légumes.','Assembler dans un bol.']},
-      {id:'r23',name:'Tortilla pommes de terre',meal:'Repas du soir',goal:'Petit budget',servings:2,time:24,image:IMG.dinner,tags:['petit budget'],ingredients:[['Œufs',4,'pièce'],['Pommes de terre',4,'pièce'],['Oignons',1,'pièce']],steps:['Fais revenir pommes de terre et oignon.','Ajoute les œufs battus.','Cuire jusqu’à prise complète.']},
-      {id:'r24',name:'Cabillaud citron semoule',meal:'Repas du soir',goal:'Équilibre',servings:2,time:20,image:IMG.dinner,tags:['digeste'],ingredients:[['Filets de poisson',2,'pièce'],['Semoule',140,'g'],['Citron',1,'pièce'],['Salade',0.5,'pièce']],steps:['Cuire la semoule.','Cuire le poisson avec citron.','Sers avec salade.']}
-    ];
+    function recipePalette(recipe){
+      const family = recipeFamily(recipe);
+      if(family==='Pâtes') return ['#c85f30','#f3b36a','#fff1d6'];
+      if(recipe.meal==='Petit-déjeuner') return ['#8c5a28','#f0c985','#fff2da'];
+      if(recipe.meal==='Goûter') return ['#7b4a5a','#df9ab3','#fff0f4'];
+      if(recipe.meal==='Déjeuner') return ['#2d6c4f','#8bc1a6','#eaf8ef'];
+      return ['#415f92','#9eb8f1','#edf4ff'];
+    }
+
+    function recipeImage(recipe){
+      if(recipe.image && /^data:image|^https?:/i.test(recipe.image) && !recipe.image.includes('unsplash.com/photo-1490645935967') && !recipe.image.includes('unsplash.com/photo-1547592180') && !recipe.image.includes('unsplash.com/photo-1505253758473') && !recipe.image.includes('unsplash.com/photo-1512058564366')) return recipe.image;
+      const [c1,c2,c3] = recipePalette(recipe);
+      const emoji = recipeEmoji(recipe);
+      const title = String(recipe.name || '').slice(0,32);
+      const sub = `${recipeFamily(recipe)} · ${recipe.time} min`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="55%" stop-color="${c2}"/><stop offset="100%" stop-color="${c3}"/></linearGradient></defs><rect width="900" height="520" rx="42" fill="url(#g)"/><circle cx="710" cy="135" r="96" fill="rgba(255,255,255,0.16)"/><circle cx="760" cy="410" r="120" fill="rgba(255,255,255,0.08)"/><rect x="58" y="58" width="784" height="404" rx="34" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.28)"/><text x="95" y="145" font-size="132">${emoji}</text><text x="95" y="250" font-family="Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff">${esc(title)}</text><text x="95" y="300" font-family="Arial, sans-serif" font-size="24" fill="rgba(255,255,255,0.88)">${esc(sub)}</text><text x="95" y="380" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.92)">Visuel recette cohérent · sans porc · sans alcool</text></svg>`;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    function detailedRecipeSteps(recipe){
+      const raw = Array.isArray(recipe.steps) ? recipe.steps.filter(Boolean) : [];
+      const names = (recipe.ingredients || []).map(i => i[0]).slice(0,4).join(', ');
+      const steps = [
+        `Sors tous les ingrédients et mesure précisément ce qu’il faut pour ${getRecipeServings(recipe)} personne${getRecipeServings(recipe)>1?'s':''}. Prépare aussi une poêle, une casserole et un couteau.`
+      ];
+      if(names) steps.push(`Rince, épluche ou coupe ce qui doit l’être, puis rassemble sur le plan de travail : ${names}.`);
+      if(recipeFamily(recipe)==='Pâtes') steps.push(`Porte une grande casserole d’eau salée à ébullition pour cuire les pâtes au bon moment, sans les surcuire.`);
+      raw.forEach((s,i)=>{
+        steps.push(`${i+1<10 ? 'Étape' : 'Action'} ${i+1} : ${s.replace(/\.$/,'')}. Prends le temps de vérifier la cuisson, l’assaisonnement et la texture avant de passer à la suite.`);
+      });
+      steps.push(`Goûte, ajuste le sel, le poivre, le citron ou les herbes si besoin, puis dresse dans des assiettes chaudes avant de servir.`);
+      return steps;
+    }
+
+    function fridgeSummary(){
+      return (state.fridge || []).map(i => `${i.name} (${formatQty(i.qty)} ${i.unit})`).join(', ');
+    }
+
+    function isCustomProduct(category, name){
+      return !!state.customProducts.find(p => p.category===category && p.name===name);
+    }
+
+    function toast(text){
+      const t = $('#toast');
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    }
 
     function blankQuiz(type='Solo'){
-      return {type, persons:type==='Duo'?2:type==='Famille'?4:1, age:'', height:'', weight:'', allergies:'', likes:'', dislikes:'', goal:'Équilibre', style:'Équilibré', budget:'normal', time:'25', sport:'modere'};
-    }
-    function defaultProfiles(){
-      return [
-        {id:uid(),name:'Solo',pin:'',quiz:{...blankQuiz('Solo'), likes:'œufs, pâtes, poulet', goal:'Équilibre', style:'Express'}},
-        {id:uid(),name:'Duo',pin:'',quiz:{...blankQuiz('Duo'), likes:'salades, poulet, riz', goal:'Rapide', style:'Classique'}},
-        {id:uid(),name:'Famille',pin:'',quiz:{...blankQuiz('Famille'), likes:'pâtes, pommes de terre, fromage', goal:'Petit budget', style:'Classique'}},
-        {id:uid(),name:'Sur mesure',pin:'',quiz:{...blankQuiz('Sur mesure'), likes:'quinoa, saumon, légumes', goal:'Prise de muscle', style:'Protéiné'}}
-      ];
-    }
-    function defaultWeek(){
-      return DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => [meal,null]))}));
-    }
-    function loadState(){
-      const raw = localStorage.getItem(STORE_KEY);
-      if(raw){
-        try { return JSON.parse(raw); } catch(e){}
-      }
-      const profiles = defaultProfiles();
       return {
-        profiles,
-        activeProfileId:profiles[0].id,
-        onboardingOpen:true,
-        onboardingStep:0,
+        type,
+        persons:type==='Duo'?2:type==='Famille'?4:1,
+        age:'',
+        height:'',
+        weight:'',
+        allergies:'',
+        likes:'',
+        dislikes:'',
+        goal:'Équilibre',
+        style:'Rapide',
+        budget:'normal',
+        time:'25',
+        sport:'modere',
+        nutrition:'equilibre',
+        cookingLevel:'intermédiaire'
+      };
+    }
+
+    function defaultOnboarding(){
+      return {
+        open:true,
+        step:'intro',
         introIndex:0,
+        tutorialIndex:0,
+        selectedProfileId:null,
+        selectedType:'Solo',
+        quizStep:0,
+        editProfileId:null,
+        quizDraft:blankQuiz('Solo')
+      };
+    }
+
+    function defaultState(){
+      return {
+        profiles:[],
+        activeProfileId:null,
         currentView:'home',
-        catalogCategory:'Fruits & légumes',
+        catalogCategory:Object.keys(CATALOG_BASE)[0],
         catalogQty:{},
         hiddenProducts:[],
+        customProducts:[],
+        fridge:[],
         shopping:[],
         shoppingFilter:'À acheter',
         selectedDay:0,
         weekMode:'Équilibre',
-        weekPlan:defaultWeek(),
+        weekPlan:DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => [meal,null]))})),
         recipeFilter:'Toutes',
         recipeSearch:'',
         hiddenRecipes:[],
         customRecipes:[],
         openRecipeId:null,
         recipeServings:{},
-        chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
+        chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce qu’il y a dans ton frigo et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
+        coachCompact:false,
         apiKey:'',
-        weekPicker:{open:false, meal:'Déjeuner', dayIndex:0}
+        weekPicker:{open:false, meal:'Déjeuner', dayIndex:0},
+        onboarding:defaultOnboarding()
       };
     }
+
+    function loadState(){
+      const base = defaultState();
+      const raw = localStorage.getItem(STORE_KEY);
+      if(raw){
+        try{
+          const parsed = JSON.parse(raw);
+          Object.assign(base, parsed);
+        }catch(e){}
+      }
+      base.onboarding = defaultOnboarding();
+      if(!Array.isArray(base.profiles)) base.profiles = [];
+      if(!base.activeProfileId && base.profiles[0]) base.activeProfileId = base.profiles[0].id;
+      if(!Array.isArray(base.shopping)) base.shopping = [];
+      if(!Array.isArray(base.fridge)) base.fridge = [];
+      if(!Array.isArray(base.hiddenProducts)) base.hiddenProducts = [];
+      if(!Array.isArray(base.hiddenRecipes)) base.hiddenRecipes = [];
+      if(!Array.isArray(base.customProducts)) base.customProducts = [];
+      if(!Array.isArray(base.customRecipes)) base.customRecipes = [];
+      if(!Array.isArray(base.chats) || !base.chats.length) base.chats = defaultState().chats;
+      if(typeof base.coachCompact !== 'boolean') base.coachCompact = false;
+      return base;
+    }
+
     let state = loadState();
 
-    function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-    function toast(text){ const el=$('#toast'); el.textContent=text; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1800); }
-    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
-    function activeProfile(){ return state.profiles.find(p=>p.id===state.activeProfileId) || state.profiles[0]; }
-    function recipesDb(){ return [...RECIPES_BASE, ...state.customRecipes]; }
-    function activeRecipe(){ return recipesDb().find(r=>r.id===state.openRecipeId); }
-    function goalLabel(){ return activeProfile()?.quiz?.goal || 'Équilibre'; }
-    function shoppingActiveCount(){ return state.shopping.filter(i=>!i.done).length; }
-    function shoppingBudget(){ return state.shopping.filter(i=>!i.done).reduce((sum,i)=>sum + (PRICE_BY_CAT[i.cat]||2) * Math.max(1, Number(i.qty)||1) * 0.35, 0); }
-    function plannedCount(){ return state.weekPlan.reduce((n,d)=> n + MEALS.filter(meal => d.meals[meal]).length,0); }
-    function hasForbidden(text){ const t=(text||'').toLowerCase(); return /(porc|lardon|jambon|bacon|vin |vin$|alcool|bi[èe]re|rhum|champagne|whisky)/.test(t); }
-    function scaleQty(qty, baseServings, targetServings){ return Math.round((qty * targetServings / baseServings) * 100) / 100; }
-    function formatQty(q){ return Number.isInteger(q) ? String(q) : String(q).replace('.', ','); }
-    function itemKey(cat,name){ return `${cat}::${name}`; }
-    function getCatalogItem(cat,name){ return (CATALOG_BASE[cat]||[]).find(x=>x.name===name) || null; }
-    function getCatalogQty(cat,name){ return state.catalogQty[itemKey(cat,name)] || getCatalogItem(cat,name)?.defaultQty || 1; }
-    function setCatalogQty(cat,name,val){ state.catalogQty[itemKey(cat,name)] = Math.max(1, val); save(); renderCatalog(); }
+    function save(){
+      const toSave = {...state, onboarding:{...state.onboarding, open:false}};
+      localStorage.setItem(STORE_KEY, JSON.stringify(toSave));
+    }
 
-    function mergeShopping(item){
-      const found = state.shopping.find(x => !x.done && x.name === item.name && x.unit === item.unit);
-      if(found){ found.qty = Math.round((Number(found.qty)+Number(item.qty))*100)/100; found.cat = item.cat || found.cat; found.source = found.source === item.source ? found.source : 'mixte'; }
-      else state.shopping.push({...item, id:uid(), done:false});
-    }
-    function addShopping(name, qty=1, unit='pièce', cat='Épicerie', source='manuel'){
-      mergeShopping({name, qty:Math.max(1, Number(qty)||1), unit, cat, source});
-      save(); renderHome(); renderShopping(); toast('Ajouté à la liste');
-    }
-    function addRecipeIngredientsToShopping(recipeId, servings){
-      const r = recipesDb().find(x=>x.id===recipeId); if(!r) return;
-      r.ingredients.forEach(([name, qty, unit]) => {
-        mergeShopping({name, qty:scaleQty(qty, r.servings, servings), unit, cat:inferCategory(name), source:r.name});
+    function catalogDb(){
+      const out = JSON.parse(JSON.stringify(CATALOG_BASE));
+      state.customProducts.forEach(item => {
+        if(!out[item.category]) out[item.category] = [];
+        out[item.category].push({name:item.name, unit:item.unit, defaultQty:0});
       });
-      save(); renderHome(); renderShopping(); toast('Recette ajoutée à la liste');
+      return out;
     }
-    function inferCategory(name){
-      const n = (name||'').toLowerCase();
-      if(['pomme','banane','orange','fraise','avocat','tomate','concombre','salade','carotte','courgette','brocoli','poivron','pomme de terre','oignon','citron','champignon','kiwi'].some(k=>n.includes(k))) return 'Fruits & légumes';
-      if(['œuf','oeuf','lait','yaourt','fromage blanc','mozzarella','feta','parmesan','beurre','poulet','dinde','tofu','saumon'].some(k=>n.includes(k))) return 'Produits frais';
-      if(['eau','jus','thé','lait végétal'].some(k=>n.includes(k))) return 'Boissons sans alcool';
-      return 'Épicerie';
+
+    function recipesDb(){ return [...RECIPES_BASE, ...state.customRecipes]; }
+
+    function fallbackProfile(){
+      return {
+        id:'guest-temp',
+        name:'Invité',
+        isGuest:true,
+        pin:'',
+        quiz:{...blankQuiz('Solo'), goal:'Découverte', style:'Rapide'}
+      };
     }
+
+    function activeProfile(){
+      return state.profiles.find(p => p.id === state.activeProfileId) || state.profiles[0] || fallbackProfile();
+    }
+
+    function profileSummary(p){
+      const q = p.quiz || blankQuiz('Solo');
+      return `${q.type} · ${q.goal} · ${q.style} · ${q.persons || 1} ${Number(q.persons||1) > 1 ? 'personnes' : 'personne'}`;
+    }
+
+    function getCatalogItem(category, name){
+      return (catalogDb()[category] || []).find(i => i.name === name);
+    }
+
+    function itemKey(category, name){ return `${category}|||${name}`; }
+
+    function isHiddenProduct(category, name){ return state.hiddenProducts.includes(itemKey(category, name)); }
+
+    function getCatalogQty(category, name){
+      const key = itemKey(category, name);
+      const val = state.catalogQty[key];
+      return Number.isFinite(Number(val)) ? Number(val) : Number(getCatalogItem(category, name)?.defaultQty || 0);
+    }
+
+    function setCatalogQty(category, name, qty){
+      state.catalogQty[itemKey(category,name)] = Math.max(0, Number(qty || 0));
+      save();
+      renderCatalog();
+    }
+
+    function findCatalogCategory(name){
+      const db = catalogDb();
+      for(const cat of Object.keys(db)){
+        if((db[cat] || []).some(item => item.name === name)) return cat;
+      }
+      return 'Autres';
+    }
+
+    function addShopping(name, qty=1, unit='pièce', category='Autres', source='manuel'){
+      const existing = state.shopping.find(i => i.name === name && i.unit === unit);
+      if(existing){
+        existing.qty = Math.round((Number(existing.qty) + Number(qty))*100)/100;
+      }else{
+        state.shopping.push({id:uid(), name, qty:Number(qty), unit, category, done:false, source});
+      }
+      save();
+      renderShopping();
+      renderHome();
+      toast('Ajouté à la liste');
+    }
+
+    function scaleQty(qty, baseServings, targetServings){
+      return Math.round((Number(qty) * (Number(targetServings)||1) / (Number(baseServings)||1)) * 100) / 100;
+    }
+
+    function getRecipeServings(recipe){
+      const profilePersons = Number(activeProfile().quiz?.persons || recipe.servings || 1);
+      return state.recipeServings[recipe.id] || profilePersons || recipe.servings;
+    }
+
+    function addRecipeIngredientsToShopping(recipeId, servings){
+      const recipe = recipesDb().find(r => r.id === recipeId);
+      if(!recipe) return;
+      recipe.ingredients.forEach(([name,qty,unit]) => {
+        const scaled = scaleQty(qty, recipe.servings, servings);
+        addShopping(name, scaled, unit, findCatalogCategory(name), recipe.name);
+      });
+    }
+
     function filterRecipesByProfile(list){
       const p = activeProfile();
-      const dislikes = (p?.quiz?.dislikes || '').toLowerCase();
-      const allergies = (p?.quiz?.allergies || '').toLowerCase();
-      return list.filter(r => !state.hiddenRecipes.includes(r.id)).filter(r => {
-        const hay = r.ingredients.map(i=>String(i[0]).toLowerCase());
-        if(dislikes && hay.some(i => dislikes.includes(i))) return false;
-        if(allergies && hay.some(i => allergies.includes(i))) return false;
-        return !hasForbidden(r.name + ' ' + hay.join(' '));
-      });
+      const dislikes = (p.quiz?.dislikes || '').split(',').map(s => normalize(s.trim())).filter(Boolean);
+      let out = list.filter(r => !state.hiddenRecipes.includes(r.id));
+      if(dislikes.length){
+        out = out.filter(r => {
+          const blob = normalize(r.name + ' ' + r.ingredients.map(i=>i[0]).join(' ') + ' ' + r.tags.join(' '));
+          return !dislikes.some(d => blob.includes(d));
+        });
+      }
+      return out;
+    }
+
+    function resetOnboarding(step='intro'){
+      state.onboarding = defaultOnboarding();
+      state.onboarding.step = step;
+      if(step === 'tutorial') state.onboarding.tutorialIndex = 0;
+      save();
+      renderOnboarding();
     }
 
     function renderOnboarding(){
-      $('#onboardingOverlay').classList.toggle('hidden', !state.onboardingOpen);
-      ['obStep0','obStep1','obStep2'].forEach((id,i)=> $('#'+id).classList.toggle('hidden', state.onboardingStep !== i));
-      $$('[data-ob-dot]').forEach((d,i)=> d.classList.toggle('active', i===state.onboardingStep));
-      const active = activeProfile();
-      $('#profilesStart').innerHTML = state.profiles.map(p => `
-        <div class="profileCard ${p.id===state.activeProfileId?'active':''}" data-pick-profile="${p.id}">
+      const ob = state.onboarding;
+      $('#onboardingOverlay').classList.toggle('hidden', !ob.open);
+
+      const meta = {
+        intro:{badge:'DÉCOUVERTE', title:'Bienvenue dans l’application', lead:'Une explication claire dès l’ouverture, avant de créer un compte ou de choisir un profil.'},
+        account:{badge:'COMPTE', title:'Choisis comment entrer dans l’app', lead:'Compte, profil existant ou mode invité : tu gardes une entrée simple et claire.'},
+        type:{badge:'PROFIL', title:'Choisis ton type de foyer', lead:'Solo, Duo, Famille ou Sur mesure : c’est le point de départ du quiz.'},
+        quiz:{badge:'QUIZ', title:'Quiz rapide et personnalisé', lead:'Court, mais assez complet pour adapter recettes, semaine, courses et coach IA.'},
+        tutorial:{badge:'GUIDE', title:'Comment utiliser l’application', lead:'En 4 écrans, tu comprends le fonctionnement concret avant d’arriver sur l’accueil.'}
+      }[ob.step];
+      $('#obBadge').textContent = meta.badge;
+      $('#obTitle').textContent = meta.title;
+      $('#obLead').textContent = meta.lead;
+
+      ['intro','account','type','quiz','tutorial'].forEach(step => $('#step-'+step).classList.toggle('hidden', ob.step !== step));
+
+      const stepOrder = ['intro','account','type','quiz','tutorial'];
+      const stepIndex = stepOrder.indexOf(ob.step);
+      $('#onboardingDots').innerHTML = stepOrder.map((_,i) => `<span class="dot ${i<=stepIndex ? 'active' : ''}"></span>`).join('');
+
+      const slide = INTRO_SLIDES[ob.introIndex];
+      $('#introSlideCard').innerHTML = `<div class="introIllu">${slide.emoji}</div><h3>${esc(slide.title)}</h3><p class="sub" style="margin-top:10px">${esc(slide.text)}</p>`;
+      $('#introPrevBtn').textContent = ob.introIndex === 0 ? 'Retour' : 'Précédent';
+      $('#introNextBtn').textContent = ob.introIndex === INTRO_SLIDES.length - 1 ? 'Découvrir' : 'Suivant';
+
+      const selected = ob.selectedProfileId;
+      $('#profilesCountPill').textContent = `${state.profiles.length} ${state.profiles.length > 1 ? 'profils' : 'profil'}`;
+      $('#profilesStart').innerHTML = state.profiles.length ? state.profiles.map(p => `
+        <div class="profileCard ${selected===p.id ? 'active' : ''}" data-pick-profile="${p.id}">
           <div class="name">${esc(p.name)}</div>
+          <div class="sub small" style="margin-top:4px">${esc(profileSummary(p))}</div>
           <div class="profileMeta">
-            <span class="pill">${esc(p.quiz.type||'Profil')}</span>
-            <span class="pill">${esc(p.quiz.goal||'Équilibre')}</span>
-            <span class="pill">${esc(p.quiz.style||'Classique')}</span>
-            <span class="pill">${esc(String(p.quiz.persons||1))} pers.</span>
+            <span class="pill">${esc(p.quiz?.type || 'Solo')}</span>
+            <span class="pill">${esc(p.quiz?.goal || 'Équilibre')}</span>
+            <span class="pill">${esc(p.quiz?.style || 'Rapide')}</span>
           </div>
-          <p class="sub small" style="margin-top:8px">${esc(p.quiz.likes || 'Préférences à compléter')}</p>
+        </div>`).join('') : `<div class="empty">Aucun profil enregistré pour l’instant. Crée ton premier compte ou choisis le mode invité.</div>`;
+      $('#existingProfileActions').style.display = selected ? 'grid' : 'none';
+
+      $('#typeCards').innerHTML = PROFILE_TYPES.map(type => `
+        <div class="typeCard ${ob.selectedType===type ? 'active' : ''}" data-type-card="${esc(type)}">
+          <div class="name">${esc(type)}</div>
+          <div class="sub small" style="margin-top:4px">${type==='Solo' ? '1 personne, routine simple et rapide' : type==='Duo' ? '2 personnes, goûts partagés et repas communs' : type==='Famille' ? 'Plusieurs personnes, organisation pratique' : 'Profil totalement personnalisé'}</div>
         </div>`).join('');
-      const slide = INTRO[state.introIndex];
-      $('#introCard').innerHTML = `
-        <div class="introIllu">${slide.emoji}</div>
-        <h3>${esc(slide.title)}</h3>
-        <p class="sub" style="margin-top:8px">${esc(slide.text)}</p>
-        <div class="profileMeta" style="margin-top:14px">
-          ${INTRO.map((_,i)=>`<span class="pill ${i===state.introIndex?'active':''}" style="${i===state.introIndex?'background:linear-gradient(135deg, rgba(216,178,96,.24), rgba(137,171,255,.18));':''}">${i+1}/3</span>`).join('')}
-        </div>`;
-      if(active){
-        $('#qName').value = active.name || '';
-        $('#qType').value = active.quiz.type || 'Solo';
-        $('#qPersons').value = active.quiz.persons || 1;
-        $('#qAge').value = active.quiz.age || '';
-        $('#qHeight').value = active.quiz.height || '';
-        $('#qWeight').value = active.quiz.weight || '';
-        $('#qGoal').value = active.quiz.goal || 'Équilibre';
-        $('#qStyle').value = active.quiz.style || 'Équilibré';
-        $('#qBudget').value = active.quiz.budget || 'normal';
-        $('#qTime').value = active.quiz.time || '25';
-        $('#qSport').value = active.quiz.sport || 'modere';
-        $('#qAllergies').value = active.quiz.allergies || '';
-        $('#qLikes').value = active.quiz.likes || '';
-        $('#qDislikes').value = active.quiz.dislikes || '';
+
+      $('#qType').innerHTML = PROFILE_TYPES.map(type => `<option ${ob.quizDraft.type===type ? 'selected' : ''}>${esc(type)}</option>`).join('');
+      $('#quizTabs').innerHTML = ['Identité & foyer','Objectif & rythme','Préférences alimentaires'].map((label, idx) => `<button class="quizTab ${ob.quizStep===idx ? 'active' : ''}" data-quiz-tab="${idx}">${esc(label)}</button>`).join('');
+      [0,1,2].forEach(i => $('#quizPanel'+i).classList.toggle('hidden', ob.quizStep !== i));
+      fillQuizFieldsFromDraft();
+
+      const guide = TUTORIAL_SLIDES[ob.tutorialIndex];
+      $('#tutorialSlideCard').innerHTML = `<div class="introIllu">${guide.emoji}</div><h3>${esc(guide.title)}</h3><p class="sub" style="margin-top:10px">${esc(guide.text)}</p>`;
+      $('#tutorialNextBtn').textContent = ob.tutorialIndex === TUTORIAL_SLIDES.length - 1 ? 'Commencer' : 'Suivant';
+    }
+
+    function fillQuizFieldsFromDraft(){
+      const q = state.onboarding.quizDraft;
+      if(!q) return;
+      $('#qName').value = q.name || '';
+      $('#qPin').value = q.pin || '';
+      $('#qType').value = q.type || 'Solo';
+      $('#qPersons').value = q.persons || 1;
+      $('#qAge').value = q.age || '';
+      $('#qCookingLevel').value = q.cookingLevel || 'intermédiaire';
+      $('#qGoal').value = q.goal || 'Équilibre';
+      $('#qStyle').value = q.style || 'Rapide';
+      $('#qBudget').value = q.budget || 'normal';
+      $('#qTime').value = q.time || '25';
+      $('#qHeight').value = q.height || '';
+      $('#qWeight').value = q.weight || '';
+      $('#qSport').value = q.sport || 'modere';
+      $('#qNutrition').value = q.nutrition || 'equilibre';
+      $('#qAllergies').value = q.allergies || '';
+      $('#qLikes').value = q.likes || '';
+      $('#qDislikes').value = q.dislikes || '';
+    }
+
+    function syncQuizDraft(){
+      const q = state.onboarding.quizDraft;
+      q.name = $('#qName').value.trim();
+      q.pin = $('#qPin').value.trim();
+      q.type = $('#qType').value;
+      q.persons = Math.max(1, Number($('#qPersons').value || 1));
+      q.age = $('#qAge').value.trim();
+      q.cookingLevel = $('#qCookingLevel').value;
+      q.goal = $('#qGoal').value;
+      q.style = $('#qStyle').value;
+      q.budget = $('#qBudget').value;
+      q.time = $('#qTime').value;
+      q.height = $('#qHeight').value.trim();
+      q.weight = $('#qWeight').value.trim();
+      q.sport = $('#qSport').value;
+      q.nutrition = $('#qNutrition').value;
+      q.allergies = $('#qAllergies').value.trim();
+      q.likes = $('#qLikes').value.trim();
+      q.dislikes = $('#qDislikes').value.trim();
+    }
+
+    function startCreateFlow(){
+      state.onboarding.step = 'type';
+      state.onboarding.selectedType = 'Solo';
+      state.onboarding.editProfileId = null;
+      state.onboarding.quizStep = 0;
+      state.onboarding.quizDraft = blankQuiz('Solo');
+      renderOnboarding();
+    }
+
+    function createGuestProfile(){
+      let guest = state.profiles.find(p => p.isGuest);
+      if(!guest){
+        guest = {id:uid(), name:'Invité', isGuest:true, pin:'', quiz:{...blankQuiz('Solo'), goal:'Découverte', style:'Rapide'}};
+        state.profiles.push(guest);
       }
+      state.activeProfileId = guest.id;
+      save();
+      return guest;
+    }
+
+    function saveProfileFromQuiz(){
+      syncQuizDraft();
+      const q = state.onboarding.quizDraft;
+      let profile = null;
+      if(state.onboarding.editProfileId){
+        profile = state.profiles.find(p => p.id === state.onboarding.editProfileId);
+      }
+      if(!profile){
+        profile = {id:uid(), name:'', pin:'', isGuest:false, quiz:{}};
+        state.profiles.push(profile);
+      }
+      profile.name = q.name || (q.type === 'Famille' ? 'Profil famille' : q.type === 'Duo' ? 'Profil duo' : q.type === 'Sur mesure' ? 'Profil sur mesure' : 'Profil solo');
+      profile.pin = q.pin || '';
+      profile.quiz = {
+        type:q.type, persons:q.persons, age:q.age, height:q.height, weight:q.weight,
+        allergies:q.allergies, likes:q.likes, dislikes:q.dislikes,
+        goal:q.goal, style:q.style, budget:q.budget, time:q.time, sport:q.sport,
+        nutrition:q.nutrition, cookingLevel:q.cookingLevel
+      };
+      state.activeProfileId = profile.id;
+      save();
     }
 
     function renderHeader(){
+      const labels = {home:'Accueil',catalog:'Catalogue',fridge:'Frigo',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
       const p = activeProfile();
-      const labels = {home:'Accueil',catalog:'Catalogue',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
       $('#headerPage').textContent = labels[state.currentView] || 'Accueil';
-      $('#headerProfile').textContent = `${p?.name || 'Profil'} · ${p?.quiz?.type || 'Solo'}`;
-      $('#headerGoal').textContent = p?.quiz?.goal || 'Équilibre';
+      $('#headerProfile').textContent = `${p.name} · ${p.quiz?.type || 'Solo'}`;
+      $('#headerGoal').textContent = p.quiz?.goal || 'Découverte';
+    }
+
+    function estimatedBudget(){
+      return Math.round(state.shopping.filter(i => !i.done).reduce((sum, item) => sum + (PRICE_BY_CAT[item.category] || PRICE_BY_CAT['Autres']) * Math.max(1, Number(item.qty)||1) * 0.6, 0));
     }
 
     function renderHome(){
       const p = activeProfile();
-      const hour = new Date().getHours();
-      const hello = hour<12?'Bonjour':hour<18?'Bon après-midi':'Bonsoir';
-      $('#homeHello').textContent = `${hello} ${p?.name || ''}`.trim();
-      $('#homeLead').textContent = `Profil ${p?.quiz?.type || 'Solo'} · ${p?.quiz?.style || 'Équilibré'} · objectif ${p?.quiz?.goal || 'Équilibre'}. Tu peux planifier ta semaine, ajuster tes recettes et partir en courses avec une liste claire.`;
-      $('#homeTypeBadge').textContent = p?.quiz?.type || 'Solo';
-      $('#homePlanned').textContent = plannedCount();
-      $('#homeShoppingCount').textContent = shoppingActiveCount();
-      $('#homeBudget').textContent = `${shoppingBudget().toFixed(0)} €`;
-      const rec = filterRecipesByProfile(recipesDb()).find(r => r.goal === (p?.quiz?.goal || 'Équilibre')) || filterRecipesByProfile(recipesDb())[0];
-      $('#homeSuggestion').innerHTML = rec ? `
-        <div class="recipeCard" data-open-recipe="${rec.id}">
+      const visibleRecipes = filterRecipesByProfile(recipesDb());
+      const planned = state.weekPlan.reduce((acc, day) => acc + Object.values(day.meals).filter(Boolean).length, 0);
+      const suggestion = visibleRecipes.find(r => r.goal === p.quiz?.goal) || visibleRecipes.find(r => r.meal === 'Repas du soir') || visibleRecipes[0];
+      $('#homeHello').textContent = p.isGuest ? 'Bienvenue en mode invité' : `Bonjour ${p.name}`;
+      $('#homeLead').textContent = `${p.quiz?.type || 'Solo'} · ${p.quiz?.persons || 1} ${Number(p.quiz?.persons || 1) > 1 ? 'personnes' : 'personne'} · ${p.quiz?.goal || 'Découverte'} · ${p.quiz?.style || 'Rapide'}`;
+      $('#homeTypeBadge').textContent = p.quiz?.type || 'Solo';
+      $('#homePlanned').textContent = planned;
+      $('#homeShoppingCount').textContent = state.shopping.filter(i => !i.done).length;
+      $('#homeRecipeCount').textContent = visibleRecipes.length;
+      $('#homeSuggestion').innerHTML = suggestion ? `
+        <div class="item" data-open-recipe="${suggestion.id}">
           <div class="between">
             <div>
-              <h3>${esc(rec.name)}</h3>
-              <p class="sub small">${esc(rec.meal)} · ${rec.time} min · ${esc(rec.tags[0] || 'simple')}</p>
+              <div>${esc(suggestion.name)}</div>
+              <div class="small muted">${esc(suggestion.meal)} · ${suggestion.time} min · ${suggestion.ingredients.length} ingrédients</div>
             </div>
-            <button class="btn primary" data-suggest-add="${rec.id}">Ajouter</button>
+            <button class="btn" data-suggest-add="${suggestion.id}">Ajouter</button>
           </div>
-          <img src="${rec.image}" alt="${esc(rec.name)}">
-        </div>` : '<div class="empty">Aucune suggestion pour le moment.</div>';
+          <div class="recipeTags">
+            ${suggestion.tags.slice(0,3).map(t => `<span>${esc(t)}</span>`).join('')}
+          </div>
+        </div>` : `<div class="empty">Aucune recette visible pour l’instant.</div>`;
     }
 
     function renderCatalog(){
-      const cat = state.catalogCategory;
-      $('#catalogTabs').innerHTML = Object.keys(CATALOG_BASE).map(c => `<button class="chip ${c===cat?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
-      const q = ($('#catalogSearch').value || '').trim().toLowerCase();
-      const list = (CATALOG_BASE[cat]||[]).filter(i => !state.hiddenProducts.includes(itemKey(cat,i.name))).filter(i => !q || i.name.toLowerCase().includes(q));
-      $('#catalogList').innerHTML = list.length ? list.map(i => `
-        <div class="item">
+      const db = catalogDb();
+      const categories = Object.keys(db);
+      $('#newCatalogItemCategory').innerHTML = categories.map(cat => `<option>${esc(cat)}</option>`).join('');
+      $('#catalogTabs').innerHTML = categories.map(cat => `<button class="chip ${state.catalogCategory===cat ? 'active':''}" data-cat="${esc(cat)}">${esc(cat)}</button>`).join('');
+      const search = normalize($('#catalogSearch').value || '');
+      const items = (db[state.catalogCategory] || [])
+        .filter(item => !isHiddenProduct(state.catalogCategory, item.name))
+        .filter(item => !search || normalize(item.name).includes(search))
+        .sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+      $('#catalogList').innerHTML = items.length ? items.map(item => {
+        const qty = getCatalogQty(state.catalogCategory, item.name);
+        const isCustom = isCustomProduct(state.catalogCategory, item.name);
+        return `
+        <div class="item ${qty>0 ? '' : 'soft'}">
           <div class="catalogRow">
             <div>
-              <h3>${esc(i.name)}</h3>
-              <p class="sub small">${esc(cat)} · unité : ${esc(i.unit)}</p>
+              <div>${esc(item.name)}</div>
+              <div class="small muted">${esc(item.unit)} · quantité actuelle ${formatQty(qty)}</div>
             </div>
             <div class="catalogActions">
               <div class="qtyBox">
-                <button class="qtyBtn" data-cat-minus="${esc(i.name)}">−</button>
-                <span class="qtyValue">${formatQty(getCatalogQty(cat,i.name))}</span>
-                <button class="qtyBtn" data-cat-plus="${esc(i.name)}">＋</button>
+                <button class="qtyBtn" data-cat-minus="${esc(item.name)}">−</button>
+                <span class="qtyValue">${formatQty(qty)}</span>
+                <button class="qtyBtn" data-cat-plus="${esc(item.name)}">＋</button>
               </div>
-              <button class="btn primary" data-add-cat-item="${esc(i.name)}">Ajouter</button>
-              <button class="btn danger" data-hide-product="${esc(i.name)}">✕</button>
+              <button class="btn ${qty===0 ? 'ghost':''}" data-add-cat-item="${esc(item.name)}">${qty===0 ? 'Ajouter 1' : 'Ajouter à la liste'}</button>
+              ${isCustom ? `<button class="btn danger" data-delete-product="${esc(item.name)}">Suppr.</button>` : ''}
+              <button class="btn danger" data-hide-product="${esc(item.name)}">✕</button>
             </div>
           </div>
-        </div>`).join('') : '<div class="empty">Aucun article visible dans cette catégorie.</div>';
-      const hidden = (CATALOG_BASE[cat]||[]).filter(i => state.hiddenProducts.includes(itemKey(cat,i.name)));
-      $('#hiddenProductsList').innerHTML = hidden.length ? hidden.map(i => `
+        </div>`;
+      }).join('') : `<div class="empty">Aucun article dans cette catégorie avec ce filtre.</div>`;
+      const hidden = (db[state.catalogCategory] || []).filter(item => isHiddenProduct(state.catalogCategory, item.name));
+      $('#hiddenProductsList').innerHTML = hidden.length ? hidden.map(item => `
         <div class="item">
-          <div class="catalogRow">
+          <div class="between">
             <div>
-              <h3>${esc(i.name)}</h3>
-              <p class="sub small">Article masqué</p>
+              <div>${esc(item.name)}</div>
+              <div class="small muted">${esc(item.unit)}</div>
             </div>
-            <button class="btn primary" data-restore-product="${esc(i.name)}">Remettre</button>
+            <button class="btn" data-restore-product="${esc(item.name)}">Remettre</button>
           </div>
-        </div>`).join('') : '<div class="empty">Aucun article masqué ici.</div>';
+        </div>`).join('') : `<div class="empty">Aucun article masqué.</div>`;
+    }
+
+
+    function renderFridge(){
+      $('#fridgeQuickAdd').innerHTML = FRIDGE_QUICK.map(name => `<button class="miniChip" data-fridge-quick="${esc(name)}">${esc(name)}</button>`).join('');
+      $('#fridgeList').innerHTML = (state.fridge || []).length ? state.fridge.map(item => `
+        <div class="item ${item.fast ? 'soft' : ''}">
+          <div class="shoppingRow">
+            <div>
+              <div>${esc(item.name)}</div>
+              <div class="small muted">${formatQty(item.qty)} ${esc(item.unit)}${item.fast ? ' · à utiliser vite' : ''}</div>
+            </div>
+            <div class="shoppingActions">
+              <div class="qtyBox">
+                <button class="qtyBtn" data-fridge-minus="${item.id}">−</button>
+                <span class="qtyValue">${formatQty(item.qty)}</span>
+                <button class="qtyBtn" data-fridge-plus="${item.id}">＋</button>
+              </div>
+              <button class="togglePill ${item.fast ? 'fast' : ''}" data-fridge-fast="${item.id}">${item.fast ? 'À utiliser vite' : 'Normal'}</button>
+              <button class="btn" data-fridge-to-coach="${item.id}">Idée</button>
+              <button class="btn danger" data-fridge-remove="${item.id}">✕</button>
+            </div>
+          </div>
+        </div>`).join('') : `<div class="empty">Ton frigo est encore vide. Ajoute simplement ce que tu as chez toi.</div>`;
     }
 
     function renderShopping(){
       const filters = ['Tout','À acheter','Déjà pris'];
-      $('#shoppingFilters').innerHTML = filters.map(f => `<button class="chip ${state.shoppingFilter===f?'active':''}" data-shopping-filter="${esc(f)}">${esc(f)}</button>`).join('');
-      let list = [...state.shopping];
-      if(state.shoppingFilter==='À acheter') list = list.filter(i => !i.done);
-      if(state.shoppingFilter==='Déjà pris') list = list.filter(i => i.done);
-      $('#shoppingList').innerHTML = list.length ? list.map(i => `
-        <div class="item ${i.done?'done':''}">
-          <div class="shoppingRow">
-            <div class="row">
-              <button class="check" data-toggle-shopping="${i.id}">✓</button>
-              <div>
-                <div class="itemName">${esc(i.name)}</div>
-                <div class="small muted">${formatQty(i.qty)} ${esc(i.unit)} · ${esc(i.cat)} · <span class="sourceTag">${esc(i.source)}</span></div>
-              </div>
-            </div>
-            <div class="shoppingActions">
-              <div class="qtyBox">
-                <button class="qtyBtn" data-shopping-minus="${i.id}">−</button>
-                <span class="qtyValue">${formatQty(i.qty)}</span>
-                <button class="qtyBtn" data-shopping-plus="${i.id}">＋</button>
-              </div>
-              <button class="btn danger" data-remove-shopping="${i.id}">Suppr.</button>
-            </div>
+      $('#shoppingFilters').innerHTML = filters.map(f => `<button class="chip ${state.shoppingFilter===f ? 'active':''}" data-shopping-filter="${esc(f)}">${esc(f)}</button>`).join('');
+      let items = [...state.shopping];
+      if(state.shoppingFilter === 'À acheter') items = items.filter(i => !i.done);
+      if(state.shoppingFilter === 'Déjà pris') items = items.filter(i => i.done);
+      const byCat = {};
+      items.forEach(item => {
+        const cat = item.category || 'Autres';
+        if(!byCat[cat]) byCat[cat] = [];
+        byCat[cat].push(item);
+      });
+      const categories = Object.keys(byCat).sort();
+      $('#shoppingList').innerHTML = categories.length ? categories.map(cat => `
+        <div class="item">
+          <div class="sectionTitleRow">
+            <h3>${esc(cat)}</h3>
+            <span class="pill">${byCat[cat].length} article${byCat[cat].length>1?'s':''}</span>
           </div>
-        </div>`).join('') : '<div class="empty">Ta liste est vide pour le moment.</div>';
+          <div class="list" style="margin-top:10px">
+            ${byCat[cat].map(item => `
+              <div class="shoppingRow ${item.done ? 'done' : ''}">
+                <div class="row">
+                  <button class="check" data-toggle-shopping="${item.id}">✓</button>
+                  <div>
+                    <div class="itemName">${esc(item.name)}</div>
+                    <div class="small muted">${formatQty(item.qty)} ${esc(item.unit)} · ${esc(item.source)}</div>
+                  </div>
+                </div>
+                <div class="shoppingActions">
+                  <div class="qtyBox">
+                    <button class="qtyBtn" data-shopping-minus="${item.id}">−</button>
+                    <span class="qtyValue">${formatQty(item.qty)}</span>
+                    <button class="qtyBtn" data-shopping-plus="${item.id}">＋</button>
+                  </div>
+                  <button class="btn danger" data-remove-shopping="${item.id}">✕</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('') : `<div class="empty">Ta liste est vide. Ajoute une recette, un article du catalogue ou génère ta semaine.</div>`;
     }
 
     function renderWeek(){
-      const modes = ['Équilibre','Petit budget','Rapide','Perte de poids','Prise de muscle'];
-      $('#weekModes').innerHTML = modes.map(m => `<button class="chip ${state.weekMode===m?'active':''}" data-week-mode="${esc(m)}">${esc(m)}</button>`).join('');
-      $('#weekDaysChips').innerHTML = DAYS.map((d,i) => `<button class="chip dayChip ${state.selectedDay===i?'active':''}" data-day-index="${i}">${esc(d)}</button>`).join('');
+      const modes = ['Équilibre','Forme','Petit budget','Rapide','Gourmand','Organisation'];
+      $('#weekModes').innerHTML = modes.map(mode => `<button class="chip ${state.weekMode===mode ? 'active':''}" data-week-mode="${esc(mode)}">${esc(mode)}</button>`).join('');
+      $('#weekDaysChips').innerHTML = DAYS.map((day, idx) => `<button class="chip dayChip ${state.selectedDay===idx ? 'active':''}" data-day-index="${idx}">${esc(day)}</button>`).join('');
       const day = state.weekPlan[state.selectedDay];
       $('#selectedDayTitle').textContent = day.day;
-      $('#selectedDayCount').textContent = `${MEALS.filter(m=>day.meals[m]).length}/4`;
+      const filled = Object.values(day.meals).filter(Boolean).length;
+      $('#selectedDayCount').textContent = `${filled}/4`;
       $('#dayMeals').innerHTML = MEALS.map(meal => {
-        const rid = day.meals[meal];
-        const recipe = recipesDb().find(r => r.id === rid);
-        return `
-          <div class="mealCard">
-            <div class="between">
-              <div>
-                <div class="mealName">${esc(meal)}</div>
-                <div class="mealValue">${recipe ? esc(recipe.name) : 'Aucun repas choisi'}</div>
-              </div>
-              <div class="row">
-                <button class="btn primary" data-pick-meal="${esc(meal)}">Choisir</button>
-                ${recipe ? `<button class="btn" data-open-recipe="${recipe.id}">Voir</button><button class="btn danger" data-clear-meal="${esc(meal)}">✕</button>` : ''}
-              </div>
+        const recipeId = day.meals[meal];
+        const recipe = recipesDb().find(r => r.id === recipeId);
+        return `<div class="mealCard">
+          <div class="between">
+            <div>
+              <div class="mealName">${esc(meal)}</div>
+              <div class="mealValue">${recipe ? esc(recipe.name) : 'Aucun repas choisi'}</div>
+              <div class="small muted" style="margin-top:4px">${recipe ? `${recipe.time} min · ${recipe.ingredients.length} ingrédients` : 'Choisis une recette ou génère la semaine.'}</div>
             </div>
-          </div>`;
+            <div class="row">
+              ${recipe ? `<button class="btn" data-open-recipe="${recipe.id}">Voir</button><button class="btn danger" data-clear-meal="${esc(meal)}">✕</button>` : `<button class="btn primary" data-pick-meal="${esc(meal)}">Choisir</button>`}
+            </div>
+          </div>
+        </div>`;
       }).join('');
     }
 
     function renderRecipes(){
-      const tabs = ['Toutes', ...MEALS];
-      $('#recipeTabs').innerHTML = tabs.map(t => `<button class="chip ${state.recipeFilter===t?'active':''}" data-recipe-filter="${esc(t)}">${esc(t)}</button>`).join('');
-      const q = ($('#recipeSearch').value || '').trim().toLowerCase();
+      const tabs = ['Toutes', ...MEALS, 'Pâtes'];
+      $('#recipeTabs').innerHTML = tabs.map(tab => `<button class="chip ${state.recipeFilter===tab ? 'active':''}" data-recipe-filter="${esc(tab)}">${esc(tab)}</button>`).join('');
+      const search = normalize($('#recipeSearch').value || '');
       let list = filterRecipesByProfile(recipesDb());
-      if(state.recipeFilter !== 'Toutes') list = list.filter(r => r.meal === state.recipeFilter);
-      if(q) list = list.filter(r => (r.name + ' ' + r.tags.join(' ') + ' ' + r.ingredients.map(i=>i[0]).join(' ')).toLowerCase().includes(q));
+      if(state.recipeFilter !== 'Toutes') list = list.filter(r => r.meal === state.recipeFilter || recipeFamily(r) === state.recipeFilter);
+      if(search) list = list.filter(r => normalize(`${r.name} ${recipeFamily(r)} ${r.meal} ${r.tags.join(' ')}`).includes(search));
       $('#recipesList').innerHTML = list.length ? list.map(r => `
         <div class="recipeCard" data-open-recipe="${r.id}">
           <div class="between">
             <div>
-              <h3>${esc(r.name)}</h3>
-              <p class="sub small">${esc(r.meal)} · ${r.time} min · ${esc(r.goal)}</p>
+              <div>${esc(r.name)}</div>
+              <div class="small muted">${esc(recipeFamily(r))} · ${esc(r.meal)} · ${r.time} min · ${r.ingredients.length} ingrédients</div>
             </div>
             <button class="btn danger" data-hide-recipe="${r.id}">✕</button>
           </div>
-          <img src="${r.image}" alt="${esc(r.name)}">
-          <div class="recipeTags">${r.tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>
-        </div>`).join('') : '<div class="empty">Aucune recette pour ce filtre.</div>';
+          <div class="recipeTags">
+            <span>${esc(recipeFamily(r))}</span>
+            ${r.tags.slice(0,4).map(tag => `<span>${esc(tag)}</span>`).join('')}
+          </div>
+          <img src="${recipeImage(r)}" alt="${esc(r.name)}">
+        </div>`).join('') : `<div class="empty">Aucune recette visible avec ce filtre.</div>`;
       const hidden = recipesDb().filter(r => state.hiddenRecipes.includes(r.id));
       $('#hiddenRecipesList').innerHTML = hidden.length ? hidden.map(r => `
         <div class="item">
           <div class="between">
             <div>
               <div>${esc(r.name)}</div>
-              <div class="small muted">Recette masquée</div>
+              <div class="small muted">${esc(recipeFamily(r))} · ${r.time} min</div>
             </div>
-            <button class="btn primary" data-restore-recipe="${r.id}">Remettre</button>
+            <button class="btn" data-restore-recipe="${r.id}">Remettre</button>
           </div>
-        </div>`).join('') : '<div class="empty">Aucune recette masquée.</div>';
+        </div>`).join('') : `<div class="empty">Aucune recette masquée.</div>`;
     }
 
     function renderRecipeModal(){
-      const r = activeRecipe();
       const modal = $('#recipeModal');
+      const r = recipesDb().find(x => x.id === state.openRecipeId);
       if(!r){ modal.classList.remove('open'); return; }
       modal.classList.add('open');
-      const servings = state.recipeServings[r.id] || r.servings;
+      const servings = getRecipeServings(r);
+      const detailed = detailedRecipeSteps(r);
       $('#recipeModalContent').innerHTML = `
         <div class="between">
           <div>
-            <h2>${esc(r.name)}</h2>
-            <p class="sub small">${esc(r.meal)} · ${r.time} min · ${esc(r.goal)}</p>
+            <div class="badge">${esc(recipeFamily(r))}</div>
+            <h2 style="margin-top:10px">${esc(r.name)}</h2>
+            <p class="sub small" style="margin-top:6px">${r.time} min · ${r.ingredients.length} ingrédients · repas ${esc(r.meal)} · objectif ${esc(r.goal)}</p>
           </div>
           <button class="iconBtn" data-close="recipeModal">✕</button>
         </div>
-        <div class="recipeHero"><img src="${r.image}" alt="${esc(r.name)}"></div>
+        <div class="recipeHero"><img src="${recipeImage(r)}" alt="${esc(r.name)}"></div>
         <div class="recipeTags">${r.tags.map(t=>`<span>${esc(t)}</span>`).join('')}<span>sans porc</span><span>sans alcool</span></div>
         <div class="between" style="margin-top:14px">
           <div>
@@ -867,27 +1264,28 @@
           </div>
           <div class="qtyBox">
             <button class="qtyBtn" data-recipe-servings-minus="${r.id}">−</button>
-            <span class="qtyValue">${servings}</span>
+            <span class="qtyValue">${formatQty(servings)}</span>
             <button class="qtyBtn" data-recipe-servings-plus="${r.id}">＋</button>
           </div>
         </div>
         <div class="divider"></div>
         <div>
           <h3>Ingrédients</h3>
+          <div class="small muted" style="margin-top:4px">${r.ingredients.length} ingrédients au total</div>
           <div class="list" style="margin-top:10px">
             ${r.ingredients.map(([name,qty,unit])=>`<div class="item small">${esc(name)} · ${formatQty(scaleQty(qty, r.servings, servings))} ${esc(unit)}</div>`).join('')}
           </div>
         </div>
         <div class="divider"></div>
         <div>
-          <h3>Préparation</h3>
+          <h3>Préparation détaillée</h3>
           <div class="list" style="margin-top:10px">
-            ${r.steps.map((s,i)=>`<div class="item small"><span class="badge">${i+1}</span> ${esc(s)}</div>`).join('')}
+            ${detailed.map((s,i)=>`<div class="item small"><span class="badge">${i+1}</span> ${esc(s)}</div>`).join('')}
           </div>
         </div>
         <div class="grid2" style="margin-top:14px">
           <button class="btn primary" data-recipe-add-list="${r.id}">Ajouter à la liste</button>
-          <button class="btn" data-recipe-add-week="${r.id}">Ajouter à ${esc(DAYS[state.selectedDay])}</button>
+          <button class="btn" data-recipe-add-week="${r.id}">Ajouter au jour choisi</button>
         </div>`;
     }
 
@@ -896,28 +1294,39 @@
       if(!state.weekPicker.open){ modal.classList.remove('open'); return; }
       modal.classList.add('open');
       $('#weekPickerLabel').textContent = `${DAYS[state.weekPicker.dayIndex]} · ${state.weekPicker.meal}`;
-      const filters = filterRecipesByProfile(recipesDb()).filter(r => r.meal === state.weekPicker.meal);
-      $('#weekPickerFilters').innerHTML = ['Toutes', ...new Set(filters.flatMap(r=>r.tags.slice(0,2)))].map(tag=>`<span class="pill">${esc(tag)}</span>`).join('');
-      $('#weekPickerList').innerHTML = filters.length ? filters.map(r => `
+      const list = filterRecipesByProfile(recipesDb()).filter(r => r.meal === state.weekPicker.meal);
+      $('#weekPickerList').innerHTML = list.length ? list.map(r => `
         <div class="item">
           <div class="between">
             <div>
               <div>${esc(r.name)}</div>
-              <div class="small muted">${r.time} min · ${esc(r.goal)}</div>
+              <div class="small muted">${r.time} min · ${r.ingredients.length} ingrédients</div>
             </div>
             <div class="row">
               <button class="btn" data-open-recipe-from-picker="${r.id}">Voir</button>
               <button class="btn primary" data-pick-week-recipe="${r.id}">Choisir</button>
             </div>
           </div>
-        </div>`).join('') : '<div class="empty">Aucune recette adaptée.</div>';
+        </div>`).join('') : `<div class="empty">Aucune recette adaptée à ce moment de la journée.</div>`;
     }
 
     function renderChat(){
-      const prompts = ['Idée repas', 'Construis ma semaine', 'Liste petit budget', 'Perte de poids', 'Programme sport'];
-      $('#coachPrompts').innerHTML = prompts.map(p=>`<button class="chip" data-prompt="${esc(p)}">${esc(p)}</button>`).join('');
-      $('#chatList').innerHTML = state.chats.map(c => `<div class="bubble ${c.role==='me'?'me':'bot'}">${esc(c.text)}</div>`).join('');
+      const prompts = [
+        'Idée repas',
+        'Avec mon frigo',
+        'Construis ma semaine',
+        'Liste petit budget',
+        'Perte de poids',
+        'Prise de muscle',
+        'Remplacer un ingrédient',
+        'Sport rapide',
+        'Batch cooking'
+      ];
+      $('#coachPrompts').innerHTML = prompts.map(p => `<button class="miniChip" data-prompt="${esc(p)}">${esc(p)}</button>`).join('');
+      $('#chatList').innerHTML = state.chats.map(c => `<div class="bubble ${c.role==='me' ? 'me' : 'bot'}">${esc(c.text)}</div>`).join('');
       $('#chatList').scrollTop = $('#chatList').scrollHeight;
+      $('#coachCard').classList.toggle('coachCollapsed', !!state.coachCompact);
+      $('#toggleCoachCompactBtn').textContent = state.coachCompact ? 'Ouvrir' : 'Réduire';
     }
 
     function renderSettings(){ $('#apiKeyInput').value = state.apiKey || ''; }
@@ -927,6 +1336,7 @@
       renderHeader();
       renderHome();
       renderCatalog();
+      renderFridge();
       renderShopping();
       renderWeek();
       renderRecipes();
@@ -948,93 +1358,120 @@
       window.scrollTo({top:0, behavior:'smooth'});
     }
 
-    function createProfile(name, type, pin=''){
-      const profile = {id:uid(), name, pin, quiz:{...blankQuiz(type), type}};
-      state.profiles.push(profile);
-      state.activeProfileId = profile.id;
-      save();
-      renderOnboarding();
-      renderHeader();
-      toast('Profil créé');
-    }
-
-    function updateActiveProfileFromQuiz(){
-      let p = activeProfile();
-      if(!p){ createProfile('Solo','Solo',''); p = activeProfile(); }
-      p.name = $('#qName').value.trim() || p.name;
-      p.quiz = {
-        ...p.quiz,
-        type:$('#qType').value,
-        persons:Number($('#qPersons').value || 1),
-        age:$('#qAge').value,
-        height:$('#qHeight').value,
-        weight:$('#qWeight').value,
-        goal:$('#qGoal').value,
-        style:$('#qStyle').value,
-        budget:$('#qBudget').value,
-        time:$('#qTime').value,
-        sport:$('#qSport').value,
-        allergies:$('#qAllergies').value.trim(),
-        likes:$('#qLikes').value.trim(),
-        dislikes:$('#qDislikes').value.trim()
-      };
-      save();
-    }
-
     function hideProduct(name){
       const key = itemKey(state.catalogCategory, name);
       if(!state.hiddenProducts.includes(key)) state.hiddenProducts.push(key);
-      save(); renderCatalog(); toast('Article masqué');
+      save();
+      renderCatalog();
+      toast('Article masqué');
     }
+
     function restoreProduct(name){
       const key = itemKey(state.catalogCategory, name);
-      state.hiddenProducts = state.hiddenProducts.filter(k=>k!==key);
-      save(); renderCatalog(); toast('Article remis');
+      state.hiddenProducts = state.hiddenProducts.filter(k => k !== key);
+      save();
+      renderCatalog();
+      toast('Article remis');
     }
-    function hideRecipe(id){ if(!state.hiddenRecipes.includes(id)) state.hiddenRecipes.push(id); save(); renderRecipes(); toast('Recette masquée'); }
-    function restoreRecipe(id){ state.hiddenRecipes = state.hiddenRecipes.filter(x=>x!==id); save(); renderRecipes(); toast('Recette remise'); }
+
+    function hideRecipe(id){
+      if(!state.hiddenRecipes.includes(id)) state.hiddenRecipes.push(id);
+      save();
+      renderRecipes();
+      toast('Recette masquée');
+    }
+
+    function restoreRecipe(id){
+      state.hiddenRecipes = state.hiddenRecipes.filter(x => x !== id);
+      save();
+      renderRecipes();
+      toast('Recette remise');
+    }
+
     function addRecipeToWeek(recipeId, dayIndex=state.selectedDay){
-      const recipe = recipesDb().find(r=>r.id===recipeId); if(!recipe) return;
+      const recipe = recipesDb().find(r => r.id === recipeId);
+      if(!recipe) return;
       state.weekPlan[dayIndex].meals[recipe.meal] = recipe.id;
-      save(); renderWeek(); toast('Ajouté au programme');
+      save();
+      renderWeek();
+      renderHome();
+      toast('Ajouté au programme');
     }
-    function openWeekPicker(dayIndex, meal){ state.weekPicker = {open:true, dayIndex, meal}; renderWeekPicker(); }
-    function closeModal(id){ $('#'+id).classList.remove('open'); if(id==='recipeModal') state.openRecipeId=null; if(id==='weekPickerModal') state.weekPicker.open=false; save(); }
+
+    function openWeekPicker(dayIndex, meal){
+      state.weekPicker = {open:true, dayIndex, meal};
+      renderWeekPicker();
+    }
+
+    function closeModal(id){
+      $('#'+id).classList.remove('open');
+      if(id === 'recipeModal') state.openRecipeId = null;
+      if(id === 'weekPickerModal') state.weekPicker.open = false;
+      save();
+    }
 
     function generateWeek(){
       const p = activeProfile();
       const visible = filterRecipesByProfile(recipesDb());
-      state.weekPlan = DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => {
-        let pool = visible.filter(r => r.meal===meal);
-        const targeted = pool.filter(r => r.goal===state.weekMode || r.goal===p.quiz.goal);
-        if(targeted.length) pool = targeted;
-        return [meal, (pool[0]||null)?.id || null];
-      }))}));
-      save(); renderWeek(); renderHome(); toast('Programme généré');
+      state.weekPlan = DAYS.map((day, dayIdx) => ({
+        day,
+        meals:Object.fromEntries(MEALS.map((meal, mealIdx) => {
+          let pool = visible.filter(r => r.meal === meal);
+          let targeted = pool.filter(r => r.goal === state.weekMode || r.goal === p.quiz.goal || r.tags.some(t => normalize(t).includes(normalize(p.quiz.style || ''))));
+          if(!targeted.length) targeted = pool;
+          const pick = targeted[(dayIdx + mealIdx) % Math.max(1, targeted.length)] || null;
+          return [meal, pick ? pick.id : null];
+        }))
+      }));
+      save();
+      renderWeek();
+      renderHome();
+      toast('Programme généré');
     }
-    function clearWeek(){ state.weekPlan = defaultWeek(); save(); renderWeek(); renderHome(); toast('Programme vidé'); }
+
+    function clearWeek(){
+      state.weekPlan = DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => [meal,null]))}));
+      save();
+      renderWeek();
+      renderHome();
+      toast('Programme vidé');
+    }
+
     function sendWeekToShopping(){
-      state.weekPlan.forEach(day => MEALS.forEach(meal => { if(day.meals[meal]) addRecipeIngredientsToShopping(day.meals[meal], recipesDb().find(r=>r.id===day.meals[meal]).servings); }));
+      state.weekPlan.forEach(day => MEALS.forEach(meal => {
+        const recipeId = day.meals[meal];
+        if(recipeId){
+          const recipe = recipesDb().find(r => r.id === recipeId);
+          if(recipe) addRecipeIngredientsToShopping(recipeId, getRecipeServings(recipe));
+        }
+      }));
       switchView('shopping');
     }
 
     function localCoachReply(text){
       const p = activeProfile();
-      const t = text.toLowerCase();
-      if(hasForbidden(text)) return 'Je ne propose ni porc ni alcool dans cette application. Je peux en revanche te donner une alternative adaptée, par exemple poulet, dinde, tofu, poisson, bouillon citronné ou sauce sans alcool.';
-      if(t.includes('semaine')) return `Pour ton profil ${p.quiz.type.toLowerCase()}, je te conseille une semaine ${p.quiz.goal.toLowerCase()} sur 4 moments par jour : petit-déjeuner simple, déjeuner rassasiant, goûter léger, repas du soir plus digeste.`;
-      if(t.includes('budget')) return 'Pour réduire le budget, base-toi sur œufs, flocons d’avoine, pommes de terre, lentilles corail, pâtes, riz et quelques légumes polyvalents. Je peux te préparer une semaine petit budget complète.';
-      if(t.includes('poids') || t.includes('gras')) return 'Pour aller vers une perte de poids, garde des protéines à chaque repas, maîtrise les portions de féculents le soir et privilégie des collations simples. Je peux te bâtir un programme semaine + sport doux.';
-      if(t.includes('sport')) return `Côté sport, je te conseillerais un rythme ${p.quiz.sport} avec 3 à 5 séances courtes par semaine, combinées à des repas réguliers et suffisamment protéinés.`;
-      if(t.includes('liste')) return 'Le plus pratique est de choisir tes recettes ou de générer ta semaine, puis d’envoyer le tout dans la liste de courses. Les quantités seront ajoutées automatiquement et les doublons fusionnés.';
-      return 'Je peux t’aider à construire une semaine, adapter tes recettes, alléger ton panier, équilibrer ton alimentation ou te proposer un plan sport simple et concret.';
+      const t = normalize(text);
+      if(hasForbidden(text)) return 'Je ne propose ni porc ni alcool dans cette application. Je peux en revanche te donner une alternative adaptée : poulet, dinde, tofu, poisson, bouillon citronné ou sauce sans alcool.';
+      if(t.includes('frigo')) return state.fridge?.length ? `Avec ton frigo actuel — ${fridgeSummary()} — je te conseillerais un repas simple autour des produits déjà présents. Va dans Recettes ou dis-moi si tu veux plutôt un déjeuner, un goûter ou un dîner.` : 'Ton frigo est encore vide dans l’app. Ajoute quelques produits puis redemande-moi une idée repas.';
+      if(t.includes('semaine')) return `Pour ton profil ${normalize(p.quiz.type)} orienté ${normalize(p.quiz.goal)}, je peux te proposer une semaine en 4 temps : petit-déjeuner simple, déjeuner rassasiant, goûter léger et repas du soir plus digeste.`;
+      if(t.includes('budget')) return 'Pour réduire le budget, appuie-toi surtout sur les œufs, les flocons d’avoine, le riz, les pâtes, les pommes de terre, les lentilles corail et quelques légumes polyvalents.';
+      if(t.includes('poids') || t.includes('gras')) return 'Pour aller vers une perte de poids, garde une source de protéines à chaque repas, maîtrise les portions de féculents le soir et mise sur des collations simples.';
+      if(t.includes('muscle')) return 'Pour une prise de muscle, assure une portion régulière de protéines, ajoute une source de glucides autour de l’entraînement et garde une bonne régularité sur la semaine.';
+      if(t.includes('sport')) return `Avec ton niveau ${p.quiz.sport}, je te conseillerais 3 à 5 séances courtes par semaine, associées à une alimentation régulière et suffisamment protéinée.`;
+      if(t.includes('liste')) return 'Le plus simple est de choisir tes recettes ou de générer ta semaine, puis d’envoyer le tout dans la liste de courses. Les quantités sont ajoutées automatiquement et les doublons fusionnés.';
+      return 'Je peux t’aider à construire une semaine, ajuster des recettes, utiliser ton frigo, alléger ton panier, équilibrer ton alimentation ou te proposer un plan sport simple et concret.';
     }
+
     async function askGemini(text){
       if(!state.apiKey) return localCoachReply(text);
       const p = activeProfile();
-      const prompt = `Tu es un expert en cuisine, nutrition, diététique et coaching sportif. Réponds en français, de façon concrète. Règle absolue : tu ne proposes jamais de porc ni d’alcool et tu rediriges vers des alternatives adaptées. Profil utilisateur : ${JSON.stringify(p)}. Demande : ${text}`;
+      const context = state.chats.slice(-8).map(m => `${m.role==='me' ? 'Utilisateur' : 'Assistant'}: ${m.text}`).join('\n');
+      const fridge = fridgeSummary() || 'Aucun produit saisi dans le frigo';
+      const prompt = `Tu es un expert en cuisine, nutrition, diététique et coaching sportif. Réponds en français, de façon concrète. Règle absolue : tu ne proposes jamais de porc ni d’alcool et tu rediriges vers des alternatives adaptées. Garde les réponses courtes. Profil utilisateur : ${JSON.stringify(p)}. Frigo actuel : ${fridge}. Contexte récent : ${context}. Nouvelle demande : ${text}`;
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
       });
       const data = await res.json();
       const out = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join('\n') || '';
@@ -1045,14 +1482,14 @@
       const name = $('#customRecipeName').value.trim();
       const meal = $('#customRecipeMeal').value;
       const servings = Math.max(1, Number($('#customRecipeServings').value || 2));
-      const image = $('#customRecipeImage').value.trim() || (meal==='Petit-déjeuner'?IMG.breakfast:meal==='Déjeuner'?IMG.lunch:meal==='Goûter'?IMG.snack:IMG.dinner);
+      const image = $('#customRecipeImage').value.trim() || '';
       const ingredientsRaw = $('#customRecipeIngredients').value.trim();
       const stepsRaw = $('#customRecipeSteps').value.trim();
       if(!name || !ingredientsRaw || !stepsRaw) return toast('Complète la recette');
       if(hasForbidden(name + ' ' + ingredientsRaw + ' ' + stepsRaw)) return toast('Porc et alcool sont exclus de cette app');
-      const ingredients = ingredientsRaw.split('\n').map(line => line.split('|').map(x=>x.trim())).filter(parts => parts[0]).map(parts => [parts[0], Number(parts[1]||1), parts[2]||'pièce']);
-      const steps = stepsRaw.split('\n').map(s=>s.trim()).filter(Boolean);
-      state.customRecipes.push({id:uid(), name, meal, goal:'Sur mesure', servings, time:20, image, tags:['maison'], ingredients, steps});
+      const ingredients = ingredientsRaw.split('\n').map(line => line.split('|').map(x => x.trim())).filter(parts => parts[0]).map(parts => [parts[0], Number(parts[1] || 1), parts[2] || 'pièce']);
+      const steps = stepsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+      state.customRecipes.push({id:uid(), name, meal, family:meal, goal:'Sur mesure', servings, time:20, image, tags:['maison'], ingredients, steps});
       ['#customRecipeName','#customRecipeImage','#customRecipeIngredients','#customRecipeSteps'].forEach(id => $(id).value='');
       $('#customRecipeServings').value = 2;
       save();
@@ -1061,7 +1498,55 @@
       toast('Recette créée');
     }
 
-    function bind(){
+    function addCustomCatalogItem(){
+      const name = $('#newCatalogItemName').value.trim();
+      const category = $('#newCatalogItemCategory').value;
+      const unit = $('#newCatalogItemUnit').value.trim() || 'pièce';
+      if(!name) return toast('Entre un nom d’article');
+      if(hasForbidden(name)) return toast('Porc et alcool sont exclus de cette app');
+      if((catalogDb()[category] || []).some(i => normalize(i.name)===normalize(name))) return toast('Cet article existe déjà');
+      state.customProducts.push({id:uid(), name, defaultQty:0, unit, category});
+      $('#newCatalogItemName').value = '';
+      $('#newCatalogItemUnit').value = '';
+      save();
+      renderCatalog();
+      toast('Article ajouté au catalogue');
+    }
+
+
+    function addFridgeItem(name, qty=1, unit='pièce'){
+      const clean = String(name||'').trim();
+      if(!clean) return toast('Entre un produit du frigo');
+      if(hasForbidden(clean)) return toast('Porc et alcool sont exclus de cette app');
+      const existing = state.fridge.find(i => normalize(i.name)===normalize(clean) && i.unit===unit);
+      if(existing){
+        existing.qty = Math.round((Number(existing.qty) + Number(qty))*100)/100;
+      }else{
+        state.fridge.push({id:uid(), name:clean, qty:Number(qty)||1, unit, fast:false});
+      }
+      save();
+      renderFridge();
+      toast('Ajouté au frigo');
+    }
+
+    function removeCustomProduct(category, name){
+      state.customProducts = state.customProducts.filter(p => !(p.category===category && p.name===name));
+      state.catalogQty[itemKey(category,name)] = 0;
+      state.hiddenProducts = state.hiddenProducts.filter(k => k !== itemKey(category,name));
+      save();
+      renderCatalog();
+      toast('Produit supprimé');
+    }
+
+    function clearCoachHistory(){
+      state.chats = defaultState().chats;
+      save();
+      renderChat();
+      toast('Historique IA effacé');
+    }
+
+    
+function bind(){
       $('#openDrawerBtn').onclick = () => $('#drawer').classList.add('open');
       $('#closeDrawerBtn').onclick = () => $('#drawer').classList.remove('open');
       $('#drawerBack').onclick = () => $('#drawer').classList.remove('open');
@@ -1071,87 +1556,302 @@
       $('#homeRecipesBtn').onclick = () => switchView('recipes');
       $('#homeShoppingBtn').onclick = () => switchView('shopping');
       $('#homeCoachBtn').onclick = () => switchView('coach');
+      $('#homeOpenIntroBtn').onclick = () => { state.onboarding.open = true; state.onboarding.step = 'tutorial'; state.onboarding.tutorialIndex = 0; renderOnboarding(); };
 
-      $('#skipOnboardingBtn').onclick = () => { state.onboardingOpen=false; save(); renderOnboarding(); };
-      $('#enterDirectBtn').onclick = () => { state.onboardingOpen=false; save(); renderOnboarding(); };
-      $('#toIntroBtn').onclick = () => { state.onboardingStep=1; renderOnboarding(); };
-      $('#introPrevBtn').onclick = () => { if(state.introIndex>0){state.introIndex--; renderOnboarding();} else {state.onboardingStep=0; renderOnboarding();} };
-      $('#introNextBtn').onclick = () => {
-        if(state.introIndex<INTRO.length-1){state.introIndex++; renderOnboarding();}
-        else {state.onboardingStep=2; renderOnboarding();}
+      $('#closeOnboardingBtn').onclick = () => {
+        if(!state.profiles.length) createGuestProfile();
+        state.onboarding.open = false;
+        save();
+        renderOnboarding();
+        renderAll();
       };
-      $('#backToIntroBtn').onclick = () => { state.onboardingStep=1; renderOnboarding(); };
-      $('#finishOnboardingBtn').onclick = () => { updateActiveProfileFromQuiz(); state.onboardingOpen=false; save(); renderAll(); toast('Profil enregistré'); };
-      $('#createProfileBtn').onclick = () => {
-        const name = $('#newProfileName').value.trim();
-        const type = $('#newProfileType').value;
-        const pin = $('#newProfilePin').value.trim();
-        if(!name) return toast('Entre un nom de profil');
-        createProfile(name, type, pin);
-        $('#newProfileName').value=''; $('#newProfilePin').value='';
+      $('#introGuestBtn').onclick = () => {
+        createGuestProfile();
+        state.onboarding.step = 'tutorial';
+        state.onboarding.tutorialIndex = 0;
+        state.onboarding.open = true;
+        renderOnboarding();
+      };
+      $('#introPrevBtn').onclick = () => {
+        if(state.onboarding.introIndex > 0){
+          state.onboarding.introIndex--;
+          renderOnboarding();
+        }
+      };
+      $('#introNextBtn').onclick = () => {
+        if(state.onboarding.introIndex < INTRO_SLIDES.length - 1){
+          state.onboarding.introIndex++;
+          renderOnboarding();
+        }else{
+          state.onboarding.step = 'account';
+          renderOnboarding();
+        }
+      };
+
+      $('#startCreateBtn').onclick = startCreateFlow;
+      $('#accountGuestBtn').onclick = () => {
+        createGuestProfile();
+        state.onboarding.step = 'tutorial';
+        state.onboarding.tutorialIndex = 0;
+        renderOnboarding();
+        renderAll();
       };
       $('#profilesStart').onclick = e => {
         const card = e.target.closest('[data-pick-profile]');
         if(!card) return;
-        const profile = state.profiles.find(p=>p.id===card.dataset.pickProfile);
-        if(profile?.pin){
+        state.onboarding.selectedProfileId = card.dataset.pickProfile;
+        renderOnboarding();
+      };
+      $('#useSelectedProfileBtn').onclick = () => {
+        const profile = state.profiles.find(p => p.id === state.onboarding.selectedProfileId);
+        if(!profile) return toast('Sélectionne un profil');
+        if(profile.pin){
           const entered = prompt(`Entre le code du profil ${profile.name}`);
           if(entered !== profile.pin) return toast('Code incorrect');
         }
-        state.activeProfileId = card.dataset.pickProfile;
-        save(); renderOnboarding(); renderHeader(); toast('Profil sélectionné');
+        state.activeProfileId = profile.id;
+        state.onboarding.step = 'tutorial';
+        state.onboarding.tutorialIndex = 0;
+        save();
+        renderOnboarding();
+        renderAll();
+      };
+      $('#editSelectedProfileBtn').onclick = () => {
+        const profile = state.profiles.find(p => p.id === state.onboarding.selectedProfileId);
+        if(!profile) return toast('Sélectionne un profil');
+        state.activeProfileId = profile.id;
+        state.onboarding.editProfileId = profile.id;
+        state.onboarding.selectedType = profile.quiz?.type || 'Solo';
+        state.onboarding.quizStep = 0;
+        state.onboarding.quizDraft = {...blankQuiz(profile.quiz?.type || 'Solo'), ...profile.quiz, name:profile.name, pin:profile.pin || ''};
+        state.onboarding.step = 'quiz';
+        renderOnboarding();
+      };
+
+      $('#typeCards').onclick = e => {
+        const card = e.target.closest('[data-type-card]');
+        if(!card) return;
+        state.onboarding.selectedType = card.dataset.typeCard;
+        renderOnboarding();
+      };
+      $('#typeBackBtn').onclick = () => { state.onboarding.step = 'account'; renderOnboarding(); };
+      $('#typeNextBtn').onclick = () => {
+        state.onboarding.quizDraft = {...blankQuiz(state.onboarding.selectedType), type:state.onboarding.selectedType};
+        state.onboarding.quizStep = 0;
+        state.onboarding.step = 'quiz';
+        renderOnboarding();
+      };
+
+      $('#quizTabs').onclick = e => {
+        const b = e.target.closest('[data-quiz-tab]');
+        if(!b) return;
+        syncQuizDraft();
+        state.onboarding.quizStep = Number(b.dataset.quizTab);
+        renderOnboarding();
+      };
+      $('#qType').onchange = e => {
+        $('#qPersons').value = e.target.value === 'Duo' ? 2 : e.target.value === 'Famille' ? 4 : 1;
+      };
+      $('#quizBackBtn').onclick = () => {
+        if(state.onboarding.editProfileId){
+          state.onboarding.step = 'account';
+        }else{
+          state.onboarding.step = 'type';
+        }
+        renderOnboarding();
+      };
+      $('#quizPrevBtn').onclick = () => {
+        syncQuizDraft();
+        if(state.onboarding.quizStep > 0){
+          state.onboarding.quizStep--;
+          renderOnboarding();
+        }
+      };
+      $('#quizNextBtn').onclick = () => {
+        syncQuizDraft();
+        if(state.onboarding.quizStep < 2){
+          state.onboarding.quizStep++;
+          renderOnboarding();
+        }else{
+          saveProfileFromQuiz();
+          state.onboarding.step = 'tutorial';
+          state.onboarding.tutorialIndex = 0;
+          state.onboarding.editProfileId = null;
+          renderOnboarding();
+          renderAll();
+        }
+      };
+
+      $('#tutorialPrevBtn').onclick = () => {
+        if(state.onboarding.tutorialIndex > 0){
+          state.onboarding.tutorialIndex--;
+          renderOnboarding();
+        }else{
+          state.onboarding.step = state.profiles.length ? 'account' : 'intro';
+          renderOnboarding();
+        }
+      };
+      $('#tutorialNextBtn').onclick = () => {
+        if(state.onboarding.tutorialIndex < TUTORIAL_SLIDES.length - 1){
+          state.onboarding.tutorialIndex++;
+          renderOnboarding();
+        }else{
+          state.onboarding.open = false;
+          save();
+          renderOnboarding();
+          renderAll();
+        }
       };
 
       $('#catalogSearch').oninput = renderCatalog;
       $('#toggleHiddenProductsBtn').onclick = () => $('#hiddenProductsWrap').classList.toggle('hidden');
-      $('#catalogTabs').onclick = e => { const b=e.target.closest('[data-cat]'); if(!b) return; state.catalogCategory=b.dataset.cat; save(); renderCatalog(); };
-      $('#catalogList').onclick = e => {
-        const name = e.target.dataset.addCatItem || e.target.dataset.hideProduct || e.target.dataset.catPlus || e.target.dataset.catMinus;
-        if(!name) return;
-        const cat = state.catalogCategory;
-        const item = getCatalogItem(cat,name);
-        if(e.target.dataset.catPlus) return setCatalogQty(cat,name,getCatalogQty(cat,name)+1);
-        if(e.target.dataset.catMinus) return setCatalogQty(cat,name,Math.max(1,getCatalogQty(cat,name)-1));
-        if(e.target.dataset.hideProduct) return hideProduct(name);
-        if(item) addShopping(item.name, getCatalogQty(cat,name), item.unit, cat, 'catalogue');
+      $('#saveCatalogItemBtn').onclick = addCustomCatalogItem;
+      $('#catalogTabs').onclick = e => {
+        const b = e.target.closest('[data-cat]');
+        if(!b) return;
+        state.catalogCategory = b.dataset.cat;
+        save();
+        renderCatalog();
       };
-      $('#hiddenProductsList').onclick = e => { const b=e.target.closest('[data-restore-product]'); if(!b) return; restoreProduct(b.dataset.restoreProduct); };
+      $('#catalogList').onclick = e => {
+        const cat = state.catalogCategory;
+        const name = e.target.dataset.addCatItem || e.target.dataset.hideProduct || e.target.dataset.catPlus || e.target.dataset.catMinus || e.target.dataset.deleteProduct;
+        if(!name) return;
+        const item = getCatalogItem(cat, name);
+        if(e.target.dataset.catPlus) return setCatalogQty(cat, name, getCatalogQty(cat, name) + 1);
+        if(e.target.dataset.catMinus) return setCatalogQty(cat, name, Math.max(0, getCatalogQty(cat, name) - 1));
+        if(e.target.dataset.hideProduct) return hideProduct(name);
+        if(e.target.dataset.deleteProduct) return removeCustomProduct(cat, name);
+        if(item) addShopping(item.name, Math.max(1, getCatalogQty(cat, name) || 1), item.unit, cat, 'catalogue');
+      };
+      $('#hiddenProductsList').onclick = e => {
+        const b = e.target.closest('[data-restore-product]');
+        if(!b) return;
+        restoreProduct(b.dataset.restoreProduct);
+      };
 
-      $('#shoppingFilters').onclick = e => { const b=e.target.closest('[data-shopping-filter]'); if(!b) return; state.shoppingFilter=b.dataset.shoppingFilter; save(); renderShopping(); };
+      $('#saveFridgeItemBtn').onclick = () => {
+        addFridgeItem($('#fridgeItemName').value.trim(), Number($('#fridgeItemQty').value || 1), $('#fridgeItemUnit').value.trim() || 'pièce');
+        $('#fridgeItemName').value = '';
+        $('#fridgeItemQty').value = 1;
+        $('#fridgeItemUnit').value = '';
+      };
+      $('#fridgeQuickAdd').onclick = e => {
+        const b = e.target.closest('[data-fridge-quick]');
+        if(!b) return;
+        addFridgeItem(b.dataset.fridgeQuick, 1, getCatalogItem(findCatalogCategory(b.dataset.fridgeQuick), b.dataset.fridgeQuick)?.unit || 'pièce');
+      };
+      $('#fridgeList').onclick = e => {
+        const id = e.target.dataset.fridgePlus || e.target.dataset.fridgeMinus || e.target.dataset.fridgeFast || e.target.dataset.fridgeRemove || e.target.dataset.fridgeToCoach;
+        if(!id) return;
+        const item = state.fridge.find(x => x.id === id);
+        if(!item) return;
+        if(e.target.dataset.fridgePlus) item.qty = Math.round((Number(item.qty) + 1) * 100) / 100;
+        else if(e.target.dataset.fridgeMinus) item.qty = Math.max(1, Math.round((Number(item.qty) - 1) * 100) / 100);
+        else if(e.target.dataset.fridgeFast) item.fast = !item.fast;
+        else if(e.target.dataset.fridgeToCoach){
+          switchView('coach');
+          $('#coachInput').value = `Propose-moi un repas avec ${item.name}`;
+          return renderChat();
+        }else if(e.target.dataset.fridgeRemove) state.fridge = state.fridge.filter(x => x.id !== id);
+        save();
+        renderFridge();
+      };
+      $('#fridgeIdeasBtn').onclick = () => {
+        switchView('coach');
+        $('#coachInput').value = state.fridge.length ? `Propose-moi un repas avec mon frigo : ${fridgeSummary()}` : 'Propose-moi un repas simple à partir de quelques ingrédients de base';
+      };
+
+      $('#shoppingFilters').onclick = e => {
+        const b = e.target.closest('[data-shopping-filter]');
+        if(!b) return;
+        state.shoppingFilter = b.dataset.shoppingFilter;
+        save();
+        renderShopping();
+      };
       $('#shoppingList').onclick = e => {
         const id = e.target.dataset.toggleShopping || e.target.dataset.shoppingPlus || e.target.dataset.shoppingMinus || e.target.dataset.removeShopping;
         if(!id) return;
-        const item = state.shopping.find(x=>x.id===id); if(!item) return;
-        if(e.target.dataset.toggleShopping){ item.done=!item.done; }
-        else if(e.target.dataset.shoppingPlus){ item.qty = Math.round((Number(item.qty)+1)*100)/100; }
-        else if(e.target.dataset.shoppingMinus){ item.qty = Math.max(1, Math.round((Number(item.qty)-1)*100)/100); }
-        else if(e.target.dataset.removeShopping){ state.shopping = state.shopping.filter(x=>x.id!==id); }
-        save(); renderShopping(); renderHome();
+        const item = state.shopping.find(x => x.id === id);
+        if(!item) return;
+        if(e.target.dataset.toggleShopping) item.done = !item.done;
+        else if(e.target.dataset.shoppingPlus) item.qty = Math.round((Number(item.qty) + 1) * 100) / 100;
+        else if(e.target.dataset.shoppingMinus) item.qty = Math.max(1, Math.round((Number(item.qty) - 1) * 100) / 100);
+        else if(e.target.dataset.removeShopping) state.shopping = state.shopping.filter(x => x.id !== id);
+        save();
+        renderShopping();
+        renderHome();
       };
-      $('#clearDoneShoppingBtn').onclick = () => { state.shopping = state.shopping.filter(i=>!i.done); save(); renderShopping(); renderHome(); toast('Articles cochés retirés'); };
+      $('#clearDoneShoppingBtn').onclick = () => {
+        state.shopping = state.shopping.filter(i => !i.done);
+        save();
+        renderShopping();
+        renderHome();
+        toast('Articles cochés retirés');
+      };
 
-      $('#weekModes').onclick = e => { const b=e.target.closest('[data-week-mode]'); if(!b) return; state.weekMode=b.dataset.weekMode; save(); renderWeek(); };
+      $('#weekModes').onclick = e => {
+        const b = e.target.closest('[data-week-mode]');
+        if(!b) return;
+        state.weekMode = b.dataset.weekMode;
+        save();
+        renderWeek();
+      };
       $('#generateWeekBtn').onclick = generateWeek;
       $('#clearWeekBtn').onclick = clearWeek;
       $('#weekToShoppingBtn').onclick = sendWeekToShopping;
-      $('#weekDaysChips').onclick = e => { const b=e.target.closest('[data-day-index]'); if(!b) return; state.selectedDay=Number(b.dataset.dayIndex); save(); renderWeek(); };
+      $('#weekDaysChips').onclick = e => {
+        const b = e.target.closest('[data-day-index]');
+        if(!b) return;
+        state.selectedDay = Number(b.dataset.dayIndex);
+        save();
+        renderWeek();
+      };
       $('#dayMeals').onclick = e => {
         const pick = e.target.closest('[data-pick-meal]');
         const clear = e.target.closest('[data-clear-meal]');
         const open = e.target.closest('[data-open-recipe]');
         if(pick) return openWeekPicker(state.selectedDay, pick.dataset.pickMeal);
-        if(clear){ state.weekPlan[state.selectedDay].meals[clear.dataset.clearMeal]=null; save(); renderWeek(); renderHome(); return; }
-        if(open){ state.openRecipeId = open.dataset.openRecipe; save(); renderRecipeModal(); }
+        if(clear){
+          state.weekPlan[state.selectedDay].meals[clear.dataset.clearMeal] = null;
+          save();
+          renderWeek();
+          renderHome();
+          return;
+        }
+        if(open){
+          state.openRecipeId = open.dataset.openRecipe;
+          save();
+          renderRecipeModal();
+        }
       };
       $('#weekPickerList').onclick = e => {
         const choose = e.target.closest('[data-pick-week-recipe]');
         const open = e.target.closest('[data-open-recipe-from-picker]');
-        if(choose){ state.weekPlan[state.weekPicker.dayIndex].meals[state.weekPicker.meal] = choose.dataset.pickWeekRecipe; state.weekPicker.open=false; save(); renderWeek(); renderHome(); renderWeekPicker(); toast('Recette ajoutée'); }
-        if(open){ state.openRecipeId = open.dataset.openRecipeFromPicker; save(); renderRecipeModal(); }
+        if(choose){
+          state.weekPlan[state.weekPicker.dayIndex].meals[state.weekPicker.meal] = choose.dataset.pickWeekRecipe;
+          state.weekPicker.open = false;
+          save();
+          renderWeek();
+          renderHome();
+          renderWeekPicker();
+          toast('Recette ajoutée');
+        }
+        if(open){
+          state.openRecipeId = open.dataset.openRecipeFromPicker;
+          save();
+          renderRecipeModal();
+        }
       };
 
-      $('#recipeSearch').oninput = e => { state.recipeSearch=e.target.value; renderRecipes(); };
-      $('#recipeTabs').onclick = e => { const b=e.target.closest('[data-recipe-filter]'); if(!b) return; state.recipeFilter=b.dataset.recipeFilter; save(); renderRecipes(); };
+      $('#recipeSearch').oninput = e => { state.recipeSearch = e.target.value; renderRecipes(); };
+      $('#recipeTabs').onclick = e => {
+        const b = e.target.closest('[data-recipe-filter]');
+        if(!b) return;
+        state.recipeFilter = b.dataset.recipeFilter;
+        save();
+        renderRecipes();
+      };
       $('#toggleHiddenRecipesBtn').onclick = () => $('#hiddenRecipesWrap').classList.toggle('hidden');
       $('#recipesList').onclick = e => {
         const hide = e.target.closest('[data-hide-recipe]');
@@ -1159,7 +1859,11 @@
         const open = e.target.closest('[data-open-recipe]');
         if(open){ state.openRecipeId = open.dataset.openRecipe; save(); renderRecipeModal(); }
       };
-      $('#hiddenRecipesList').onclick = e => { const b=e.target.closest('[data-restore-recipe]'); if(!b) return; restoreRecipe(b.dataset.restoreRecipe); };
+      $('#hiddenRecipesList').onclick = e => {
+        const b = e.target.closest('[data-restore-recipe]');
+        if(!b) return;
+        restoreRecipe(b.dataset.restoreRecipe);
+      };
       $('#openCustomRecipeBtn').onclick = () => $('#customRecipeModal').classList.add('open');
       $('#saveCustomRecipeBtn').onclick = saveCustomRecipe;
 
@@ -1167,34 +1871,93 @@
         const close = e.target.closest('[data-close]');
         if(close) closeModal(close.dataset.close);
         const suggestAdd = e.target.closest('[data-suggest-add]');
-        if(suggestAdd){ e.stopPropagation(); const r=recipesDb().find(x=>x.id===suggestAdd.dataset.suggestAdd); if(r) addRecipeIngredientsToShopping(r.id, r.servings); }
+        if(suggestAdd){
+          e.stopPropagation();
+          const r = recipesDb().find(x => x.id === suggestAdd.dataset.suggestAdd);
+          if(r) addRecipeIngredientsToShopping(r.id, getRecipeServings(r));
+        }
         const open = e.target.closest('[data-open-recipe]');
-        if(open && !e.target.closest('#recipesList') && !e.target.closest('#dayMeals')){ state.openRecipeId=open.dataset.openRecipe; save(); renderRecipeModal(); }
+        if(open && !e.target.closest('#recipesList') && !e.target.closest('#dayMeals')){
+          state.openRecipeId = open.dataset.openRecipe;
+          save();
+          renderRecipeModal();
+        }
       };
       $('#recipeModalContent').onclick = e => {
         const minus = e.target.closest('[data-recipe-servings-minus]');
         const plus = e.target.closest('[data-recipe-servings-plus]');
         const addList = e.target.closest('[data-recipe-add-list]');
         const addWeek = e.target.closest('[data-recipe-add-week]');
-        if(minus){ const id=minus.dataset.recipeServingsMinus; const r=recipesDb().find(x=>x.id===id); state.recipeServings[id]=Math.max(1,(state.recipeServings[id]||r.servings)-1); save(); return renderRecipeModal(); }
-        if(plus){ const id=plus.dataset.recipeServingsPlus; const r=recipesDb().find(x=>x.id===id); state.recipeServings[id]=(state.recipeServings[id]||r.servings)+1; save(); return renderRecipeModal(); }
-        if(addList){ const id=addList.dataset.recipeAddList; const r=recipesDb().find(x=>x.id===id); addRecipeIngredientsToShopping(id, state.recipeServings[id]||r.servings); }
-        if(addWeek){ addRecipeToWeek(addWeek.dataset.recipeAddWeek, state.selectedDay); renderHome(); }
+        if(minus){
+          const id = minus.dataset.recipeServingsMinus;
+          const r = recipesDb().find(x => x.id === id);
+          state.recipeServings[id] = Math.max(1, (state.recipeServings[id] || getRecipeServings(r)) - 1);
+          save();
+          return renderRecipeModal();
+        }
+        if(plus){
+          const id = plus.dataset.recipeServingsPlus;
+          const r = recipesDb().find(x => x.id === id);
+          state.recipeServings[id] = (state.recipeServings[id] || getRecipeServings(r)) + 1;
+          save();
+          return renderRecipeModal();
+        }
+        if(addList){
+          const id = addList.dataset.recipeAddList;
+          const r = recipesDb().find(x => x.id === id);
+          addRecipeIngredientsToShopping(id, state.recipeServings[id] || getRecipeServings(r));
+        }
+        if(addWeek){
+          addRecipeToWeek(addWeek.dataset.recipeAddWeek, state.selectedDay);
+          renderHome();
+        }
       };
 
-      $('#coachPrompts').onclick = e => { const b=e.target.closest('[data-prompt]'); if(!b) return; $('#coachInput').value = b.dataset.prompt; };
+      $('#coachPrompts').onclick = e => {
+        const b = e.target.closest('[data-prompt]');
+        if(!b) return;
+        $('#coachInput').value = b.dataset.prompt === 'Avec mon frigo'
+          ? (state.fridge.length ? `Propose-moi un repas avec mon frigo : ${fridgeSummary()}` : 'Propose-moi un repas simple avec des ingrédients de base')
+          : b.dataset.prompt;
+      };
+      $('#toggleCoachCompactBtn').onclick = () => {
+        state.coachCompact = !state.coachCompact;
+        save();
+        renderChat();
+      };
       $('#sendCoachBtn').onclick = async () => {
         const text = $('#coachInput').value.trim();
         if(!text) return;
         state.chats.push({role:'me', text});
-        $('#coachInput').value=''; renderChat(); save();
-        const reply = await askGemini(text).catch(()=>localCoachReply(text));
+        if(state.chats.length > 31) state.chats = [state.chats[0], ...state.chats.slice(-30)];
+        $('#coachInput').value = '';
+        renderChat();
+        save();
+        const reply = await askGemini(text).catch(() => localCoachReply(text));
         state.chats.push({role:'bot', text:reply});
-        save(); renderChat();
+        if(state.chats.length > 31) state.chats = [state.chats[0], ...state.chats.slice(-30)];
+        save();
+        renderChat();
       };
+      $('#clearCoachHistoryBtn').onclick = clearCoachHistory;
+      $('#clearCoachHistoryBtn2').onclick = clearCoachHistory;
 
-      $('#reopenOnboardingBtn').onclick = () => { state.onboardingOpen=true; state.onboardingStep=0; save(); renderOnboarding(); };
-      $('#saveApiKeyBtn').onclick = () => { state.apiKey = $('#apiKeyInput').value.trim(); save(); toast('Clé enregistrée'); };
+      $('#reopenIntroBtn').onclick = () => { state.onboarding.open = true; state.onboarding.step = 'intro'; state.onboarding.introIndex = 0; renderOnboarding(); };
+      $('#reopenTutorialBtn').onclick = () => { state.onboarding.open = true; state.onboarding.step = 'tutorial'; state.onboarding.tutorialIndex = 0; renderOnboarding(); };
+      $('#reopenQuizBtn').onclick = () => {
+        const p = activeProfile();
+        state.onboarding.open = true;
+        state.onboarding.step = 'quiz';
+        state.onboarding.editProfileId = p.id === 'guest-temp' ? null : p.id;
+        state.onboarding.quizDraft = {...blankQuiz(p.quiz?.type || 'Solo'), ...p.quiz, name:p.name, pin:p.pin || ''};
+        state.onboarding.quizStep = 0;
+        renderOnboarding();
+      };
+      $('#saveApiKeyBtn').onclick = () => {
+        state.apiKey = $('#apiKeyInput').value.trim();
+        save();
+        toast('Clé enregistrée');
+      };
       $('#resetDemoBtn').onclick = () => {
         localStorage.removeItem(STORE_KEY);
         state = loadState();

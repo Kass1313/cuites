@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Maison Gourmet Mobile V7</title>
+  <title>Maison Gourmet Mobile V9</title>
   <meta name="theme-color" content="#0e1830">
   <style>
     :root{
@@ -314,7 +314,7 @@
       <div class="drawerLinks">
         <button class="drawerLink active" data-view="home">Accueil</button>
         <button class="drawerLink" data-view="catalog">Catalogue</button>
-        <button class="drawerLink" data-view="fridge">Frigo</button>
+        <button class="drawerLink" data-view="fridge">Mes provisions</button>
         <button class="drawerLink" data-view="shopping">Liste de courses</button>
         <button class="drawerLink" data-view="week">Programme semaine</button>
         <button class="drawerLink" data-view="recipes">Recettes</button>
@@ -461,7 +461,7 @@
       <div class="card">
         <div class="between">
           <div>
-            <h2>Frigo</h2>
+            <h2>Mes provisions</h2>
             <p class="sub small">Ajoute simplement ce que tu as chez toi, sans dates compliquées. Tu peux aussi marquer certains produits à utiliser vite.</p>
           </div>
           <button class="btn" id="fridgeIdeasBtn">Idées repas</button>
@@ -612,6 +612,8 @@
     const hasForbidden = text => FORBIDDEN.some(w => normalize(text).includes(normalize(w)));
 
     const FRIDGE_QUICK = ['Œufs','Lait','Yaourts nature','Tomates','Poulet','Fromage râpé','Salade','Bananes','Pain complet','Fruits rouges'];
+    const BASE_PACK = ['Œufs','Lait','Farine','Huile d’olive','Riz basmati','Penne','Spaghetti','Thon','Tomates concassées','Beurre','Yaourts nature','Fromage râpé'];
+    const PROVISION_IDEA_STYLES = ['Rapide','Facile','Équilibrée','Gourmande','Peu d’ingrédients'];
 
     function recipeFamily(recipe){
       if(recipe.family) return recipe.family;
@@ -738,7 +740,7 @@
         customRecipes:[],
         openRecipeId:null,
         recipeServings:{},
-        chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce qu’il y a dans ton frigo et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
+        chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce que tu as déjà dans tes provisions et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
         coachCompact:false,
         apiKey:'',
         weekPicker:{open:false, meal:'Déjeuner', dayIndex:0},
@@ -757,7 +759,6 @@
       }
       base.onboarding = defaultOnboarding();
       if(!Array.isArray(base.profiles)) base.profiles = [];
-      if(!base.activeProfileId && base.profiles[0]) base.activeProfileId = base.profiles[0].id;
       if(!Array.isArray(base.shopping)) base.shopping = [];
       if(!Array.isArray(base.fridge)) base.fridge = [];
       if(!Array.isArray(base.hiddenProducts)) base.hiddenProducts = [];
@@ -798,7 +799,7 @@
     }
 
     function activeProfile(){
-      return state.profiles.find(p => p.id === state.activeProfileId) || state.profiles[0] || fallbackProfile();
+      return state.profiles.find(p => p.id === state.activeProfileId) || fallbackProfile();
     }
 
     function profileSummary(p){
@@ -913,8 +914,8 @@
       $('#introNextBtn').textContent = ob.introIndex === INTRO_SLIDES.length - 1 ? 'Découvrir' : 'Suivant';
 
       const selected = ob.selectedProfileId;
-      $('#profilesCountPill').textContent = `${state.profiles.length} ${state.profiles.length > 1 ? 'profils' : 'profil'}`;
-      $('#profilesStart').innerHTML = state.profiles.length ? state.profiles.map(p => `
+      const visibleProfiles = state.profiles.filter(p=>p.role!=='admin'); $('#profilesCountPill').textContent = `${visibleProfiles.length} ${visibleProfiles.length > 1 ? 'profils' : 'profil'}`;
+      $('#profilesStart').innerHTML = visibleProfiles.length ? visibleProfiles.map(p => `
         <div class="profileCard ${selected===p.id ? 'active' : ''}" data-pick-profile="${p.id}">
           <div class="name">${esc(p.name)}</div>
           <div class="sub small" style="margin-top:4px">${esc(profileSummary(p))}</div>
@@ -1029,7 +1030,7 @@
     }
 
     function renderHeader(){
-      const labels = {home:'Accueil',catalog:'Catalogue',fridge:'Frigo',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
+      const labels = {home:'Accueil',catalog:'Catalogue',fridge:'Mes provisions',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
       const p = activeProfile();
       $('#headerPage').textContent = labels[state.currentView] || 'Accueil';
       $('#headerProfile').textContent = `${p.name} · ${p.quiz?.type || 'Solo'}`;
@@ -1112,28 +1113,99 @@
         </div>`).join('') : `<div class="empty">Aucun article masqué.</div>`;
     }
 
+    function provisionTabItems(tab){
+      const db = catalogDb();
+      let items = [];
+      Object.keys(db).forEach(cat => (db[cat]||[]).forEach(item => items.push({...item, category:cat, custom:isCustomProduct(cat,item.name)})));
+      if(tab === 'Bases') items = items.filter(item => BASE_PACK.some(name => normalize(name)===normalize(item.name)));
+      else if(tab !== 'Tout') items = items.filter(item => item.category === tab);
+      const q = normalize(state.provisionSearch || '');
+      items = items.filter(item => !q || normalize(item.name).includes(q));
+      items = items.filter(item => !isHiddenProduct(item.category, item.name));
+      items.sort((a,b) => (Number(b.custom)-Number(a.custom)) || a.name.localeCompare(b.name,'fr'));
+      return items;
+    }
 
     function renderFridge(){
-      $('#fridgeQuickAdd').innerHTML = FRIDGE_QUICK.map(name => `<button class="miniChip" data-fridge-quick="${esc(name)}">${esc(name)}</button>`).join('');
-      $('#fridgeList').innerHTML = (state.fridge || []).length ? state.fridge.map(item => `
-        <div class="item ${item.fast ? 'soft' : ''}">
-          <div class="shoppingRow">
-            <div>
-              <div>${esc(item.name)}</div>
-              <div class="small muted">${formatQty(item.qty)} ${esc(item.unit)}${item.fast ? ' · à utiliser vite' : ''}</div>
-            </div>
-            <div class="shoppingActions">
-              <div class="qtyBox">
-                <button class="qtyBtn" data-fridge-minus="${item.id}">−</button>
-                <span class="qtyValue">${formatQty(item.qty)}</span>
-                <button class="qtyBtn" data-fridge-plus="${item.id}">＋</button>
-              </div>
-              <button class="togglePill ${item.fast ? 'fast' : ''}" data-fridge-fast="${item.id}">${item.fast ? 'À utiliser vite' : 'Normal'}</button>
-              <button class="btn" data-fridge-to-coach="${item.id}">Idée</button>
-              <button class="btn danger" data-fridge-remove="${item.id}">✕</button>
-            </div>
+      const db = catalogDb();
+      const tabs = ['Tout','Bases', ...Object.keys(db).filter(c=>c!=='Autres'), 'Autres'];
+      if(!tabs.includes(state.provisionCategory)) state.provisionCategory = 'Tout';
+      const list = provisionTabItems(state.provisionCategory);
+      const current = state.fridge || [];
+      const card = $('#view-fridge .card');
+      if(!card) return;
+      card.innerHTML = `
+        <div class="between">
+          <div>
+            <h2>Mes provisions</h2>
+            <p class="sub small">Tout ce que tu as déjà à la maison : frais, placard, conserves, pâtes, thon, boissons, hygiène ou ménage.</p>
           </div>
-        </div>`).join('') : `<div class="empty">Ton frigo est encore vide. Ajoute simplement ce que tu as chez toi.</div>`;
+          <button class="btn" id="provisionAskCoachBtn">Coach IA</button>
+        </div>
+        <div class="grid" style="margin-top:12px">
+          <div class="grid2">
+            <input class="input" id="provisionSearch" placeholder="🔎 Rechercher un produit" value="${esc(state.provisionSearch || '')}">
+            <button class="btn" id="addBasePackBtn">Ajouter les bases</button>
+          </div>
+          <div class="chips" id="provisionTabs">${tabs.map(tab => `<button class="chip ${state.provisionCategory===tab?'active':''}" data-provision-tab="${esc(tab)}">${esc(tab)}</button>`).join('')}</div>
+          <div class="list" id="provisionCatalogList">${list.length ? list.slice(0,60).map(item => `
+            <div class="item ${getCatalogQty(item.category, item.name)>0?'':'soft'}">
+              <div class="catalogRow">
+                <div>
+                  <div>${esc(item.name)} ${item.custom?'<span class="pill">perso</span>':''}</div>
+                  <div class="small muted">${esc(item.category)} · ${esc(item.unit)}</div>
+                </div>
+                <div class="catalogActions">
+                  <div class="qtyBox">
+                    <button class="qtyBtn" data-provision-minus="${esc(item.name)}" data-item-cat="${esc(item.category)}">−</button>
+                    <span class="qtyValue">${formatQty(getCatalogQty(item.category, item.name))}</span>
+                    <button class="qtyBtn" data-provision-plus="${esc(item.name)}" data-item-cat="${esc(item.category)}">＋</button>
+                  </div>
+                  <button class="btn" data-add-provision="${esc(item.name)}" data-item-cat="${esc(item.category)}">J’ai ça</button>
+                </div>
+              </div>
+            </div>`).join('') : `<div class="empty">Aucun produit trouvé avec ce filtre.</div>`}</div>
+        </div>
+        <div class="divider"></div>
+        <div class="between">
+          <div>
+            <h3>Mon stock maison</h3>
+            <p class="sub small">Tu ajustes les quantités, tu retires ce que tu n’as plus, puis tu demandes une idée recette.</p>
+          </div>
+          <div class="badge">${current.length} produit${current.length>1?'s':''}</div>
+        </div>
+        <div class="chips" style="margin-top:10px">${PROVISION_IDEA_STYLES.map(mode => `<button class="chip ${state.provisionIdeaStyle===mode?'active':''}" data-provision-idea-style="${esc(mode)}">${esc(mode)}</button>`).join('')}</div>
+        <div class="grid2" style="margin-top:10px">
+          <button class="btn primary" id="provisionIdeas3Btn">3 idées avec ce que j’ai</button>
+          <button class="btn" id="provisionToShoppingBtn">Ajouter ce qu’il manque</button>
+        </div>
+        <div class="list" id="fridgeList" style="margin-top:12px">${current.length ? current.map(item => `
+          <div class="item ${item.fast ? 'soft' : ''}">
+            <div class="shoppingRow">
+              <div>
+                <div>${esc(item.name)}</div>
+                <div class="small muted">${formatQty(item.qty)} ${esc(item.unit)}${item.fast ? ' · presque fini' : ''}</div>
+              </div>
+              <div class="shoppingActions">
+                <div class="qtyBox">
+                  <button class="qtyBtn" data-fridge-minus="${item.id}">−</button>
+                  <span class="qtyValue">${formatQty(item.qty)}</span>
+                  <button class="qtyBtn" data-fridge-plus="${item.id}">＋</button>
+                </div>
+                <button class="togglePill ${item.fast ? 'fast' : ''}" data-fridge-fast="${item.id}">${item.fast ? 'Presque fini' : 'Normal'}</button>
+                <button class="btn" data-fridge-to-shopping="${item.id}">Liste</button>
+                <button class="btn danger" data-fridge-remove="${item.id}">✕</button>
+              </div>
+            </div>
+          </div>`).join('') : `<div class="empty">Aucune provision pour le moment. Coche simplement ce que tu as déjà à la maison.</div>`}</div>`;
+    }
+
+    function provisionPrompt(count=1){
+      const summary = fridgeSummary() || 'quelques ingrédients de base';
+      const style = (state.provisionIdeaStyle || 'Rapide').toLowerCase();
+      return count === 3
+        ? `Propose-moi 3 idées de repas ${style} avec mes provisions : ${summary}`
+        : `Propose-moi une recette ${style} avec mes provisions : ${summary}`;
     }
 
     function renderShopping(){
@@ -1313,7 +1385,7 @@
     function renderChat(){
       const prompts = [
         'Idée repas',
-        'Avec mon frigo',
+        'Avec mes provisions',
         'Construis ma semaine',
         'Liste petit budget',
         'Perte de poids',
@@ -1452,22 +1524,22 @@
       const p = activeProfile();
       const t = normalize(text);
       if(hasForbidden(text)) return 'Je ne propose ni porc ni alcool dans cette application. Je peux en revanche te donner une alternative adaptée : poulet, dinde, tofu, poisson, bouillon citronné ou sauce sans alcool.';
-      if(t.includes('frigo')) return state.fridge?.length ? `Avec ton frigo actuel — ${fridgeSummary()} — je te conseillerais un repas simple autour des produits déjà présents. Va dans Recettes ou dis-moi si tu veux plutôt un déjeuner, un goûter ou un dîner.` : 'Ton frigo est encore vide dans l’app. Ajoute quelques produits puis redemande-moi une idée repas.';
+      if(t.includes('frigo')) return state.fridge?.length ? `Avec ton stock maison actuel — ${fridgeSummary()} — je te conseillerais un repas simple autour des produits déjà présents. Va dans Recettes ou dis-moi si tu veux plutôt un déjeuner, un goûter ou un dîner.` : 'Tes provisions sont encore vides dans l’app. Ajoute quelques produits puis redemande-moi une idée repas.';
       if(t.includes('semaine')) return `Pour ton profil ${normalize(p.quiz.type)} orienté ${normalize(p.quiz.goal)}, je peux te proposer une semaine en 4 temps : petit-déjeuner simple, déjeuner rassasiant, goûter léger et repas du soir plus digeste.`;
       if(t.includes('budget')) return 'Pour réduire le budget, appuie-toi surtout sur les œufs, les flocons d’avoine, le riz, les pâtes, les pommes de terre, les lentilles corail et quelques légumes polyvalents.';
       if(t.includes('poids') || t.includes('gras')) return 'Pour aller vers une perte de poids, garde une source de protéines à chaque repas, maîtrise les portions de féculents le soir et mise sur des collations simples.';
       if(t.includes('muscle')) return 'Pour une prise de muscle, assure une portion régulière de protéines, ajoute une source de glucides autour de l’entraînement et garde une bonne régularité sur la semaine.';
       if(t.includes('sport')) return `Avec ton niveau ${p.quiz.sport}, je te conseillerais 3 à 5 séances courtes par semaine, associées à une alimentation régulière et suffisamment protéinée.`;
       if(t.includes('liste')) return 'Le plus simple est de choisir tes recettes ou de générer ta semaine, puis d’envoyer le tout dans la liste de courses. Les quantités sont ajoutées automatiquement et les doublons fusionnés.';
-      return 'Je peux t’aider à construire une semaine, ajuster des recettes, utiliser ton frigo, alléger ton panier, équilibrer ton alimentation ou te proposer un plan sport simple et concret.';
+      return 'Je peux t’aider à construire une semaine, ajuster des recettes, utiliser tes provisions, alléger ton panier, équilibrer ton alimentation ou te proposer un plan sport simple et concret.';
     }
 
     async function askGemini(text){
       if(!state.apiKey) return localCoachReply(text);
       const p = activeProfile();
       const context = state.chats.slice(-8).map(m => `${m.role==='me' ? 'Utilisateur' : 'Assistant'}: ${m.text}`).join('\n');
-      const fridge = fridgeSummary() || 'Aucun produit saisi dans le frigo';
-      const prompt = `Tu es un expert en cuisine, nutrition, diététique et coaching sportif. Réponds en français, de façon concrète. Règle absolue : tu ne proposes jamais de porc ni d’alcool et tu rediriges vers des alternatives adaptées. Garde les réponses courtes. Profil utilisateur : ${JSON.stringify(p)}. Frigo actuel : ${fridge}. Contexte récent : ${context}. Nouvelle demande : ${text}`;
+      const fridge = fridgeSummary() || 'Aucune provision saisie';
+      const prompt = `Tu es un expert en cuisine, nutrition, diététique et coaching sportif. Réponds en français, de façon concrète. Règle absolue : tu ne proposes jamais de porc ni d’alcool et tu rediriges vers des alternatives adaptées. Garde les réponses courtes. Profil utilisateur : ${JSON.stringify(p)}. Mes provisions actuel : ${fridge}. Contexte récent : ${context}. Nouvelle demande : ${text}`;
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -1516,7 +1588,7 @@
 
     function addFridgeItem(name, qty=1, unit='pièce'){
       const clean = String(name||'').trim();
-      if(!clean) return toast('Entre un produit du frigo');
+      if(!clean) return toast('Entre un produit');
       if(hasForbidden(clean)) return toast('Porc et alcool sont exclus de cette app');
       const existing = state.fridge.find(i => normalize(i.name)===normalize(clean) && i.unit===unit);
       if(existing){
@@ -1526,7 +1598,7 @@
       }
       save();
       renderFridge();
-      toast('Ajouté au frigo');
+      toast('Ajouté à mes provisions');
     }
 
     function removeCustomProduct(category, name){
@@ -1730,36 +1802,64 @@ function bind(){
         restoreProduct(b.dataset.restoreProduct);
       };
 
-      $('#saveFridgeItemBtn').onclick = () => {
-        addFridgeItem($('#fridgeItemName').value.trim(), Number($('#fridgeItemQty').value || 1), $('#fridgeItemUnit').value.trim() || 'pièce');
-        $('#fridgeItemName').value = '';
-        $('#fridgeItemQty').value = 1;
-        $('#fridgeItemUnit').value = '';
-      };
-      $('#fridgeQuickAdd').onclick = e => {
-        const b = e.target.closest('[data-fridge-quick]');
-        if(!b) return;
-        addFridgeItem(b.dataset.fridgeQuick, 1, getCatalogItem(findCatalogCategory(b.dataset.fridgeQuick), b.dataset.fridgeQuick)?.unit || 'pièce');
-      };
-      $('#fridgeList').onclick = e => {
-        const id = e.target.dataset.fridgePlus || e.target.dataset.fridgeMinus || e.target.dataset.fridgeFast || e.target.dataset.fridgeRemove || e.target.dataset.fridgeToCoach;
-        if(!id) return;
-        const item = state.fridge.find(x => x.id === id);
-        if(!item) return;
-        if(e.target.dataset.fridgePlus) item.qty = Math.round((Number(item.qty) + 1) * 100) / 100;
-        else if(e.target.dataset.fridgeMinus) item.qty = Math.max(1, Math.round((Number(item.qty) - 1) * 100) / 100);
-        else if(e.target.dataset.fridgeFast) item.fast = !item.fast;
-        else if(e.target.dataset.fridgeToCoach){
+      $('#view-fridge').onclick = e => {
+        const tab = e.target.closest('[data-provision-tab]');
+        if(tab){ state.provisionCategory = tab.dataset.provisionTab; save(); renderFridge(); return; }
+        const ideaStyle = e.target.closest('[data-provision-idea-style]');
+        if(ideaStyle){ state.provisionIdeaStyle = ideaStyle.dataset.provisionIdeaStyle; save(); renderFridge(); return; }
+        const add = e.target.closest('[data-add-provision]');
+        if(add){
+          const cat = add.dataset.itemCat;
+          const name = add.dataset.addProvision;
+          const item = getCatalogItem(cat, name) || {name, unit:'pièce'};
+          addFridgeItem(name, Math.max(1, getCatalogQty(cat, name) || 1), item.unit);
+          return;
+        }
+        const plus = e.target.closest('[data-provision-plus]');
+        if(plus){ const cat = plus.dataset.itemCat; const name = plus.dataset.provisionPlus; setCatalogQty(cat, name, getCatalogQty(cat, name)+1); renderFridge(); return; }
+        const minus = e.target.closest('[data-provision-minus]');
+        if(minus){ const cat = minus.dataset.itemCat; const name = minus.dataset.provisionMinus; setCatalogQty(cat, name, Math.max(0, getCatalogQty(cat, name)-1)); renderFridge(); return; }
+        const id = e.target.dataset.fridgePlus || e.target.dataset.fridgeMinus || e.target.dataset.fridgeFast || e.target.dataset.fridgeRemove || e.target.dataset.fridgeToShopping;
+        if(id){
+          const item = state.fridge.find(x => x.id === id);
+          if(!item) return;
+          if(e.target.dataset.fridgePlus) item.qty = Math.round((Number(item.qty) + 1) * 100) / 100;
+          else if(e.target.dataset.fridgeMinus) item.qty = Math.max(1, Math.round((Number(item.qty) - 1) * 100) / 100);
+          else if(e.target.dataset.fridgeFast) item.fast = !item.fast;
+          else if(e.target.dataset.fridgeToShopping) addShopping(item.name, item.qty, item.unit, findCatalogCategory(item.name), 'mes provisions');
+          else if(e.target.dataset.fridgeRemove) state.fridge = state.fridge.filter(x => x.id !== id);
+          save(); renderFridge(); renderHome(); return;
+        }
+        if(e.target.id === 'addBasePackBtn'){
+          BASE_PACK.forEach(name => {
+            const cat = findCatalogCategory(name);
+            const item = getCatalogItem(cat, name) || {name, unit:'pièce'};
+            addFridgeItem(name, 1, item.unit);
+          });
+          toast('Bases ajoutées');
+          return;
+        }
+        if(e.target.id === 'provisionAskCoachBtn'){
           switchView('coach');
-          $('#coachInput').value = `Propose-moi un repas avec ${item.name}`;
-          return renderChat();
-        }else if(e.target.dataset.fridgeRemove) state.fridge = state.fridge.filter(x => x.id !== id);
-        save();
-        renderFridge();
+          $('#coachInput').value = provisionPrompt(1);
+          state.coachCompact = false; save(); renderChat(); return;
+        }
+        if(e.target.id === 'provisionIdeas3Btn'){
+          switchView('coach');
+          $('#coachInput').value = provisionPrompt(3);
+          state.coachCompact = false; save(); renderChat(); return;
+        }
+        if(e.target.id === 'provisionToShoppingBtn'){
+          state.fridge.filter(i => i.fast).forEach(item => addShopping(item.name, Math.max(1, item.qty), item.unit, findCatalogCategory(item.name), 'mes provisions'));
+          if(!state.fridge.some(i => i.fast)) toast('Marque d’abord quelques produits comme presque finis');
+          return;
+        }
       };
-      $('#fridgeIdeasBtn').onclick = () => {
-        switchView('coach');
-        $('#coachInput').value = state.fridge.length ? `Propose-moi un repas avec mon frigo : ${fridgeSummary()}` : 'Propose-moi un repas simple à partir de quelques ingrédients de base';
+      $('#view-fridge').oninput = e => {
+        if(e.target.id === 'provisionSearch'){
+          state.provisionSearch = e.target.value;
+          renderFridge();
+        }
       };
 
       $('#shoppingFilters').onclick = e => {
@@ -1916,8 +2016,8 @@ function bind(){
       $('#coachPrompts').onclick = e => {
         const b = e.target.closest('[data-prompt]');
         if(!b) return;
-        $('#coachInput').value = b.dataset.prompt === 'Avec mon frigo'
-          ? (state.fridge.length ? `Propose-moi un repas avec mon frigo : ${fridgeSummary()}` : 'Propose-moi un repas simple avec des ingrédients de base')
+        $('#coachInput').value = b.dataset.prompt === 'Avec mes provisions'
+          ? (state.fridge.length ? `Propose-moi un repas avec mes provisions : ${fridgeSummary()}` : 'Propose-moi un repas simple avec des ingrédients de base')
           : b.dataset.prompt;
       };
       $('#toggleCoachCompactBtn').onclick = () => {
@@ -2000,7 +2100,7 @@ function bind(){
 </style>
 <script>
 (()=>{
-  const VIEW_LABELS = {home:'Accueil',catalog:'Catalogue',fridge:'Frigo',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
+  const VIEW_LABELS = {home:'Accueil',catalog:'Catalogue',fridge:'Mes provisions',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
   const MENU_DEFAULT = ['home','catalog','fridge','shopping','week','recipes','coach','settings'];
   const SPORT_OPTIONS = [
     ['0','0 séance de sport'],
@@ -2020,7 +2120,7 @@ function bind(){
     {key:'peach',emoji:'😌',bg:'#d68b62'},{key:'sky',emoji:'🧑',bg:'#7fa6ff'},{key:'leaf',emoji:'👩',bg:'#5ca874'},{key:'violet',emoji:'👨',bg:'#8a70c8'}
   ];
   const ACCOUNT_HTML = `
-    <div class="tip"><div class="small">Chaque profil garde ses données privées. Pour te connecter, entre simplement ton nom de profil et son code si tu en as un.</div></div>
+    <div class="tip"><div class="small">Chaque profil garde ses données privées. Connecte-toi avec ton nom et ton code. L’accès Admin reste caché et séparé.</div></div>
     <div class="loginBox">
       <input class="input" id="loginProfileName" placeholder="Nom du profil">
       <input class="input" id="loginProfilePin" placeholder="Code du profil">
@@ -2044,7 +2144,7 @@ function bind(){
       weekPlan:DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => [meal,null]))})),
       hiddenRecipes:[],
       customRecipes:[],
-      chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce qu’il y a dans ton frigo et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
+      chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce que tu as déjà dans tes provisions et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
       hiddenProducts:[],
       customProducts:[],
       catalogQty:{},
@@ -2072,7 +2172,10 @@ function bind(){
   state.profiles = (state.profiles||[]).map(ensureProfileMeta);
   state.menuOrder = Array.isArray(state.menuOrder) && state.menuOrder.length ? state.menuOrder.filter(v=>MENU_DEFAULT.includes(v)).concat(MENU_DEFAULT.filter(v=>!(state.menuOrder||[]).includes(v))) : MENU_DEFAULT.slice();
   state.privateByProfile = state.privateByProfile || {};
-  const legacyPid = state.activeProfileId || state.profiles[0]?.id || 'guest-temp';
+  state.provisionCategory = state.provisionCategory || 'Tout';
+  state.provisionSearch = state.provisionSearch || '';
+  state.provisionIdeaStyle = state.provisionIdeaStyle || 'Rapide';
+  const legacyPid = state.activeProfileId || 'guest-temp';
   function ensureBucket(pid){
     if(!pid) pid = legacyPid;
     if(!state.privateByProfile[pid]) state.privateByProfile[pid] = defaultPrivate();
@@ -2095,7 +2198,6 @@ function bind(){
     });
   });
   if(state.profiles.length && state.activeProfileId) state.onboarding.open = false;
-  if(!state.activeProfileId && state.profiles[0]) state.activeProfileId = state.profiles[0].id;
 
   function currentRole(){ return activeProfile()?.role || 'standard'; }
   function profileStore(profileId){ return ensureBucket(profileId); }
@@ -2107,7 +2209,7 @@ function bind(){
     $('#shareModal').classList.add('open');
   }
   function closeShare(){ $('#shareModal').classList.remove('open'); state.shareDraft = null; }
-  function recipients(){ return state.profiles.filter(p => p.id !== state.activeProfileId && !p.isGuest); }
+  function recipients(){ return state.profiles.filter(p => p.id !== state.activeProfileId && !p.isGuest && p.role!=='admin'); }
 
   // Enrich catalog
   function addCatalogUnique(cat, name, unit='pièce'){
@@ -2228,7 +2330,7 @@ function bind(){
       $('#loginProfileBtn').onclick = () => {
         const name = normalize($('#loginProfileName').value.trim());
         const pin = $('#loginProfilePin').value.trim();
-        const profile = state.profiles.find(p => normalize(p.name)===name);
+        const profile = state.profiles.find(p => p.role!=='admin' && normalize(p.name)===name);
         if(!profile) return toast('Profil introuvable');
         if(profile.pin && profile.pin !== pin) return toast('Code incorrect');
         state.activeProfileId = profile.id;
@@ -2415,10 +2517,11 @@ function bind(){
     card.classList.add('settingsPanel');
     const avatarCards = AVATARS.map(a => `<button class="avatarCard ${p.avatarKey===a.key?'active':''}" data-avatar-key="${a.key}"><img src="${getAvatar(a.key)}" alt="avatar"><div class="tiny muted" style="margin-top:6px">${a.key}</div></button>`).join('');
     const adminBlock = p.role==='admin' ? `<div class="adminOnly"><div class="between"><div><h3>Gestion admin</h3><p class="sub small">Tu peux supprimer un profil sans voir ses listes, son frigo ou son historique.</p></div></div><div class="adminList" id="adminProfilesList" style="margin-top:10px">${state.profiles.filter(x=>x.id!==p.id).map(x => `<div class="item"><div class="between"><div><div>${esc(x.name)}</div><div class="small muted">${esc(x.quiz?.type || 'Profil')} · créé le ${formatDate(x.createdAt)}</div></div><button class="btn danger" data-admin-delete="${x.id}">Supprimer</button></div></div>`).join('') || '<div class="empty">Aucun autre profil.</div>'}</div></div>` : '';
-    card.innerHTML = `<div><h2>Paramètres</h2><p class="sub small">Confidentialité par profil, partage volontaire, et guide visible une seule fois.</p></div><div class="item"><div class="between"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="avatar" style="width:56px;height:56px;border-radius:18px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')} · ${p.role==='admin'?'Admin':'Profil privé'}</div></div></div><span class="badge">${p.role==='admin'?'Admin':'Privé'}</span></div></div><div class="item"><div class="groupTitle">Avatar</div><div class="avatarGrid" style="margin-top:10px">${avatarCards}</div></div><div class="grid2"><input class="input" id="settingsProfileName" value="${esc(p.name)}" placeholder="Modifier le nom"><input class="input" id="settingsProfilePin" value="${esc(p.pin||'')}" placeholder="Modifier le code"></div><div class="grid2"><button class="btn primary" id="saveProfileSettingsBtn">Enregistrer mon profil</button><button class="btn" id="logoutBtn">Se déconnecter</button></div><div class="item"><div class="groupTitle">Ordre du menu</div><div class="list" id="menuSortList" style="margin-top:10px">${state.menuOrder.map(v => `<div class="menuSortRow item soft"><span>${VIEW_LABELS[v]}</span><div class="row"><button class="btn" data-menu-up="${v}">↑</button><button class="btn" data-menu-down="${v}">↓</button></div></div>`).join('')}</div></div><div class="grid2"><button class="btn" id="reopenIntroBtn">Revoir l’explication</button><button class="btn" id="reopenTutorialBtn">Revoir le guide</button></div><button class="btn" id="reopenQuizBtn">Modifier mes préférences</button><button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button><div class="grid2"><input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle" value="${esc(state.apiKey || '')}"><button class="btn primary" id="saveApiKeyBtn">Enregistrer</button></div><button class="btn danger" id="deleteMyProfileBtn">Supprimer mon profil</button>${adminBlock}<button class="btn danger" id="resetDemoBtn">Réinitialiser la démo</button>`;
+    card.innerHTML = `<div><h2>Paramètres</h2><p class="sub small">Confidentialité par profil, partage volontaire, et guide visible une seule fois.</p></div><div class="item"><div class="between"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="avatar" style="width:56px;height:56px;border-radius:18px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')} · ${p.role==='admin'?'Admin':'Profil privé'}</div></div></div><span class="badge">${p.role==='admin'?'Admin':'Privé'}</span></div></div><div class="item"><div class="groupTitle">Avatar</div><div class="avatarGrid" style="margin-top:10px">${avatarCards}</div></div><div class="grid2"><input class="input" id="settingsProfileName" value="${esc(p.name)}" placeholder="Modifier le nom"><input class="input" id="settingsProfilePin" value="" placeholder="Nouveau code (laisser vide pour garder l’actuel)" autocomplete="off"></div><div class="grid2"><button class="btn primary" id="saveProfileSettingsBtn">Enregistrer mon profil</button><button class="btn" id="logoutBtn">Se déconnecter</button></div><div class="item"><div class="groupTitle">Ordre du menu</div><div class="list" id="menuSortList" style="margin-top:10px">${state.menuOrder.map(v => `<div class="menuSortRow item soft"><span>${VIEW_LABELS[v]}</span><div class="row"><button class="btn" data-menu-up="${v}">↑</button><button class="btn" data-menu-down="${v}">↓</button></div></div>`).join('')}</div></div><div class="grid2"><button class="btn" id="reopenIntroBtn">Revoir l’explication</button><button class="btn" id="reopenTutorialBtn">Revoir le guide</button></div><button class="btn" id="reopenQuizBtn">Modifier mes préférences</button><button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button><div class="grid2"><input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle" value="${esc(state.apiKey || '')}"><button class="btn primary" id="saveApiKeyBtn">Enregistrer</button></div><button class="btn danger" id="deleteMyProfileBtn">Supprimer mon profil</button>${adminBlock}<button class="btn danger" id="resetDemoBtn">Réinitialiser la démo</button>`;
     $('#saveProfileSettingsBtn').onclick = () => {
       p.name = $('#settingsProfileName').value.trim() || p.name;
-      p.pin = $('#settingsProfilePin').value.trim();
+      const newPin = $('#settingsProfilePin').value.trim();
+      if(newPin) p.pin = newPin;
       save(); renderHeader(); renderSettings(); toast('Profil mis à jour');
     };
     $('#logoutBtn').onclick = () => { state.activeProfileId = null; state.onboarding.open = true; state.onboarding.step = 'account'; save(); renderOnboarding(); renderAll(); };
@@ -2452,6 +2555,7 @@ function bind(){
     oldRenderAll();
     renderDrawerLinks();
     renderSettings();
+    bindAdminLongPress();
   };
 
   // Event overrides
@@ -2549,6 +2653,32 @@ function bind(){
 
   // Fix create flow labels
   if($('#homeHello')) $('#homeHello').textContent = 'Tes repas, tes courses, ton rythme';
+
+  function openAdminAccess(){
+    const code = prompt('Accès Admin : entre le code');
+    if(code !== '21') return toast('Code admin incorrect');
+    const admin = state.profiles.find(p => p.role==='admin');
+    if(!admin) return toast('Compte Admin introuvable');
+    state.activeProfileId = admin.id;
+    state.onboarding.open = false;
+    save();
+    renderOnboarding();
+    renderAll();
+    toast('Connexion Admin réussie');
+  }
+  function bindAdminLongPress(){
+    const targets = [document.querySelector('.headerTitle h1'), document.getElementById('obTitle')].filter(Boolean);
+    targets.forEach(el => {
+      if(el.dataset.adminBound) return;
+      el.dataset.adminBound = '1';
+      let timer = null;
+      const start = () => { timer = setTimeout(openAdminAccess, 800); };
+      const cancel = () => { if(timer){ clearTimeout(timer); timer = null; } };
+      el.addEventListener('mousedown', start);
+      el.addEventListener('touchstart', start, {passive:true});
+      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt => el.addEventListener(evt, cancel));
+    });
+  }
   // Final render
   save();
   renderAll();

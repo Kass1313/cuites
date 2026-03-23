@@ -1969,5 +1969,591 @@ function bind(){
     bind();
     renderAll();
   </script>
+
+<style id="v8-extra-style">
+  .miniHeadline{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+  .compactHero{padding:14px 16px}
+  .compactHero .sub{font-size:.9rem}
+  .weekMini .chip{padding:7px 10px;font-size:.72rem}
+  .menuSortRow,.profileMiniRow,.historyActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .menuSortRow{justify-content:space-between}
+  .avatarGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .avatarCard{border:1px solid var(--line);border-radius:18px;padding:8px;background:rgba(255,255,255,.04);cursor:pointer;text-align:center}
+  .avatarCard.active{background:linear-gradient(135deg, rgba(216,178,96,.24), rgba(137,171,255,.22));border-color:rgba(216,178,96,.34)}
+  .avatarCard img{width:100%;aspect-ratio:1;border-radius:14px;display:block}
+  .prefsGroup{padding:12px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .prefsGrid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .prefChip{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:.76rem;cursor:pointer}
+  .prefChip.active{background:linear-gradient(135deg, rgba(216,178,96,.24), rgba(137,171,255,.22));border-color:rgba(216,178,96,.34)}
+  .settingsPanel{display:grid;gap:12px}
+  .adminList,.historyList{display:grid;gap:10px}
+  .historyCard{position:relative;overflow:hidden}
+  .historyCard.swiped{transform:translateX(-72px);transition:.2s}
+  .historyDelete{position:absolute;right:-72px;top:0;bottom:0;width:72px;border:none;background:linear-gradient(135deg, rgba(255,115,132,.88), rgba(255,115,132,.76));color:#fff;cursor:pointer}
+  .dotsBtn{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);cursor:pointer}
+  .shareTargets{display:grid;gap:10px;margin-top:12px}
+  .shareTarget{padding:12px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .drawerTip{padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-top:12px}
+  .loginBox{display:grid;gap:10px;margin-top:10px}
+  .shareTag{padding:5px 8px;border-radius:999px;background:rgba(216,178,96,.14);border:1px solid rgba(216,178,96,.3);font-size:.72rem}
+  .adminOnly{background:rgba(255,255,255,.03);border:1px dashed var(--line);padding:12px;border-radius:18px}
+</style>
+<script>
+(()=>{
+  const VIEW_LABELS = {home:'Accueil',catalog:'Catalogue',fridge:'Frigo',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
+  const MENU_DEFAULT = ['home','catalog','fridge','shopping','week','recipes','coach','settings'];
+  const SPORT_OPTIONS = [
+    ['0','0 séance de sport'],
+    ['1-2','1 à 2 fois par semaine'],
+    ['3-4','3 à 4 fois par semaine'],
+    ['5-6','5 à 6 fois par semaine'],
+    ['7','Tous les jours']
+  ];
+  const PREFS = {
+    allergies:['Gluten','Lactose','Œufs','Fruits à coque','Poisson','Crustacés','Soja','Sésame'],
+    likes:['Pâtes','Riz','Poulet','Saumon','Œufs','Légumes rôtis','Soupes','Salades','Fromage','Flocons d’avoine','Yaourts','Tartines'],
+    dislikes:['Champignons','Courgettes','Carottes','Brocoli','Aubergines','Poisson','Tofu','Épinards','Pois chiches','Tomates cuites','Oignons'],
+    styles:['Rapide','Gourmand','Simple','Protéiné','Équilibré','Petit budget','Varié','Batch cooking']
+  };
+  const AVATARS = [
+    {key:'sun',emoji:'🙂',bg:'#d8b260'},{key:'navy',emoji:'😎',bg:'#5c7ec9'},{key:'mint',emoji:'😊',bg:'#53b38c'},{key:'rose',emoji:'🤍',bg:'#c47aa5'},
+    {key:'peach',emoji:'😌',bg:'#d68b62'},{key:'sky',emoji:'🧑',bg:'#7fa6ff'},{key:'leaf',emoji:'👩',bg:'#5ca874'},{key:'violet',emoji:'👨',bg:'#8a70c8'}
+  ];
+  const ACCOUNT_HTML = `
+    <div class="tip"><div class="small">Chaque profil garde ses données privées. Pour te connecter, entre simplement ton nom de profil et son code si tu en as un.</div></div>
+    <div class="loginBox">
+      <input class="input" id="loginProfileName" placeholder="Nom du profil">
+      <input class="input" id="loginProfilePin" placeholder="Code du profil">
+      <button class="btn primary full" id="loginProfileBtn">Se connecter à mon profil</button>
+    </div>`;
+
+  function avatarSvg(emoji, bg){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="#ffffff22"/></linearGradient></defs><rect width="280" height="280" rx="56" fill="url(#g)"/><circle cx="140" cy="140" r="82" fill="rgba(255,255,255,.18)"/><text x="140" y="164" font-size="92" text-anchor="middle">${emoji}</text></svg>`;
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  }
+  function getAvatar(key){
+    const found = AVATARS.find(a=>a.key===key) || AVATARS[0];
+    return avatarSvg(found.emoji, found.bg);
+  }
+  function defaultPrivate(){
+    return {
+      shopping:[],
+      shoppingHistory:[],
+      fridge:[],
+      shoppingFilter:'À acheter',
+      weekPlan:DAYS.map(day => ({day, meals:Object.fromEntries(MEALS.map(meal => [meal,null]))})),
+      hiddenRecipes:[],
+      customRecipes:[],
+      chats:[{role:'bot',text:'Bonjour. Je peux te proposer des recettes, ajuster tes quantités, préparer ta semaine, utiliser ce qu’il y a dans ton frigo et te répondre sur la nutrition et le sport, toujours sans porc et sans alcool.'}],
+      hiddenProducts:[],
+      customProducts:[],
+      catalogQty:{},
+      recipeServings:{},
+      receivedShares:[]
+    };
+  }
+  function ensureProfileMeta(p){
+    if(!p.role) p.role = p.name === 'Admin' ? 'admin' : 'standard';
+    if(!p.avatarKey) p.avatarKey = AVATARS[Math.floor(Math.random()*AVATARS.length)].key;
+    if(p.tutorialSeen === undefined) p.tutorialSeen = !p.isGuest;
+    if(p.introSeen === undefined) p.introSeen = !p.isGuest;
+    if(!p.createdAt) p.createdAt = new Date().toISOString();
+    return p;
+  }
+  function ensureAdmin(){
+    let admin = state.profiles.find(p => p.role==='admin' || normalize(p.name)==='admin');
+    if(!admin){
+      admin = {id:'admin-profile', name:'Admin', pin:'21', isGuest:false, role:'admin', avatarKey:'navy', tutorialSeen:true, introSeen:true, createdAt:new Date().toISOString(), quiz:{...blankQuiz('Sur mesure'), type:'Sur mesure', goal:'Organisation', style:'Rapide', persons:1}};
+      state.profiles.unshift(admin);
+    }
+    return ensureProfileMeta(admin);
+  }
+  ensureAdmin();
+  state.profiles = (state.profiles||[]).map(ensureProfileMeta);
+  state.menuOrder = Array.isArray(state.menuOrder) && state.menuOrder.length ? state.menuOrder.filter(v=>MENU_DEFAULT.includes(v)).concat(MENU_DEFAULT.filter(v=>!(state.menuOrder||[]).includes(v))) : MENU_DEFAULT.slice();
+  state.privateByProfile = state.privateByProfile || {};
+  const legacyPid = state.activeProfileId || state.profiles[0]?.id || 'guest-temp';
+  function ensureBucket(pid){
+    if(!pid) pid = legacyPid;
+    if(!state.privateByProfile[pid]) state.privateByProfile[pid] = defaultPrivate();
+    const bucket = state.privateByProfile[pid];
+    const blank = defaultPrivate();
+    Object.keys(blank).forEach(k => { if(bucket[k] === undefined) bucket[k] = blank[k]; });
+    return bucket;
+  }
+  const legacyKeys = ['shopping','fridge','shoppingFilter','weekPlan','hiddenRecipes','customRecipes','chats','hiddenProducts','customProducts','catalogQty','recipeServings'];
+  const legacyData = {};
+  legacyKeys.forEach(k => { try { legacyData[k] = JSON.parse(JSON.stringify(state[k])); } catch(e){ legacyData[k] = state[k]; } });
+  const currentBucket = ensureBucket(legacyPid);
+  legacyKeys.forEach(k => { if((Array.isArray(legacyData[k]) && legacyData[k].length) || (legacyData[k] && !Array.isArray(legacyData[k]) && Object.keys(legacyData[k]).length)) currentBucket[k] = legacyData[k]; });
+  ['shopping','shoppingHistory','fridge','shoppingFilter','weekPlan','hiddenRecipes','customRecipes','chats','hiddenProducts','customProducts','catalogQty','recipeServings','receivedShares'].forEach(k => {
+    try{ delete state[k]; }catch(e){}
+    Object.defineProperty(state, k, {
+      configurable:true,
+      get(){ return ensureBucket(state.activeProfileId || legacyPid)[k]; },
+      set(v){ ensureBucket(state.activeProfileId || legacyPid)[k] = v; }
+    });
+  });
+  if(state.profiles.length && state.activeProfileId) state.onboarding.open = false;
+  if(!state.activeProfileId && state.profiles[0]) state.activeProfileId = state.profiles[0].id;
+
+  function currentRole(){ return activeProfile()?.role || 'standard'; }
+  function profileStore(profileId){ return ensureBucket(profileId); }
+  function deep(v){ return JSON.parse(JSON.stringify(v)); }
+  function formatDate(iso){ try{return new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return iso||'';} }
+  function openShare(kind, payload){
+    state.shareDraft = {kind, payload};
+    renderShareModal();
+    $('#shareModal').classList.add('open');
+  }
+  function closeShare(){ $('#shareModal').classList.remove('open'); state.shareDraft = null; }
+  function recipients(){ return state.profiles.filter(p => p.id !== state.activeProfileId && !p.isGuest); }
+
+  // Enrich catalog
+  function addCatalogUnique(cat, name, unit='pièce'){
+    CATALOG_BASE[cat] = CATALOG_BASE[cat] || [];
+    if(!(CATALOG_BASE[cat]||[]).some(i => normalize(i.name)===normalize(name))) CATALOG_BASE[cat].push({name,unit,defaultQty:0});
+  }
+  ['Poires','Clémentines','Framboises','Melon','Pastèque','Betteraves','Chou-fleur','Concombre','Radis','Poireaux','Courge','Potimarron','Laitue','Roquette','Pommes de terre grenaille','Patate douce','Courgette jaune'].forEach(n=>addCatalogUnique('Fruits & légumes',n, ['Framboises'].includes(n)?'barquette':'pièce'));
+  ['Skyr','Kiri','Boursin','Yaourts grecs','Halloumi','Burrata','Cottage cheese','Filets de poulet','Escalopes de dinde','Merlu','Boulettes de bœuf'].forEach(n=>addCatalogUnique('Produits frais & protéines',n, /g|Filets|Escalopes|Merlu|Boulettes/.test(n)?'g':'pot'));
+  ['Lasagnes','Tortiglioni','Riz basmati','Purée instantanée','Chapelure','Haricots blancs','Haricots rouges','Farfalle','Orzo','Semoule fine','Sauce tomate cuisinée'].forEach(n=>addCatalogUnique('Épicerie salée',n,/Riz|Lasagnes|Tortiglioni|Farfalle|Orzo|Semoule/.test(n)?'g':'pot'));
+  ['Brioche','Pain de mie','Céréales','Barres céréales','Pépites de chocolat','Poudre d’amande','Vanille','Muesli','Biscottes','Pâte à tartiner'].forEach(n=>addCatalogUnique('Épicerie petit-déjeuner & goûter',n,/Céréales|Muesli|Pépites|Poudre/.test(n)?'g':'paquet'));
+  ['Eau minérale','Limonade','Soda sans sucre','Glace chocolat','Frites surgelées','Poisson pané','Petits pois surgelés','Myrtilles surgelées'].forEach(n=>addCatalogUnique('Boissons sans alcool & surgelés',n,/Glace/.test(n)?'bac':/surgel|Frites|Poisson/.test(n)?'sachet':'bouteille'));
+  ['Crème mains','Lingettes','Gel hydroalcoolique','Peigne','Brosse à cheveux','Savon intime','Masques visage'].forEach(n=>addCatalogUnique('Hygiène',n,'pièce'));
+  ['Pastilles lave-vaisselle','Produit WC','Détartrant','Balai essuie-sol','Aluminium','Papier cuisson','Film alimentaire','Sopalin','Serpillière'].forEach(n=>addCatalogUnique('Ménage & papier',n,'paquet'));
+  PRICE_BY_CAT['Produits personnalisés'] = 2.0;
+
+  // Better images
+  const photoMap = {
+    pasta:'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=900&q=80',
+    salad:'https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=80',
+    soup:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80',
+    breakfast:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80',
+    fish:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=900&q=80',
+    chicken:'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80',
+    snack:'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=900&q=80',
+    gratin:'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=900&q=80',
+    bowl:'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=900&q=80',
+    dessert:'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=900&q=80'
+  };
+  recipeImage = function(recipe){
+    if(recipe.image && /^https?:/i.test(recipe.image) && !recipe.image.includes('photo-1512058564366')) return recipe.image;
+    const blob = normalize(`${recipe.name} ${(recipe.tags||[]).join(' ')} ${recipe.meal} ${recipe.family||''}`);
+    if(blob.includes('pates') || blob.includes('penne') || blob.includes('spaghetti') || blob.includes('tagliatelles') || blob.includes('coquillettes') || blob.includes('fusilli') || blob.includes('macaroni')) return photoMap.pasta;
+    if(blob.includes('salade')) return photoMap.salad;
+    if(blob.includes('soupe') || blob.includes('curry') || blob.includes('veloute')) return photoMap.soup;
+    if(blob.includes('saumon') || blob.includes('cabillaud') || blob.includes('thon')) return photoMap.fish;
+    if(blob.includes('poulet') || blob.includes('dinde') || blob.includes('wrap')) return photoMap.chicken;
+    if(blob.includes('gratin')) return photoMap.gratin;
+    if(recipe.meal==='Petit-déjeuner') return photoMap.breakfast;
+    if(recipe.meal==='Goûter') return photoMap.snack;
+    if(blob.includes('bowl')) return photoMap.bowl;
+    return photoMap.bowl;
+  };
+  detailedRecipeSteps = function(recipe){
+    const servings = getRecipeServings(recipe);
+    const ing = recipe.ingredients || [];
+    const names = ing.map(i=>i[0]).join(', ');
+    const steps = [];
+    steps.push(`Prépare le plan de travail, sors tous les ingrédients et mesure les quantités prévues pour ${servings} personne${servings>1?'s':''}.`);
+    if(ing.length) steps.push(`Lave, épluche ou coupe si nécessaire : ${names}. Regroupe les ingrédients par ordre d’utilisation pour aller plus vite.`);
+    if(recipeFamily(recipe)==='Pâtes') steps.push(`Fais chauffer une grande casserole d’eau salée. Quand l’eau bout franchement, verse les pâtes et remue dès le départ pour éviter qu’elles ne collent.`);
+    recipe.steps.forEach((step,idx)=>{
+      let extra = ' Surveille la cuisson, mélange régulièrement et ajuste l’assaisonnement si besoin.';
+      if(idx===0) extra = ' Commence doucement et fais revenir sans brûler.';
+      if(idx===recipe.steps.length-1) extra = ' Termine par un dernier goûtage avant de servir.';
+      steps.push(`Étape ${idx+1} : ${String(step).replace(/\.$/,'')}.${extra}`);
+    });
+    steps.push('Dresse le plat, ajoute les herbes, le fromage ou le citron prévu dans la recette si besoin, puis sers immédiatement.');
+    return steps;
+  };
+
+  // Better quiz defaults / login privacy screen
+  const oldBlankQuiz = blankQuiz;
+  blankQuiz = function(type='Solo'){
+    const q = oldBlankQuiz(type);
+    q.sport = '1-2';
+    q.nutrition = 'equilibre';
+    return q;
+  };
+
+  function renderPrefPanel(){
+    const panel = $('#quizPanel2');
+    if(!panel) return;
+    panel.innerHTML = `
+      <div class="prefsGroup"><div class="groupTitle">Allergies et intolérances</div><div class="prefsGrid" id="pref-allergies"></div></div>
+      <div class="prefsGroup"><div class="groupTitle">Ce que tu aimes manger</div><div class="prefsGrid" id="pref-likes"></div></div>
+      <div class="prefsGroup"><div class="groupTitle">Ce que tu ne veux pas voir</div><div class="prefsGrid" id="pref-dislikes"></div></div>
+      <div class="prefsGroup"><div class="groupTitle">Styles de repas préférés</div><div class="prefsGrid" id="pref-styles"></div></div>
+      <textarea class="textarea hidden" id="qAllergies"></textarea>
+      <textarea class="textarea hidden" id="qLikes"></textarea>
+      <textarea class="textarea hidden" id="qDislikes"></textarea>`;
+    ['allergies','likes','dislikes','styles'].forEach(field => {
+      const selected = new Set(String(state.onboarding.quizDraft[field]||'').split(',').map(s=>s.trim()).filter(Boolean));
+      const target = $('#pref-'+field);
+      if(!target) return;
+      target.innerHTML = PREFS[field].map(item => `<button class="prefChip ${selected.has(item)?'active':''}" type="button" data-pref-field="${field}" data-pref-value="${esc(item)}">${esc(item)}</button>`).join('');
+    });
+    $('#qAllergies').value = state.onboarding.quizDraft.allergies || '';
+    $('#qLikes').value = state.onboarding.quizDraft.likes || '';
+    $('#qDislikes').value = state.onboarding.quizDraft.dislikes || '';
+  }
+  function installAccountPrivacyBox(){
+    const step = $('#step-account .grid');
+    if(!step) return;
+    $('#profilesStart').style.display = 'none';
+    $('#existingProfileActions').style.display = 'none';
+    if(!$('#privateLoginWrap')){
+      const wrap = document.createElement('div');
+      wrap.id = 'privateLoginWrap';
+      wrap.innerHTML = ACCOUNT_HTML;
+      const startBtn = $('#startCreateBtn')?.parentElement;
+      if(startBtn) step.insertBefore(wrap, startBtn);
+      else step.appendChild(wrap);
+    }
+  }
+
+  const oldRenderOnboarding = renderOnboarding;
+  renderOnboarding = function(){
+    oldRenderOnboarding();
+    installAccountPrivacyBox();
+    if($('#qSport')){
+      $('#qSport').innerHTML = SPORT_OPTIONS.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+      $('#qSport').value = state.onboarding.quizDraft.sport || '1-2';
+    }
+    renderPrefPanel();
+    const selectedName = state.onboarding.editProfileId ? (state.profiles.find(p=>p.id===state.onboarding.editProfileId)?.name||'') : '';
+    if($('#loginProfileName') && !$('#loginProfileName').dataset.bound){
+      $('#loginProfileName').dataset.bound = '1';
+      $('#loginProfileBtn').onclick = () => {
+        const name = normalize($('#loginProfileName').value.trim());
+        const pin = $('#loginProfilePin').value.trim();
+        const profile = state.profiles.find(p => normalize(p.name)===name);
+        if(!profile) return toast('Profil introuvable');
+        if(profile.pin && profile.pin !== pin) return toast('Code incorrect');
+        state.activeProfileId = profile.id;
+        state.onboarding.open = false;
+        save();
+        renderOnboarding();
+        renderAll();
+      };
+    }
+    if($('#qName') && !$('#qName').value && selectedName) $('#qName').value = selectedName;
+  };
+
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('[data-pref-field]');
+    if(!chip) return;
+    const field = chip.dataset.prefField;
+    const value = chip.dataset.prefValue;
+    const current = new Set(String(state.onboarding.quizDraft[field]||'').split(',').map(s=>s.trim()).filter(Boolean));
+    if(current.has(value)) current.delete(value); else current.add(value);
+    state.onboarding.quizDraft[field] = [...current].join(', ');
+    renderPrefPanel();
+  });
+
+  // Drawer order
+  function renderDrawerLinks(){
+    const host = $('#drawer .drawerLinks');
+    if(!host) return;
+    host.innerHTML = state.menuOrder.map(view => `<button class="drawerLink ${state.currentView===view?'active':''}" data-view="${view}">${VIEW_LABELS[view]}</button>`).join('') + `<div class="drawerTip small muted">Tu peux personnaliser l’ordre du menu dans Paramètres.</div>`;
+    $$('#drawer .drawerLink').forEach(b => b.onclick = () => switchView(b.dataset.view));
+  }
+  function moveMenuItem(view, dir){
+    const arr = state.menuOrder.slice();
+    const i = arr.indexOf(view); if(i<0) return;
+    const ni = i + dir; if(ni < 0 || ni >= arr.length) return;
+    [arr[i], arr[ni]] = [arr[ni], arr[i]];
+    state.menuOrder = arr; save(); renderDrawerLinks(); renderSettings();
+  }
+
+  // Share modal
+  if(!$('#shareModal')){
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'shareModal';
+    modal.innerHTML = `<div class="back"></div><div class="sheet"><div class="between"><div><h2>Partager</h2><p class="sub small">Tu choisis le profil destinataire. Rien n’est partagé sans action volontaire.</p></div><button class="iconBtn" id="closeShareBtn">✕</button></div><div class="shareTargets" id="shareTargets"></div></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('.back').onclick = closeShare;
+    modal.querySelector('#closeShareBtn').onclick = closeShare;
+  }
+  function renderShareModal(){
+    const host = $('#shareTargets');
+    if(!host) return;
+    const list = recipients();
+    host.innerHTML = list.length ? list.map(p => `<div class="shareTarget"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="${esc(p.name)}" style="width:44px;height:44px;border-radius:14px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')}</div></div></div><button class="btn primary" data-share-to="${p.id}">Partager</button></div>`).join('') : `<div class="empty">Aucun autre profil disponible.</div>`;
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-share-to]');
+    if(!b || !state.shareDraft) return;
+    const pid = b.dataset.shareTo; const target = ensureBucket(pid); const sender = activeProfile().name;
+    if(state.shareDraft.kind === 'recipe'){
+      const recipe = recipesDb().find(r => r.id === state.shareDraft.payload.recipeId);
+      if(recipe && !target.customRecipes.some(r => normalize(r.name)===normalize(recipe.name) && (r.sharedFrom||'')===sender)){
+        target.customRecipes.unshift({...deep(recipe), id:uid(), sharedFrom:sender, tags:[...(recipe.tags||[]), 'partagée']});
+      }
+      toast('Recette partagée');
+    }
+    if(state.shareDraft.kind === 'shopping'){
+      (state.shareDraft.payload.items || []).forEach(it => {
+        const existing = target.shopping.find(x => normalize(x.name)===normalize(it.name) && x.unit===it.unit);
+        if(existing) existing.qty = Math.round((Number(existing.qty)+Number(it.qty))*100)/100;
+        else target.shopping.push({...deep(it), id:uid(), done:false, source:`partagé par ${sender}`});
+      });
+      toast('Liste partagée');
+    }
+    save(); closeShare();
+  });
+
+  function autoArchiveShopping(){
+    if(state.shopping.length && state.shopping.every(i => i.done)){
+      state.shoppingHistory.unshift({id:uid(), date:new Date().toISOString(), items:deep(state.shopping), label:`Courses du ${formatDate(new Date().toISOString())}`});
+      state.shopping = [];
+      save();
+      toast('Liste envoyée dans l’historique');
+    }
+  }
+
+  function groupedCatalogItems(tab){
+    const db = catalogDb();
+    let out = [];
+    if(tab === 'Tout'){
+      Object.keys(db).forEach(cat => (db[cat]||[]).forEach(item => out.push({...item, category:cat, custom:isCustomProduct(cat, item.name)})));
+      out.sort((a,b) => (Number(b.custom)-Number(a.custom)) || a.name.localeCompare(b.name,'fr'));
+    }else if(tab === 'Produits personnalisés'){
+      out = state.customProducts.map(item => ({...item, category:item.category, custom:true})).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+    }else{
+      out = (db[tab]||[]).map(item => ({...item, category:tab, custom:isCustomProduct(tab,item.name)})).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+    }
+    const search = normalize($('#catalogSearch')?.value || '');
+    return out.filter(item => !search || normalize(item.name).includes(search)).filter(item => !isHiddenProduct(item.category,item.name));
+  }
+  renderCatalog = function(){
+    const db = catalogDb();
+    const categories = ['Tout','Produits personnalisés', ...Object.keys(db).filter(c=>c!=='Autres'), 'Autres'];
+    if(!categories.includes(state.catalogCategory)) state.catalogCategory = 'Tout';
+    $('#newCatalogItemCategory').innerHTML = Object.keys(db).map(cat => `<option>${esc(cat)}</option>`).join('');
+    $('#catalogTabs').innerHTML = categories.map(cat => `<button class="chip ${state.catalogCategory===cat?'active':''}" data-cat="${esc(cat)}">${esc(cat)}</button>`).join('');
+    const items = groupedCatalogItems(state.catalogCategory);
+    $('#catalogList').innerHTML = items.length ? items.map(item => {
+      const qty = getCatalogQty(item.category, item.name);
+      return `<div class="item ${qty>0?'':'soft'}"><div class="catalogRow"><div><div>${esc(item.name)} ${item.custom?'<span class="shareTag">perso</span>':''}</div><div class="small muted">${esc(item.category)} · ${esc(item.unit)} · quantité actuelle ${formatQty(qty)}</div></div><div class="catalogActions"><div class="qtyBox"><button class="qtyBtn" data-cat-minus="${esc(item.name)}" data-item-cat="${esc(item.category)}">−</button><span class="qtyValue">${formatQty(qty)}</span><button class="qtyBtn" data-cat-plus="${esc(item.name)}" data-item-cat="${esc(item.category)}">＋</button></div><button class="btn ${qty===0?'ghost':''}" data-add-cat-item="${esc(item.name)}" data-item-cat="${esc(item.category)}">${qty===0?'Ajouter 1':'Ajouter à la liste'}</button>${item.custom?`<button class="btn danger" data-delete-product="${esc(item.name)}" data-item-cat="${esc(item.category)}">Suppr.</button>`:''}<button class="btn danger" data-hide-product="${esc(item.name)}" data-item-cat="${esc(item.category)}">✕</button></div></div></div>`;
+    }).join('') : `<div class="empty">Aucun article visible dans cet onglet.</div>`;
+    const hidden = [];
+    Object.keys(db).forEach(cat => (db[cat]||[]).forEach(item => { if(isHiddenProduct(cat,item.name) && (state.catalogCategory==='Tout' || state.catalogCategory==='Produits personnalisés' ? (state.catalogCategory==='Tout' || isCustomProduct(cat,item.name)) : state.catalogCategory===cat)) hidden.push({...item,category:cat}); }));
+    $('#hiddenProductsList').innerHTML = hidden.length ? hidden.map(item => `<div class="item"><div class="between"><div><div>${esc(item.name)}</div><div class="small muted">${esc(item.category)} · ${esc(item.unit)}</div></div><button class="btn" data-restore-product="${esc(item.name)}" data-item-cat="${esc(item.category)}">Remettre</button></div></div>`).join('') : `<div class="empty">Aucun article masqué.</div>`;
+  };
+
+  renderHome = function(){
+    const p = activeProfile();
+    const visibleRecipes = filterRecipesByProfile(recipesDb());
+    const planned = state.weekPlan.reduce((acc, day) => acc + Object.values(day.meals).filter(Boolean).length, 0);
+    const suggestion = visibleRecipes.find(r => r.goal === p.quiz?.goal) || visibleRecipes.find(r => r.meal === 'Repas du soir') || visibleRecipes[0];
+    $('#homeHello').textContent = 'Tes repas, tes courses, ton rythme';
+    $('#homeLead').textContent = `${p.name} · ${p.quiz?.type || 'Solo'} · ${p.quiz?.goal || 'Équilibre'} · ${p.quiz?.style || 'Rapide'}`;
+    $('#homeTypeBadge').textContent = p.quiz?.type || 'Solo';
+    $('#homePlanned').textContent = planned;
+    $('#homeShoppingCount').textContent = state.shopping.filter(i => !i.done).length;
+    $('#homeRecipeCount').textContent = visibleRecipes.length;
+    $('#homeSuggestion').innerHTML = suggestion ? `<div class="item" data-open-recipe="${suggestion.id}"><div class="between"><div><div>${esc(suggestion.name)}</div><div class="small muted">${esc(suggestion.meal)} · ${suggestion.time} min · ${suggestion.ingredients.length} ingrédients</div></div><button class="btn" data-suggest-add="${suggestion.id}">Ajouter</button></div><div class="recipeTags">${suggestion.tags.slice(0,3).map(t => `<span>${esc(t)}</span>`).join('')}</div></div>` : `<div class="empty">Aucune suggestion pour l’instant.</div>`;
+    $('.heroCard')?.classList.add('compactHero');
+  };
+
+  renderShopping = function(){
+    autoArchiveShopping();
+    const filters = ['Tout','À acheter','Déjà pris'];
+    $('#view-shopping .card').innerHTML = `
+      <div class="between"><div><h2>Liste de courses</h2><p class="sub small">Pensée pour le supermarché, avec historique automatique quand tout est coché.</p></div><div class="row"><button class="btn" id="shareShoppingBtn">Partager</button><button class="btn" id="clearDoneShoppingBtn">Retirer cochés</button></div></div>
+      <div class="chips" id="shoppingFilters" style="margin-top:12px">${filters.map(f=>`<button class="chip ${state.shoppingFilter===f?'active':''}" data-shopping-filter="${esc(f)}">${esc(f)}</button>`).join('')}</div>
+      <div class="list" id="shoppingList" style="margin-top:12px"></div>
+      <div class="divider"></div>
+      <div class="between"><div><h3>Historique des achats</h3><p class="sub small">Quand toute la liste est cochée, elle part ici automatiquement avec la date.</p></div></div>
+      <div class="historyList" id="shoppingHistoryList" style="margin-top:12px"></div>`;
+    let items = [...state.shopping];
+    if(state.shoppingFilter === 'À acheter') items = items.filter(i => !i.done);
+    if(state.shoppingFilter === 'Déjà pris') items = items.filter(i => i.done);
+    const byCat = {};
+    items.forEach(item => { const cat = item.category || 'Autres'; (byCat[cat] ||= []).push(item); });
+    const categories = Object.keys(byCat).sort();
+    $('#shoppingList').innerHTML = categories.length ? categories.map(cat => `<div class="item"><div class="sectionTitleRow"><h3>${esc(cat)}</h3><span class="pill">${byCat[cat].length} article${byCat[cat].length>1?'s':''}</span></div><div class="list" style="margin-top:10px">${byCat[cat].map(item => `<div class="shoppingRow ${item.done ? 'done' : ''}"><div class="row"><button class="check" data-toggle-shopping="${item.id}">✓</button><div><div class="itemName">${esc(item.name)}</div><div class="small muted">${formatQty(item.qty)} ${esc(item.unit)} · ${esc(item.source)}</div></div></div><div class="shoppingActions"><div class="qtyBox"><button class="qtyBtn" data-shopping-minus="${item.id}">−</button><span class="qtyValue">${formatQty(item.qty)}</span><button class="qtyBtn" data-shopping-plus="${item.id}">＋</button></div><button class="btn danger" data-remove-shopping="${item.id}">✕</button></div></div>`).join('')}</div></div>`).join('') : `<div class="empty">Ta liste est vide. Ajoute une recette, un article du catalogue ou génère ta semaine.</div>`;
+    $('#shoppingHistoryList').innerHTML = state.shoppingHistory.length ? state.shoppingHistory.map(h => `<div class="item historyCard" data-history-card="${h.id}"><div class="between"><div><div>${esc(h.label || 'Ancienne liste')}</div><div class="small muted">${formatDate(h.date)} · ${h.items.length} article${h.items.length>1?'s':''}</div></div><button class="dotsBtn" data-history-menu="${h.id}">⋮</button></div><div class="historyActions hidden" id="history-actions-${h.id}" style="margin-top:10px"><button class="btn" data-history-restore="${h.id}">Remettre dans mes achats</button><button class="btn" data-history-duplicate="${h.id}">Dupliquer</button><button class="btn danger" data-history-delete="${h.id}">Supprimer</button></div><button class="historyDelete" data-history-delete="${h.id}">Suppr.</button></div>`).join('') : `<div class="empty">Aucun historique pour le moment.</div>`;
+    $('#clearDoneShoppingBtn').onclick = () => { state.shopping = state.shopping.filter(i => !i.done); save(); renderShopping(); renderHome(); toast('Articles cochés retirés'); };
+    $('#shareShoppingBtn').onclick = () => openShare('shopping', {items: state.shopping.filter(i => !i.done)});
+    bindHistorySwipe();
+  };
+  function bindHistorySwipe(){
+    $$('#shoppingHistoryList [data-history-card]').forEach(card => {
+      let startX = null;
+      card.ontouchstart = ev => { startX = ev.changedTouches[0].clientX; };
+      card.ontouchend = ev => { if(startX===null) return; const dx = ev.changedTouches[0].clientX - startX; if(dx < -50) card.classList.add('swiped'); if(dx > 30) card.classList.remove('swiped'); startX = null; };
+    });
+  }
+
+  renderWeek = function(){
+    const modes = ['Équilibré','Forme','Petit budget','Rapide','Gourmand','Simple'];
+    const wrap = $('#view-week .card');
+    wrap.innerHTML = `<div class="between"><div><h2>Programme semaine</h2><p class="sub small">4 moments par jour. Tu peux choisir, générer, ou tout envoyer dans la liste.</p></div><button class="btn" id="clearWeekBtn">Vider</button></div><div class="chips weekMini" id="weekModes" style="margin-top:12px">${modes.map(mode => `<button class="chip ${state.weekMode===mode?'active':''}" data-week-mode="${esc(mode)}">${esc(mode)}</button>`).join('')}</div><div class="between" style="margin-top:12px"><button class="btn primary" id="generateWeekBtn">Générer</button><button class="btn" id="weekToShoppingBtn">Vers la liste</button></div><div class="weekHeader" id="weekDaysChips" style="margin-top:12px">${DAYS.map((day, idx) => `<button class="chip dayChip ${state.selectedDay===idx?'active':''}" data-day-index="${idx}">${esc(day)}</button>`).join('')}</div><div class="card" style="margin-top:12px;background:rgba(255,255,255,.03)"><div class="between"><div><h3 id="selectedDayTitle">${DAYS[state.selectedDay]}</h3><p class="sub small">Choisis une recette pour chaque moment.</p></div><div class="badge" id="selectedDayCount">${Object.values(state.weekPlan[state.selectedDay].meals).filter(Boolean).length}/4</div></div><div class="grid" id="dayMeals" style="margin-top:12px"></div></div>`;
+    const day = state.weekPlan[state.selectedDay];
+    $('#dayMeals').innerHTML = MEALS.map(meal => { const recipeId = day.meals[meal]; const recipe = recipesDb().find(r => r.id === recipeId); return `<div class="mealCard"><div class="between"><div><div class="mealName">${esc(meal)}</div><div class="mealValue">${recipe ? esc(recipe.name) : 'Aucun repas choisi'}</div><div class="small muted" style="margin-top:4px">${recipe ? `${recipe.time} min · ${recipe.ingredients.length} ingrédients` : 'Choisis une recette ou génère la semaine.'}</div></div><div class="row">${recipe ? `<button class="btn" data-open-recipe="${recipe.id}">Voir</button><button class="btn danger" data-clear-meal="${esc(meal)}">✕</button>` : `<button class="btn primary" data-pick-meal="${esc(meal)}">Choisir</button>`}</div></div></div>`; }).join('');
+    $('#clearWeekBtn').onclick = clearWeek; $('#generateWeekBtn').onclick = generateWeek; $('#weekToShoppingBtn').onclick = sendWeekToShopping;
+  };
+
+  renderRecipeModal = function(){
+    const modal = $('#recipeModal');
+    const r = recipesDb().find(x => x.id === state.openRecipeId);
+    if(!r){ modal.classList.remove('open'); return; }
+    modal.classList.add('open');
+    const servings = getRecipeServings(r);
+    const detailed = detailedRecipeSteps(r);
+    $('#recipeModalContent').innerHTML = `<div class="between"><div><div class="badge">${esc(recipeFamily(r))}</div><h2 style="margin-top:10px">${esc(r.name)}</h2><p class="sub small" style="margin-top:6px">${r.time} min · ${r.ingredients.length} ingrédients · repas ${esc(r.meal)} · objectif ${esc(r.goal)}</p></div><button class="iconBtn" data-close="recipeModal">✕</button></div><div class="recipeHero"><img src="${recipeImage(r)}" alt="${esc(r.name)}"></div><div class="recipeTags">${r.tags.map(t=>`<span>${esc(t)}</span>`).join('')}<span>sans porc</span><span>sans alcool</span>${r.sharedFrom?`<span>partagée par ${esc(r.sharedFrom)}</span>`:''}</div><div class="between" style="margin-top:14px"><div><h3>Nombre de personnes</h3><p class="sub small">Les quantités s’ajustent automatiquement.</p></div><div class="qtyBox"><button class="qtyBtn" data-recipe-servings-minus="${r.id}">−</button><span class="qtyValue">${formatQty(servings)}</span><button class="qtyBtn" data-recipe-servings-plus="${r.id}">＋</button></div></div><div class="divider"></div><div><h3>Ingrédients</h3><div class="small muted" style="margin-top:4px">${r.ingredients.length} ingrédients au total</div><div class="list" style="margin-top:10px">${r.ingredients.map(([name,qty,unit])=>`<div class="item small">${esc(name)} · ${formatQty(scaleQty(qty, r.servings, servings))} ${esc(unit)}</div>`).join('')}</div></div><div class="divider"></div><div><h3>Préparation détaillée</h3><div class="list" style="margin-top:10px">${detailed.map((s,i)=>`<div class="item small"><span class="badge">${i+1}</span> ${esc(s)}</div>`).join('')}</div></div><div class="grid2" style="margin-top:14px"><button class="btn primary" data-recipe-add-list="${r.id}">Ajouter à la liste</button><button class="btn" data-recipe-add-week="${r.id}">Ajouter au jour choisi</button></div><div class="grid2" style="margin-top:10px"><button class="btn" data-share-recipe="${r.id}">Partager</button><button class="btn ghost" data-close="recipeModal">Fermer</button></div>`;
+  };
+
+  renderSettings = function(){
+    const p = activeProfile();
+    const card = $('#view-settings .card');
+    if(!card) return;
+    card.classList.add('settingsPanel');
+    const avatarCards = AVATARS.map(a => `<button class="avatarCard ${p.avatarKey===a.key?'active':''}" data-avatar-key="${a.key}"><img src="${getAvatar(a.key)}" alt="avatar"><div class="tiny muted" style="margin-top:6px">${a.key}</div></button>`).join('');
+    const adminBlock = p.role==='admin' ? `<div class="adminOnly"><div class="between"><div><h3>Gestion admin</h3><p class="sub small">Tu peux supprimer un profil sans voir ses listes, son frigo ou son historique.</p></div></div><div class="adminList" id="adminProfilesList" style="margin-top:10px">${state.profiles.filter(x=>x.id!==p.id).map(x => `<div class="item"><div class="between"><div><div>${esc(x.name)}</div><div class="small muted">${esc(x.quiz?.type || 'Profil')} · créé le ${formatDate(x.createdAt)}</div></div><button class="btn danger" data-admin-delete="${x.id}">Supprimer</button></div></div>`).join('') || '<div class="empty">Aucun autre profil.</div>'}</div></div>` : '';
+    card.innerHTML = `<div><h2>Paramètres</h2><p class="sub small">Confidentialité par profil, partage volontaire, et guide visible une seule fois.</p></div><div class="item"><div class="between"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="avatar" style="width:56px;height:56px;border-radius:18px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')} · ${p.role==='admin'?'Admin':'Profil privé'}</div></div></div><span class="badge">${p.role==='admin'?'Admin':'Privé'}</span></div></div><div class="item"><div class="groupTitle">Avatar</div><div class="avatarGrid" style="margin-top:10px">${avatarCards}</div></div><div class="grid2"><input class="input" id="settingsProfileName" value="${esc(p.name)}" placeholder="Modifier le nom"><input class="input" id="settingsProfilePin" value="${esc(p.pin||'')}" placeholder="Modifier le code"></div><div class="grid2"><button class="btn primary" id="saveProfileSettingsBtn">Enregistrer mon profil</button><button class="btn" id="logoutBtn">Se déconnecter</button></div><div class="item"><div class="groupTitle">Ordre du menu</div><div class="list" id="menuSortList" style="margin-top:10px">${state.menuOrder.map(v => `<div class="menuSortRow item soft"><span>${VIEW_LABELS[v]}</span><div class="row"><button class="btn" data-menu-up="${v}">↑</button><button class="btn" data-menu-down="${v}">↓</button></div></div>`).join('')}</div></div><div class="grid2"><button class="btn" id="reopenIntroBtn">Revoir l’explication</button><button class="btn" id="reopenTutorialBtn">Revoir le guide</button></div><button class="btn" id="reopenQuizBtn">Modifier mes préférences</button><button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button><div class="grid2"><input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle" value="${esc(state.apiKey || '')}"><button class="btn primary" id="saveApiKeyBtn">Enregistrer</button></div><button class="btn danger" id="deleteMyProfileBtn">Supprimer mon profil</button>${adminBlock}<button class="btn danger" id="resetDemoBtn">Réinitialiser la démo</button>`;
+    $('#saveProfileSettingsBtn').onclick = () => {
+      p.name = $('#settingsProfileName').value.trim() || p.name;
+      p.pin = $('#settingsProfilePin').value.trim();
+      save(); renderHeader(); renderSettings(); toast('Profil mis à jour');
+    };
+    $('#logoutBtn').onclick = () => { state.activeProfileId = null; state.onboarding.open = true; state.onboarding.step = 'account'; save(); renderOnboarding(); renderAll(); };
+    $('#deleteMyProfileBtn').onclick = () => {
+      if(p.role==='admin') return toast('Le compte Admin ne peut pas être supprimé ici');
+      if(!confirm('Supprimer définitivement ton profil ?')) return;
+      delete state.privateByProfile[p.id];
+      state.profiles = state.profiles.filter(x => x.id !== p.id);
+      state.activeProfileId = null;
+      state.onboarding.open = true; state.onboarding.step = 'account'; save(); renderOnboarding(); renderAll();
+    };
+    $('#reopenIntroBtn').onclick = () => { state.onboarding.open = true; state.onboarding.step = 'intro'; state.onboarding.introIndex = 0; renderOnboarding(); };
+    $('#reopenTutorialBtn').onclick = () => { state.onboarding.open = true; state.onboarding.step = 'tutorial'; state.onboarding.tutorialIndex = 0; renderOnboarding(); };
+    $('#reopenQuizBtn').onclick = () => {
+      state.onboarding.open = true; state.onboarding.step = 'quiz'; state.onboarding.editProfileId = p.id; state.onboarding.quizDraft = {...blankQuiz(p.quiz?.type || 'Solo'), ...p.quiz, name:p.name, pin:p.pin||''}; state.onboarding.quizStep = 0; renderOnboarding();
+    };
+    $('#saveApiKeyBtn').onclick = () => { state.apiKey = $('#apiKeyInput').value.trim(); save(); toast('Clé enregistrée'); };
+    $('#clearCoachHistoryBtn2').onclick = clearCoachHistory;
+    $('#resetDemoBtn').onclick = () => { localStorage.removeItem(STORE_KEY); location.reload(); };
+  };
+
+  renderHeader = function(){
+    const p = activeProfile();
+    $('#headerPage').textContent = VIEW_LABELS[state.currentView] || 'Accueil';
+    $('#headerProfile').textContent = p?.name ? `${p.name} · ${p.quiz?.type || 'Profil'}` : 'Profil non connecté';
+    $('#headerGoal').textContent = p?.quiz?.goal || 'Équilibre';
+  };
+
+  const oldRenderAll = renderAll;
+  renderAll = function(){
+    oldRenderAll();
+    renderDrawerLinks();
+    renderSettings();
+  };
+
+  // Event overrides
+  if($('#catalogList')){
+    $('#catalogList').onclick = e => {
+      const name = e.target.dataset.addCatItem || e.target.dataset.hideProduct || e.target.dataset.catPlus || e.target.dataset.catMinus || e.target.dataset.deleteProduct;
+      const cat = e.target.dataset.itemCat;
+      if(!name || !cat) return;
+      const item = getCatalogItem(cat, name) || {name, unit:'pièce'};
+      if(e.target.dataset.catPlus) return setCatalogQty(cat, name, getCatalogQty(cat, name) + 1);
+      if(e.target.dataset.catMinus) return setCatalogQty(cat, name, Math.max(0, getCatalogQty(cat, name) - 1));
+      if(e.target.dataset.hideProduct) return hideProduct(name, cat);
+      if(e.target.dataset.deleteProduct) return removeCustomProduct(cat, name);
+      addShopping(item.name, Math.max(1, getCatalogQty(cat, name) || 1), item.unit, cat, 'catalogue');
+    };
+  }
+  hideProduct = function(name, category){
+    const key = itemKey(category || state.catalogCategory, name);
+    if(!state.hiddenProducts.includes(key)) state.hiddenProducts.push(key);
+    save(); renderCatalog(); toast('Article masqué');
+  };
+  restoreProduct = function(name, category){
+    const key = itemKey(category || state.catalogCategory, name);
+    state.hiddenProducts = state.hiddenProducts.filter(k => k !== key);
+    save(); renderCatalog(); toast('Article remis');
+  };
+  $('#hiddenProductsList')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-restore-product]');
+    if(!b) return; restoreProduct(b.dataset.restoreProduct, b.dataset.itemCat);
+  });
+  $('#catalogTabs')?.addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if(!b) return; state.catalogCategory = b.dataset.cat; save(); renderCatalog(); });
+  $('#catalogSearch') && ($('#catalogSearch').oninput = renderCatalog);
+
+  $('#shoppingFilters')?.addEventListener('click', e => { const b = e.target.closest('[data-shopping-filter]'); if(!b) return; state.shoppingFilter = b.dataset.shoppingFilter; save(); renderShopping(); });
+  $('#view-shopping').onclick = e => {
+    const id = e.target.dataset.toggleShopping || e.target.dataset.shoppingPlus || e.target.dataset.shoppingMinus || e.target.dataset.removeShopping;
+    if(id){
+      const item = state.shopping.find(x => x.id === id); if(!item) return;
+      if(e.target.dataset.toggleShopping) item.done = !item.done;
+      else if(e.target.dataset.shoppingPlus) item.qty = Math.round((Number(item.qty) + 1) * 100) / 100;
+      else if(e.target.dataset.shoppingMinus) item.qty = Math.max(1, Math.round((Number(item.qty) - 1) * 100) / 100);
+      else if(e.target.dataset.removeShopping) state.shopping = state.shopping.filter(x => x.id !== id);
+      save(); renderShopping(); renderHome(); return;
+    }
+    const menu = e.target.closest('[data-history-menu]');
+    if(menu){ $('#history-actions-'+menu.dataset.historyMenu)?.classList.toggle('hidden'); return; }
+    const restore = e.target.closest('[data-history-restore]');
+    if(restore){ const h = state.shoppingHistory.find(x=>x.id===restore.dataset.historyRestore); if(!h) return; h.items.forEach(it => addShopping(it.name,it.qty,it.unit,it.category,it.source||'historique')); return; }
+    const dup = e.target.closest('[data-history-duplicate]');
+    if(dup){ const h = state.shoppingHistory.find(x=>x.id===dup.dataset.historyDuplicate); if(!h) return; state.shoppingHistory.unshift({...deep(h), id:uid(), date:new Date().toISOString(), label:`Copie du ${formatDate(new Date().toISOString())}`}); save(); renderShopping(); toast('Historique dupliqué'); return; }
+    const del = e.target.closest('[data-history-delete]');
+    if(del){ state.shoppingHistory = state.shoppingHistory.filter(x=>x.id!==del.dataset.historyDelete); save(); renderShopping(); toast('Historique supprimé'); return; }
+  };
+
+  $('#recipeModalContent').onclick = e => {
+    const minus = e.target.closest('[data-recipe-servings-minus]');
+    const plus = e.target.closest('[data-recipe-servings-plus]');
+    const addList = e.target.closest('[data-recipe-add-list]');
+    const addWeek = e.target.closest('[data-recipe-add-week]');
+    const share = e.target.closest('[data-share-recipe]');
+    if(minus){ const id = minus.dataset.recipeServingsMinus; const r = recipesDb().find(x => x.id === id); state.recipeServings[id] = Math.max(1, (state.recipeServings[id] || getRecipeServings(r)) - 1); save(); return renderRecipeModal(); }
+    if(plus){ const id = plus.dataset.recipeServingsPlus; const r = recipesDb().find(x => x.id === id); state.recipeServings[id] = (state.recipeServings[id] || getRecipeServings(r)) + 1; save(); return renderRecipeModal(); }
+    if(addList){ const id = addList.dataset.recipeAddList; const r = recipesDb().find(x => x.id === id); addRecipeIngredientsToShopping(id, state.recipeServings[id] || getRecipeServings(r)); return; }
+    if(addWeek){ addRecipeToWeek(addWeek.dataset.recipeAddWeek, state.selectedDay); renderHome(); return; }
+    if(share){ openShare('recipe', {recipeId: share.dataset.shareRecipe}); return; }
+  };
+
+  // Replace profile creation completion + tutorial once only
+  const oldSaveProfileFromQuiz = saveProfileFromQuiz;
+  saveProfileFromQuiz = function(){
+    syncQuizDraft();
+    const existingId = state.onboarding.editProfileId;
+    oldSaveProfileFromQuiz();
+    const p = activeProfile();
+    ensureProfileMeta(p);
+    if(!existingId) p.tutorialSeen = false;
+    save();
+  };
+  $('#useSelectedProfileBtn') && ($('#useSelectedProfileBtn').onclick = null);
+  $('#editSelectedProfileBtn') && ($('#editSelectedProfileBtn').onclick = null);
+  $('#tutorialNextBtn').onclick = () => {
+    if(state.onboarding.tutorialIndex < TUTORIAL_SLIDES.length - 1){ state.onboarding.tutorialIndex++; renderOnboarding(); }
+    else { const p = activeProfile(); if(p) p.tutorialSeen = true; state.onboarding.open = false; save(); renderOnboarding(); renderAll(); }
+  };
+  $('#accountGuestBtn').onclick = () => { createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
+  $('#introGuestBtn').onclick = () => { createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
+
+  // Settings delegated actions
+  document.addEventListener('click', e => {
+    const up = e.target.closest('[data-menu-up]'); if(up){ moveMenuItem(up.dataset.menuUp,-1); return; }
+    const down = e.target.closest('[data-menu-down]'); if(down){ moveMenuItem(down.dataset.menuDown,1); return; }
+    const avatar = e.target.closest('[data-avatar-key]'); if(avatar && activeProfile()){ activeProfile().avatarKey = avatar.dataset.avatarKey; save(); renderSettings(); toast('Avatar mis à jour'); return; }
+    const del = e.target.closest('[data-admin-delete]'); if(del && currentRole()==='admin'){ if(!confirm('Supprimer ce profil ?')) return; delete state.privateByProfile[del.dataset.adminDelete]; state.profiles = state.profiles.filter(p=>p.id!==del.dataset.adminDelete); save(); renderSettings(); toast('Profil supprimé'); return; }
+  });
+
+  // Fix create flow labels
+  if($('#homeHello')) $('#homeHello').textContent = 'Tes repas, tes courses, ton rythme';
+  // Final render
+  save();
+  renderAll();
+})();
+</script>
+
 </body>
 </html>

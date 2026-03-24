@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Maison Gourmet Mobile V9</title>
+  <title>Maison Gourmet Mobile V10</title>
   <meta name="theme-color" content="#0e1830">
   <style>
     :root{
@@ -380,7 +380,7 @@
     <header class="header">
       <button class="iconBtn" id="openDrawerBtn">☰</button>
       <div class="headerTitle">
-        <h1>Maison Gourmet</h1>
+        <h1 id="appTitleHeader">Maison Gourmet</h1>
         <div class="headerMeta"><span id="headerPage">Accueil</span> · <span id="headerProfile">Invité</span></div>
       </div>
       <div class="badge" id="headerGoal">Découverte</div>
@@ -395,13 +395,13 @@
           </div>
           <div class="badge" id="homeTypeBadge">Solo</div>
         </div>
-        <div class="stats">
+        <div class="stats" id="homeStatsBlock">
           <div class="stat"><div class="k">Repas planifiés</div><div class="v" id="homePlanned">0</div></div>
           <div class="stat"><div class="k">Articles à acheter</div><div class="v" id="homeShoppingCount">0</div></div>
           <div class="stat"><div class="k">Recettes visibles</div><div class="v" id="homeRecipeCount">0</div></div>
         </div>
       </div>
-      <div class="card section">
+      <div class="card section" id="homeWeekBlock">
         <div class="between">
           <div>
             <h3>Ma semaine</h3>
@@ -415,7 +415,7 @@
           <button class="quickBtn" id="homeShoppingBtn">Liste de courses<small>Mode supermarché, quantités, cases à cocher et doublons fusionnés</small></button>
         </div>
       </div>
-      <div class="card section">
+      <div class="card section" id="homeSuggestionBlock">
         <div class="between">
           <div>
             <h3>Suggestion du jour</h3>
@@ -779,6 +779,10 @@
 
     function catalogDb(){
       const out = JSON.parse(JSON.stringify(CATALOG_BASE));
+      (appCfg().globalProducts||[]).forEach(item => {
+        if(!out[item.category]) out[item.category] = [];
+        if(!(out[item.category]||[]).some(i => normalize(i.name)===normalize(item.name))) out[item.category].push({name:item.name, unit:item.unit, defaultQty:0});
+      });
       state.customProducts.forEach(item => {
         if(!out[item.category]) out[item.category] = [];
         out[item.category].push({name:item.name, unit:item.unit, defaultQty:0});
@@ -892,7 +896,7 @@
       $('#onboardingOverlay').classList.toggle('hidden', !ob.open);
 
       const meta = {
-        intro:{badge:'DÉCOUVERTE', title:'Bienvenue dans l’application', lead:'Une explication claire dès l’ouverture, avant de créer un compte ou de choisir un profil.'},
+        intro:{badge:'DÉCOUVERTE', title:appCfg().introTitle || 'Bienvenue dans l’application', lead:appCfg().introLead || 'Une explication claire dès l’ouverture, avant de créer un compte ou de choisir un profil.'},
         account:{badge:'COMPTE', title:'Choisis comment entrer dans l’app', lead:'Compte, profil existant ou mode invité : tu gardes une entrée simple et claire.'},
         type:{badge:'PROFIL', title:'Choisis ton type de foyer', lead:'Solo, Duo, Famille ou Sur mesure : c’est le point de départ du quiz.'},
         quiz:{badge:'QUIZ', title:'Quiz rapide et personnalisé', lead:'Court, mais assez complet pour adapter recettes, semaine, courses et coach IA.'},
@@ -908,10 +912,13 @@
       const stepIndex = stepOrder.indexOf(ob.step);
       $('#onboardingDots').innerHTML = stepOrder.map((_,i) => `<span class="dot ${i<=stepIndex ? 'active' : ''}"></span>`).join('');
 
-      const slide = INTRO_SLIDES[ob.introIndex];
+      const introSlides = appCfg().introSlides || INTRO_SLIDES;
+      const slide = introSlides[ob.introIndex] || introSlides[0];
       $('#introSlideCard').innerHTML = `<div class="introIllu">${slide.emoji}</div><h3>${esc(slide.title)}</h3><p class="sub" style="margin-top:10px">${esc(slide.text)}</p>`;
       $('#introPrevBtn').textContent = ob.introIndex === 0 ? 'Retour' : 'Précédent';
-      $('#introNextBtn').textContent = ob.introIndex === INTRO_SLIDES.length - 1 ? 'Découvrir' : 'Suivant';
+      $('#introNextBtn').textContent = ob.introIndex === introSlides.length - 1 ? 'Découvrir' : 'Suivant';
+      $('#introGuestBtn').style.display = allowGuestMode() ? '' : 'none';
+      $('#accountGuestBtn').style.display = allowGuestMode() ? '' : 'none';
 
       const selected = ob.selectedProfileId;
       const visibleProfiles = state.profiles.filter(p=>p.role!=='admin'); $('#profilesCountPill').textContent = `${visibleProfiles.length} ${visibleProfiles.length > 1 ? 'profils' : 'profil'}`;
@@ -1046,12 +1053,15 @@
       const visibleRecipes = filterRecipesByProfile(recipesDb());
       const planned = state.weekPlan.reduce((acc, day) => acc + Object.values(day.meals).filter(Boolean).length, 0);
       const suggestion = visibleRecipes.find(r => r.goal === p.quiz?.goal) || visibleRecipes.find(r => r.meal === 'Repas du soir') || visibleRecipes[0];
-      $('#homeHello').textContent = p.isGuest ? 'Bienvenue en mode invité' : `Bonjour ${p.name}`;
-      $('#homeLead').textContent = `${p.quiz?.type || 'Solo'} · ${p.quiz?.persons || 1} ${Number(p.quiz?.persons || 1) > 1 ? 'personnes' : 'personne'} · ${p.quiz?.goal || 'Découverte'} · ${p.quiz?.style || 'Rapide'}`;
+      $('#homeHello').textContent = appCfg().homePhrase || 'Tes repas, tes courses, ton rythme';
+      $('#homeLead').textContent = p.isGuest ? 'Mode invité · découverte rapide de l’application' : `${p.name} · ${p.quiz?.type || 'Solo'} · ${p.quiz?.persons || 1} ${Number(p.quiz?.persons || 1) > 1 ? 'personnes' : 'personne'} · ${p.quiz?.goal || 'Découverte'} · ${p.quiz?.style || 'Rapide'}`;
       $('#homeTypeBadge').textContent = p.quiz?.type || 'Solo';
       $('#homePlanned').textContent = planned;
       $('#homeShoppingCount').textContent = state.shopping.filter(i => !i.done).length;
       $('#homeRecipeCount').textContent = visibleRecipes.length;
+      $('#homeStatsBlock').style.display = appCfg().homeBlocks?.stats === false ? 'none' : 'grid';
+      $('#homeWeekBlock').style.display = appCfg().homeBlocks?.week === false ? 'none' : '';
+      $('#homeSuggestionBlock').style.display = appCfg().homeBlocks?.suggestion === false ? 'none' : '';
       $('#homeSuggestion').innerHTML = suggestion ? `
         <div class="item" data-open-recipe="${suggestion.id}">
           <div class="between">
@@ -1420,6 +1430,7 @@
     }
 
     function switchView(view, silent=false){
+      if(!isViewVisible(view)) view = visibleMenuOrder()[0] || 'home';
       state.currentView = view;
       $$('.view').forEach(v => v.classList.remove('active'));
       $('#view-'+view).classList.add('active');
@@ -2102,6 +2113,28 @@ function bind(){
 (()=>{
   const VIEW_LABELS = {home:'Accueil',catalog:'Catalogue',fridge:'Mes provisions',shopping:'Liste de courses',week:'Programme semaine',recipes:'Recettes',coach:'Coach IA',settings:'Paramètres'};
   const MENU_DEFAULT = ['home','catalog','fridge','shopping','week','recipes','coach','settings'];
+  const APP_DEFAULTS = {
+    appName:'Maison Gourmet',
+    homePhrase:'Tes repas, tes courses, ton rythme',
+    introTitle:'Bienvenue dans l’application',
+    introLead:'Une explication claire dès l’ouverture, avant de créer un compte ou de choisir un profil.',
+    introSlides:[
+      {emoji:'🍽️', title:'Une app qui t’aide vraiment au quotidien', text:'Tu sais plus facilement quoi manger, quoi acheter et comment t’organiser, sans perdre du temps.'},
+      {emoji:'🗓️', title:'Repas, semaine et courses au même endroit', text:'Tu choisis tes recettes, tu construis ton programme semaine et tu génères automatiquement ta liste de courses.'},
+      {emoji:'🧠', title:'Un coach IA cuisine, nutrition et sport', text:'L’IA te conseille de façon simple et cohérente, toujours sans porc et sans alcool.'}
+    ],
+    labels:{...VIEW_LABELS},
+    hiddenViews:[],
+    allowGuest:true,
+    allowShare:true,
+    allowCustomRecipes:true,
+    allowCustomProducts:true,
+    tutorialForNewProfiles:true,
+    coachTone:'court',
+    theme:'midnight',
+    homeBlocks:{stats:true, week:true, suggestion:true},
+    globalProducts:[]
+  };
   const SPORT_OPTIONS = [
     ['0','0 séance de sport'],
     ['1-2','1 à 2 fois par semaine'],
@@ -2171,6 +2204,12 @@ function bind(){
   ensureAdmin();
   state.profiles = (state.profiles||[]).map(ensureProfileMeta);
   state.menuOrder = Array.isArray(state.menuOrder) && state.menuOrder.length ? state.menuOrder.filter(v=>MENU_DEFAULT.includes(v)).concat(MENU_DEFAULT.filter(v=>!(state.menuOrder||[]).includes(v))) : MENU_DEFAULT.slice();
+  state.appConfig = {...APP_DEFAULTS, ...(state.appConfig||{})};
+  state.appConfig.labels = {...VIEW_LABELS, ...((state.appConfig&&state.appConfig.labels)||{})};
+  state.appConfig.homeBlocks = {...APP_DEFAULTS.homeBlocks, ...((state.appConfig&&state.appConfig.homeBlocks)||{})};
+  if(!Array.isArray(state.appConfig.hiddenViews)) state.appConfig.hiddenViews = [];
+  if(!Array.isArray(state.appConfig.globalProducts)) state.appConfig.globalProducts = [];
+  if(!Array.isArray(state.appConfig.introSlides) || state.appConfig.introSlides.length !== 3) state.appConfig.introSlides = APP_DEFAULTS.introSlides.map(x=>({...x}));
   state.privateByProfile = state.privateByProfile || {};
   state.provisionCategory = state.provisionCategory || 'Tout';
   state.provisionSearch = state.provisionSearch || '';
@@ -2200,10 +2239,30 @@ function bind(){
   if(state.profiles.length && state.activeProfileId) state.onboarding.open = false;
 
   function currentRole(){ return activeProfile()?.role || 'standard'; }
+  function appCfg(){ return state.appConfig || APP_DEFAULTS; }
+  function appName(){ return appCfg().appName || APP_DEFAULTS.appName; }
+  function viewLabel(view){ return (appCfg().labels||{})[view] || VIEW_LABELS[view] || view; }
+  function isViewVisible(view){ return !(appCfg().hiddenViews||[]).includes(view); }
+  function visibleMenuOrder(){ return (state.menuOrder||MENU_DEFAULT).filter(v => MENU_DEFAULT.includes(v) && isViewVisible(v)); }
+  function allowGuestMode(){ return appCfg().allowGuest !== false; }
+  function allowShareMode(){ return appCfg().allowShare !== false; }
+  function allowCustomRecipesMode(){ return appCfg().allowCustomRecipes !== false; }
+  function allowCustomProductsMode(){ return appCfg().allowCustomProducts !== false; }
+  function applyTheme(){
+    const theme = appCfg().theme || 'midnight';
+    const root = document.documentElement.style;
+    const themes = {
+      midnight:{bg:'#081223',bg2:'#0d1a32',panel:'#13203b',panel2:'#1a2b4b',gold:'#d8b260',blue:'#89abff'},
+      sable:{bg:'#17120b',bg2:'#24190d',panel:'#2c2215',panel2:'#3a2d1b',gold:'#d8b260',blue:'#d9c39a'},
+      olive:{bg:'#111811',bg2:'#172219',panel:'#1d2c22',panel2:'#25382c',gold:'#c9b36b',blue:'#8ec9a3'}
+    }[theme] || {bg:'#081223',bg2:'#0d1a32',panel:'#13203b',panel2:'#1a2b4b',gold:'#d8b260',blue:'#89abff'};
+    Object.entries(themes).forEach(([k,v]) => root.setProperty('--'+k, v));
+  }
   function profileStore(profileId){ return ensureBucket(profileId); }
   function deep(v){ return JSON.parse(JSON.stringify(v)); }
   function formatDate(iso){ try{return new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return iso||'';} }
   function openShare(kind, payload){
+    if(!allowShareMode()) return toast('Le partage est désactivé sur cette application');
     state.shareDraft = {kind, payload};
     renderShareModal();
     $('#shareModal').classList.add('open');
@@ -2358,7 +2417,9 @@ function bind(){
   function renderDrawerLinks(){
     const host = $('#drawer .drawerLinks');
     if(!host) return;
-    host.innerHTML = state.menuOrder.map(view => `<button class="drawerLink ${state.currentView===view?'active':''}" data-view="${view}">${VIEW_LABELS[view]}</button>`).join('') + `<div class="drawerTip small muted">Tu peux personnaliser l’ordre du menu dans Paramètres.</div>`;
+    const ordered = visibleMenuOrder();
+    if(!ordered.includes(state.currentView)) state.currentView = ordered[0] || 'home';
+    host.innerHTML = ordered.map(view => `<button class="drawerLink ${state.currentView===view?'active':''}" data-view="${view}">${viewLabel(view)}</button>`).join('') + `<div class="drawerTip small muted">Tu peux personnaliser l’ordre du menu dans Paramètres.</div>`;
     $$('#drawer .drawerLink').forEach(b => b.onclick = () => switchView(b.dataset.view));
   }
   function moveMenuItem(view, dir){
@@ -2515,14 +2576,45 @@ function bind(){
     const card = $('#view-settings .card');
     if(!card) return;
     card.classList.add('settingsPanel');
+    const cfg = appCfg();
     const avatarCards = AVATARS.map(a => `<button class="avatarCard ${p.avatarKey===a.key?'active':''}" data-avatar-key="${a.key}"><img src="${getAvatar(a.key)}" alt="avatar"><div class="tiny muted" style="margin-top:6px">${a.key}</div></button>`).join('');
-    const adminBlock = p.role==='admin' ? `<div class="adminOnly"><div class="between"><div><h3>Gestion admin</h3><p class="sub small">Tu peux supprimer un profil sans voir ses listes, son frigo ou son historique.</p></div></div><div class="adminList" id="adminProfilesList" style="margin-top:10px">${state.profiles.filter(x=>x.id!==p.id).map(x => `<div class="item"><div class="between"><div><div>${esc(x.name)}</div><div class="small muted">${esc(x.quiz?.type || 'Profil')} · créé le ${formatDate(x.createdAt)}</div></div><button class="btn danger" data-admin-delete="${x.id}">Supprimer</button></div></div>`).join('') || '<div class="empty">Aucun autre profil.</div>'}</div></div>` : '';
-    card.innerHTML = `<div><h2>Paramètres</h2><p class="sub small">Confidentialité par profil, partage volontaire, et guide visible une seule fois.</p></div><div class="item"><div class="between"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="avatar" style="width:56px;height:56px;border-radius:18px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')} · ${p.role==='admin'?'Admin':'Profil privé'}</div></div></div><span class="badge">${p.role==='admin'?'Admin':'Privé'}</span></div></div><div class="item"><div class="groupTitle">Avatar</div><div class="avatarGrid" style="margin-top:10px">${avatarCards}</div></div><div class="grid2"><input class="input" id="settingsProfileName" value="${esc(p.name)}" placeholder="Modifier le nom"><input class="input" id="settingsProfilePin" value="" placeholder="Nouveau code (laisser vide pour garder l’actuel)" autocomplete="off"></div><div class="grid2"><button class="btn primary" id="saveProfileSettingsBtn">Enregistrer mon profil</button><button class="btn" id="logoutBtn">Se déconnecter</button></div><div class="item"><div class="groupTitle">Ordre du menu</div><div class="list" id="menuSortList" style="margin-top:10px">${state.menuOrder.map(v => `<div class="menuSortRow item soft"><span>${VIEW_LABELS[v]}</span><div class="row"><button class="btn" data-menu-up="${v}">↑</button><button class="btn" data-menu-down="${v}">↓</button></div></div>`).join('')}</div></div><div class="grid2"><button class="btn" id="reopenIntroBtn">Revoir l’explication</button><button class="btn" id="reopenTutorialBtn">Revoir le guide</button></div><button class="btn" id="reopenQuizBtn">Modifier mes préférences</button><button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button><div class="grid2"><input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle" value="${esc(state.apiKey || '')}"><button class="btn primary" id="saveApiKeyBtn">Enregistrer</button></div><button class="btn danger" id="deleteMyProfileBtn">Supprimer mon profil</button>${adminBlock}<button class="btn danger" id="resetDemoBtn">Réinitialiser la démo</button>`;
+    const menuRows = state.menuOrder.map(v => `<div class="menuSortRow item soft"><span>${viewLabel(v)}</span><div class="row"><button class="btn" data-menu-up="${v}">↑</button><button class="btn" data-menu-down="${v}">↓</button></div></div>`).join('');
+    const adminProfiles = state.profiles.filter(x=>x.id!==p.id).map(x => `<div class="item"><div class="between"><div><div>${esc(x.name)}</div><div class="small muted">${esc(x.quiz?.type || 'Profil')} · créé le ${formatDate(x.createdAt)}</div></div><button class="btn danger" data-admin-delete="${x.id}">Supprimer</button></div></div>`).join('') || '<div class="empty">Aucun autre profil.</div>';
+    const visibleToggles = MENU_DEFAULT.map(v => `<label class="shareTarget"><span>${viewLabel(v)}</span><input type="checkbox" data-admin-view="${v}" ${isViewVisible(v)?'checked':''}></label>`).join('');
+    const labelEditors = ['catalog','fridge','shopping','week','recipes','coach'].map(v => `<div class="grid2"><div class="small muted">${VIEW_LABELS[v]}</div><input class="input" id="adminLabel_${v}" value="${esc(cfg.labels?.[v] || VIEW_LABELS[v])}"></div>`).join('');
+    const introEditors = (cfg.introSlides||APP_DEFAULTS.introSlides).map((s,i) => `<div class="item soft"><div class="groupTitle">Slide ${i+1}</div><input class="input" id="adminIntroTitle${i}" value="${esc(s.title)}" style="margin-top:8px"><textarea class="textarea" id="adminIntroText${i}" style="margin-top:8px">${esc(s.text)}</textarea></div>`).join('');
+    const globalProducts = (cfg.globalProducts||[]).map(g => `<div class="item"><div class="between"><div><div>${esc(g.name)}</div><div class="small muted">${esc(g.category)} · ${esc(g.unit)}</div></div><button class="btn danger" data-admin-remove-global-product="${esc(g.id)}">Suppr.</button></div></div>`).join('') || '<div class="empty">Aucun produit global ajouté.</div>';
+    const adminBlock = p.role==='admin' ? `
+      <div class="adminOnly"><div><h3>Gestion admin</h3><p class="sub small">Tu peux supprimer un profil sans voir ses listes, son frigo ou son historique.</p></div><div class="adminList" id="adminProfilesList" style="margin-top:10px">${adminProfiles}</div></div>
+      <div class="adminOnly"><div><h3>Configuration globale</h3><p class="sub small">Ces réglages changent l’application pour tous les profils, sans ouvrir leurs données privées.</p></div>
+        <div class="grid" style="margin-top:12px">
+          <div class="item"><div class="groupTitle">Nom et accroche</div><div class="grid2" style="margin-top:10px"><input class="input" id="adminAppName" value="${esc(appName())}" placeholder="Nom de l’application"><input class="input" id="adminHomePhrase" value="${esc(cfg.homePhrase||'')}" placeholder="Phrase d’accueil"></div></div>
+          <div class="item"><div class="groupTitle">Intro de démarrage</div><input class="input" id="adminIntroTitle" value="${esc(cfg.introTitle||'')}" style="margin-top:10px"><textarea class="textarea" id="adminIntroLead" style="margin-top:10px">${esc(cfg.introLead||'')}</textarea><div class="grid" style="margin-top:10px">${introEditors}</div></div>
+          <div class="item"><div class="groupTitle">Libellés du menu</div><div class="grid" style="margin-top:10px">${labelEditors}</div></div>
+          <div class="item"><div class="groupTitle">Onglets visibles</div><div class="shareTargets" style="margin-top:10px">${visibleToggles}</div></div>
+          <div class="item"><div class="groupTitle">Règles globales</div><div class="shareTargets" style="margin-top:10px">
+            <label class="shareTarget"><span>Mode invité</span><input type="checkbox" id="adminAllowGuest" ${cfg.allowGuest!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Partage volontaire</span><input type="checkbox" id="adminAllowShare" ${cfg.allowShare!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Produits personnalisés</span><input type="checkbox" id="adminAllowCustomProducts" ${cfg.allowCustomProducts!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Recettes personnalisées</span><input type="checkbox" id="adminAllowCustomRecipes" ${cfg.allowCustomRecipes!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Montrer le guide aux nouveaux profils</span><input type="checkbox" id="adminTutorialForNewProfiles" ${cfg.tutorialForNewProfiles!==false?'checked':''}></label>
+          </div></div>
+          <div class="item"><div class="groupTitle">Accueil</div><div class="shareTargets" style="margin-top:10px">
+            <label class="shareTarget"><span>Statistiques</span><input type="checkbox" id="adminHomeStats" ${cfg.homeBlocks?.stats!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Bloc semaine</span><input type="checkbox" id="adminHomeWeek" ${cfg.homeBlocks?.week!==false?'checked':''}></label>
+            <label class="shareTarget"><span>Suggestion du jour</span><input type="checkbox" id="adminHomeSuggestion" ${cfg.homeBlocks?.suggestion!==false?'checked':''}></label>
+          </div></div>
+          <div class="item"><div class="groupTitle">Coach et thème</div><div class="grid2" style="margin-top:10px"><select class="select" id="adminCoachTone"><option value="court" ${cfg.coachTone==='court'?'selected':''}>Coach court</option><option value="detaille" ${cfg.coachTone==='detaille'?'selected':''}>Coach détaillé</option><option value="cuisine" ${cfg.coachTone==='cuisine'?'selected':''}>Coach très cuisine</option><option value="organisation" ${cfg.coachTone==='organisation'?'selected':''}>Coach très organisation</option></select><select class="select" id="adminTheme"><option value="midnight" ${cfg.theme==='midnight'?'selected':''}>Bleu nuit</option><option value="sable" ${cfg.theme==='sable'?'selected':''}>Sable chic</option><option value="olive" ${cfg.theme==='olive'?'selected':''}>Olive doux</option></select></div></div>
+          <div class="item"><div class="groupTitle">Catalogue commun</div><div class="grid2" style="margin-top:10px"><input class="input" id="adminGlobalProductName" placeholder="Nom du produit global"><select class="select" id="adminGlobalProductCategory">${Object.keys(catalogDb()).map(cat=>`<option>${esc(cat)}</option>`).join('')}</select></div><div class="grid2" style="margin-top:10px"><input class="input" id="adminGlobalProductUnit" placeholder="Unité (pièce, g, L...)" value="pièce"><button class="btn" id="adminAddGlobalProductBtn">Ajouter au catalogue commun</button></div><div class="list" style="margin-top:10px">${globalProducts}</div></div>
+          <button class="btn primary" id="saveAdminConfigBtn">Enregistrer la configuration globale</button>
+        </div>
+      </div>` : '';
+    card.innerHTML = `<div><h2>Paramètres</h2><p class="sub small">Confidentialité par profil, partage volontaire, et guide visible une seule fois.</p></div><div class="item"><div class="between"><div class="row"><img src="${getAvatar(p.avatarKey)}" alt="avatar" style="width:56px;height:56px;border-radius:18px;border:1px solid var(--line)"><div><div>${esc(p.name)}</div><div class="small muted">${esc(p.quiz?.type || 'Profil')} · ${p.role==='admin'?'Admin':'Profil privé'}</div></div></div><span class="badge">${p.role==='admin'?'Admin':'Privé'}</span></div></div><div class="item"><div class="groupTitle">Avatar</div><div class="avatarGrid" style="margin-top:10px">${avatarCards}</div></div><div class="grid2"><input class="input" id="settingsProfileName" value="${esc(p.name)}" placeholder="Modifier le nom"><input class="input" id="settingsProfilePin" value="" placeholder="Nouveau code (laisser vide pour garder l’actuel)" autocomplete="off"></div><div class="grid2"><button class="btn primary" id="saveProfileSettingsBtn">Enregistrer mon profil</button><button class="btn" id="logoutBtn">Se déconnecter</button></div><div class="item"><div class="groupTitle">Ordre du menu</div><div class="list" id="menuSortList" style="margin-top:10px">${menuRows}</div></div><div class="grid2"><button class="btn" id="reopenIntroBtn">Revoir l’explication</button><button class="btn" id="reopenTutorialBtn">Revoir le guide</button></div><button class="btn" id="reopenQuizBtn">Modifier mes préférences</button><button class="btn" id="clearCoachHistoryBtn2">Effacer l’historique IA</button><div class="grid2"><input class="input" id="apiKeyInput" placeholder="Clé API Gemini optionnelle" value="${esc(state.apiKey || '')}"><button class="btn primary" id="saveApiKeyBtn">Enregistrer</button></div><button class="btn danger" id="deleteMyProfileBtn">Supprimer mon profil</button>${adminBlock}<button class="btn danger" id="resetDemoBtn">Réinitialiser la démo</button>`;
     $('#saveProfileSettingsBtn').onclick = () => {
       p.name = $('#settingsProfileName').value.trim() || p.name;
       const newPin = $('#settingsProfilePin').value.trim();
       if(newPin) p.pin = newPin;
-      save(); renderHeader(); renderSettings(); toast('Profil mis à jour');
+      save(); renderHeader(); renderSettings(); renderDrawerLinks(); toast('Profil mis à jour');
     };
     $('#logoutBtn').onclick = () => { state.activeProfileId = null; state.onboarding.open = true; state.onboarding.step = 'account'; save(); renderOnboarding(); renderAll(); };
     $('#deleteMyProfileBtn').onclick = () => {
@@ -2541,17 +2633,54 @@ function bind(){
     $('#saveApiKeyBtn').onclick = () => { state.apiKey = $('#apiKeyInput').value.trim(); save(); toast('Clé enregistrée'); };
     $('#clearCoachHistoryBtn2').onclick = clearCoachHistory;
     $('#resetDemoBtn').onclick = () => { localStorage.removeItem(STORE_KEY); location.reload(); };
+    if(p.role==='admin'){
+      $('#adminAddGlobalProductBtn').onclick = () => {
+        const name = $('#adminGlobalProductName').value.trim();
+        const category = $('#adminGlobalProductCategory').value;
+        const unit = $('#adminGlobalProductUnit').value.trim() || 'pièce';
+        if(!name) return toast('Entre un nom de produit global');
+        if((appCfg().globalProducts||[]).some(g => normalize(g.name)===normalize(name) && g.category===category)) return toast('Ce produit global existe déjà');
+        state.appConfig.globalProducts.unshift({id:uid(), name, category, unit});
+        save(); renderSettings(); renderCatalog(); renderFridge(); toast('Produit global ajouté');
+      };
+      $('#saveAdminConfigBtn').onclick = () => {
+        const hiddenViews = MENU_DEFAULT.filter(v => !document.querySelector(`[data-admin-view="${v}"]`)?.checked);
+        state.appConfig.appName = $('#adminAppName').value.trim() || APP_DEFAULTS.appName;
+        state.appConfig.homePhrase = $('#adminHomePhrase').value.trim() || APP_DEFAULTS.homePhrase;
+        state.appConfig.introTitle = $('#adminIntroTitle').value.trim() || APP_DEFAULTS.introTitle;
+        state.appConfig.introLead = $('#adminIntroLead').value.trim() || APP_DEFAULTS.introLead;
+        state.appConfig.introSlides = [0,1,2].map(i => ({emoji:(state.appConfig.introSlides?.[i]?.emoji || APP_DEFAULTS.introSlides[i].emoji), title:document.getElementById(`adminIntroTitle${i}`).value.trim() || APP_DEFAULTS.introSlides[i].title, text:document.getElementById(`adminIntroText${i}`).value.trim() || APP_DEFAULTS.introSlides[i].text}));
+        const labels = {...VIEW_LABELS};
+        ['catalog','fridge','shopping','week','recipes','coach'].forEach(v => labels[v] = document.getElementById('adminLabel_'+v).value.trim() || VIEW_LABELS[v]);
+        state.appConfig.labels = labels;
+        state.appConfig.hiddenViews = hiddenViews;
+        state.appConfig.allowGuest = $('#adminAllowGuest').checked;
+        state.appConfig.allowShare = $('#adminAllowShare').checked;
+        state.appConfig.allowCustomProducts = $('#adminAllowCustomProducts').checked;
+        state.appConfig.allowCustomRecipes = $('#adminAllowCustomRecipes').checked;
+        state.appConfig.tutorialForNewProfiles = $('#adminTutorialForNewProfiles').checked;
+        state.appConfig.homeBlocks = {stats:$('#adminHomeStats').checked, week:$('#adminHomeWeek').checked, suggestion:$('#adminHomeSuggestion').checked};
+        state.appConfig.coachTone = $('#adminCoachTone').value;
+        state.appConfig.theme = $('#adminTheme').value;
+        applyTheme();
+        if(!isViewVisible(state.currentView)) state.currentView = visibleMenuOrder()[0] || 'home';
+        save(); renderOnboarding(); renderAll(); toast('Configuration globale enregistrée');
+      };
+    }
   };
 
   renderHeader = function(){
     const p = activeProfile();
-    $('#headerPage').textContent = VIEW_LABELS[state.currentView] || 'Accueil';
+    const titleEl = $('#appTitleHeader');
+    if(titleEl) titleEl.textContent = appName();
+    $('#headerPage').textContent = viewLabel(state.currentView) || 'Accueil';
     $('#headerProfile').textContent = p?.name ? `${p.name} · ${p.quiz?.type || 'Profil'}` : 'Profil non connecté';
     $('#headerGoal').textContent = p?.quiz?.goal || 'Équilibre';
   };
 
   const oldRenderAll = renderAll;
   renderAll = function(){
+    applyTheme();
     oldRenderAll();
     renderDrawerLinks();
     renderSettings();
@@ -2631,8 +2760,21 @@ function bind(){
     oldSaveProfileFromQuiz();
     const p = activeProfile();
     ensureProfileMeta(p);
-    if(!existingId) p.tutorialSeen = false;
+    if(!existingId) p.tutorialSeen = !(appCfg().tutorialForNewProfiles !== false ? false : true);
+    if(!existingId && appCfg().tutorialForNewProfiles !== false) p.tutorialSeen = false;
+    if(!existingId && appCfg().tutorialForNewProfiles === false) p.tutorialSeen = true;
     save();
+  };
+
+  const oldAddCustomCatalogItem = addCustomCatalogItem;
+  addCustomCatalogItem = function(){
+    if(!allowCustomProductsMode()) return toast('Les produits personnalisés sont désactivés sur cette application');
+    return oldAddCustomCatalogItem();
+  };
+  const oldSaveCustomRecipe = saveCustomRecipe;
+  saveCustomRecipe = function(){
+    if(!allowCustomRecipesMode()) return toast('Les recettes personnalisées sont désactivées sur cette application');
+    return oldSaveCustomRecipe();
   };
   $('#useSelectedProfileBtn') && ($('#useSelectedProfileBtn').onclick = null);
   $('#editSelectedProfileBtn') && ($('#editSelectedProfileBtn').onclick = null);
@@ -2640,8 +2782,8 @@ function bind(){
     if(state.onboarding.tutorialIndex < TUTORIAL_SLIDES.length - 1){ state.onboarding.tutorialIndex++; renderOnboarding(); }
     else { const p = activeProfile(); if(p) p.tutorialSeen = true; state.onboarding.open = false; save(); renderOnboarding(); renderAll(); }
   };
-  $('#accountGuestBtn').onclick = () => { createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
-  $('#introGuestBtn').onclick = () => { createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
+  $('#accountGuestBtn').onclick = () => { if(!allowGuestMode()) return toast('Le mode invité est désactivé'); createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
+  $('#introGuestBtn').onclick = () => { if(!allowGuestMode()) return toast('Le mode invité est désactivé'); createGuestProfile(); state.onboarding.open = false; save(); renderOnboarding(); renderAll(); };
 
   // Settings delegated actions
   document.addEventListener('click', e => {
@@ -2649,10 +2791,11 @@ function bind(){
     const down = e.target.closest('[data-menu-down]'); if(down){ moveMenuItem(down.dataset.menuDown,1); return; }
     const avatar = e.target.closest('[data-avatar-key]'); if(avatar && activeProfile()){ activeProfile().avatarKey = avatar.dataset.avatarKey; save(); renderSettings(); toast('Avatar mis à jour'); return; }
     const del = e.target.closest('[data-admin-delete]'); if(del && currentRole()==='admin'){ if(!confirm('Supprimer ce profil ?')) return; delete state.privateByProfile[del.dataset.adminDelete]; state.profiles = state.profiles.filter(p=>p.id!==del.dataset.adminDelete); save(); renderSettings(); toast('Profil supprimé'); return; }
+    const delGlobal = e.target.closest('[data-admin-remove-global-product]'); if(delGlobal && currentRole()==='admin'){ state.appConfig.globalProducts = (state.appConfig.globalProducts||[]).filter(g => g.id !== delGlobal.dataset.adminRemoveGlobalProduct); save(); renderSettings(); renderCatalog(); renderFridge(); toast('Produit global supprimé'); return; }
   });
 
   // Fix create flow labels
-  if($('#homeHello')) $('#homeHello').textContent = 'Tes repas, tes courses, ton rythme';
+  if($('#homeHello')) $('#homeHello').textContent = appCfg().homePhrase || 'Tes repas, tes courses, ton rythme';
 
   function openAdminAccess(){
     const code = prompt('Accès Admin : entre le code');

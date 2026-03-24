@@ -2833,8 +2833,8 @@ function bind(){
       let warned = false;
       const start = () => {
         warned = true;
-        toast('Maintiens 5 secondes pour l’accès Admin');
-        timer = setTimeout(() => { timer = null; openAdminAccess(); }, 5000);
+        toast('Maintiens 2 secondes pour l’accès Admin');
+        timer = setTimeout(() => { timer = null; openAdminAccess(); }, 2000);
       };
       const cancel = () => { if(timer){ clearTimeout(timer); timer = null; if(warned) toast('Accès Admin annulé'); } warned = false; };
       el.addEventListener('mousedown', start);

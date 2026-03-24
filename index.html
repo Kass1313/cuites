@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Maison Gourmet Mobile V10</title>
+  <title>Maison Gourmet Mobile V14</title>
   <meta name="theme-color" content="#0e1830">
   <style>
     :root{
@@ -96,7 +96,21 @@
     .profileMeta{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
     .pill{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.72rem}
     .introCard{padding:16px;border-radius:22px;background:rgba(255,255,255,.05);border:1px solid var(--line);min-height:210px}
+    .introVisual{height:124px;border-radius:18px;border:1px solid var(--line);margin-bottom:12px;background:linear-gradient(135deg, rgba(216,178,96,.18), rgba(137,171,255,.18));display:grid;place-items:center;overflow:hidden}
+    .introVisual svg{width:100%;height:100%;display:block}
     .introIllu{font-size:2rem;margin-bottom:10px}
+    .accountShell{display:grid;gap:12px}
+    .accountHero{padding:14px;border-radius:22px;background:linear-gradient(135deg, rgba(216,178,96,.16), rgba(137,171,255,.12));border:1px solid var(--line)}
+    .accountActions{display:grid;gap:10px}
+    .accountChoice{padding:14px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);text-align:left;cursor:pointer}
+    .accountChoice strong{display:block;font-size:.98rem}
+    .accountChoice span{display:block;margin-top:5px;color:var(--muted);font-size:.84rem;line-height:1.38}
+    .loginMiniForm{display:grid;gap:10px;padding:12px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+    .loginNote{padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px dashed var(--line);color:var(--muted);font-size:.82rem;line-height:1.4}
+    .adminPressWrap{display:grid;gap:8px}
+    .adminProgress{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--line)}
+    .adminProgress > span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--blue));transition:width .08s linear}
+    .sheetHeadActions{display:flex;align-items:center;gap:8px}
     .catalogRow,.shoppingRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
     .catalogActions,.shoppingActions{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
     .qtyBox{display:inline-flex;align-items:center;gap:8px;padding:6px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
@@ -160,7 +174,16 @@
           <h2 style="margin-top:10px" id="obTitle">Bienvenue dans l’application</h2>
           <p class="sub" style="margin-top:6px" id="obLead">Repas, recettes, programme semaine, liste de courses et coach IA dans une seule app mobile.</p>
         </div>
-        <button class="iconBtn" id="closeOnboardingBtn">✕</button>
+        <div class="sheetHeadActions">
+          <button class="adminLogoBtn small" id="adminAccessBtnOnboarding" aria-label="Accès admin" title="Accès admin">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="8" y="8" width="48" height="48" rx="16" fill="#10233f"></rect>
+              <path d="M21 18h4v9l3-3 4 7 4-7 3 3v-9h4v18c0 8-6 13-15 13s-15-5-15-13V18Z" fill="#f5e8c6"></path>
+              <circle cx="32" cy="42" r="3" fill="#d8b260"></circle>
+            </svg>
+          </button>
+          <button class="iconBtn" id="closeOnboardingBtn">✕</button>
+        </div>
       </div>
       <div class="dots" id="onboardingDots"></div>
 
@@ -176,23 +199,41 @@
       </div>
 
       <div id="step-account" class="hidden">
-        <div class="grid">
-          <div class="tip">
-            <div class="small">Crée ton compte pour tout personnaliser, ou utilise le mode invité si tu veux juste découvrir l’application.</div>
+        <div class="accountShell">
+          <div class="accountHero">
+            <div class="introVisual" id="accountHeroVisual"></div>
+            <h3>Entre comme dans une vraie app</h3>
+            <p class="sub small" style="margin-top:6px">Crée ton compte, connecte-toi à ton profil existant, ou teste l’application en mode invité. Les autres profils ne sont jamais affichés publiquement.</p>
           </div>
-          <div class="sectionTitleRow">
-            <h3>Profils enregistrés</h3>
-            <span class="pill" id="profilesCountPill">0 profil</span>
+          <div class="loginMiniForm">
+            <div class="groupTitle">Nom d’utilisateur ou prénom</div>
+            <input class="input" id="accountUsername" placeholder="Facultatif · ex. Nabila">
+            <div class="small muted">On s’en sert pour préremplir la création de compte si tu le souhaites.</div>
           </div>
-          <div id="profilesStart" class="grid"></div>
-          <div class="grid2" style="margin-top:6px">
-            <button class="btn primary full" id="startCreateBtn">Créer un compte</button>
-            <button class="btn full" id="accountGuestBtn">Mode invité</button>
+          <div class="accountActions">
+            <button class="accountChoice" id="startCreateBtn">
+              <strong>Créer un compte</strong>
+              <span>Tu lances ensuite le quiz court pour personnaliser recettes, programme semaine, liste et coach IA.</span>
+            </button>
+            <button class="accountChoice" id="toggleExistingLoginBtn">
+              <strong>J’ai déjà un compte</strong>
+              <span>Connexion privée par nom du profil + code si le profil en a un. Aucun profil n’est listé à l’écran.</span>
+            </button>
+            <button class="accountChoice" id="accountGuestBtn">
+              <strong>Mode invité</strong>
+              <span>Tu découvres l’app sans créer de compte complet.</span>
+            </button>
           </div>
-          <div class="grid2" id="existingProfileActions" style="display:none">
-            <button class="btn full" id="useSelectedProfileBtn">Utiliser ce profil</button>
-            <button class="btn full" id="editSelectedProfileBtn">Modifier ce profil</button>
+          <div class="loginMiniForm hidden" id="existingLoginWrap">
+            <div class="groupTitle">Connexion à un profil existant</div>
+            <input class="input" id="existingProfileName" placeholder="Nom du profil">
+            <input class="input" id="existingProfilePin" placeholder="Code du profil si défini" autocomplete="off">
+            <div class="grid2">
+              <button class="btn" id="hideExistingLoginBtn">Annuler</button>
+              <button class="btn primary" id="loginExistingProfileBtn">Se connecter</button>
+            </div>
           </div>
+          <div class="loginNote">Confidentialité par défaut : chaque personne ne voit que son espace. Les recettes ou listes ne sont partageables qu’en choisissant explicitement “partager”.</div>
         </div>
       </div>
 
@@ -270,9 +311,11 @@
           </div>
           <div class="grid2">
             <select class="select" id="qSport">
-              <option value="doux">Sport doux</option>
-              <option value="modere">Sport modéré</option>
-              <option value="intense">Sport intense</option>
+              <option value="0">0 séance</option>
+              <option value="1-2">1 à 2 fois / semaine</option>
+              <option value="3-4">3 à 4 fois / semaine</option>
+              <option value="5-6">5 à 6 fois / semaine</option>
+              <option value="7">Tous les jours</option>
             </select>
             <select class="select" id="qNutrition">
               <option value="equilibre">Besoin : équilibre</option>
@@ -376,6 +419,27 @@
         <textarea class="textarea" id="customRecipeIngredients" placeholder="Ingrédients, une ligne par ingrédient : nom | quantité | unité&#10;Exemple : œufs | 4 | pièce"></textarea>
         <textarea class="textarea" id="customRecipeSteps" placeholder="Étapes de préparation, une ligne par étape"></textarea>
         <button class="btn primary full" id="saveCustomRecipeBtn">Ajouter la recette</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="adminModal">
+    <div class="back" data-close="adminModal"></div>
+    <div class="sheet">
+      <div class="between">
+        <div>
+          <h2>Accès Admin</h2>
+          <p class="sub small">Maintien 2 secondes sur le logo admin puis entre le code 21.</p>
+        </div>
+        <button class="iconBtn" data-close="adminModal">✕</button>
+      </div>
+      <div class="adminPressWrap" style="margin-top:12px">
+        <div class="adminProgress"><span id="adminProgressBar"></span></div>
+        <input class="input" id="adminCodeInput" placeholder="Code admin" autocomplete="off">
+        <div class="grid2">
+          <button class="btn" id="closeAdminModalBtn">Annuler</button>
+          <button class="btn primary" id="submitAdminCodeBtn">Se connecter</button>
+        </div>
       </div>
     </div>
   </div>
@@ -730,6 +794,8 @@
         selectedType:'Solo',
         quizStep:0,
         editProfileId:null,
+        showExistingLogin:false,
+        prefillUsername:'',
         quizDraft:blankQuiz('Solo')
       };
     }
@@ -906,6 +972,20 @@
       renderOnboarding();
     }
 
+    function introArtwork(kind='intro0'){
+      const arts = {
+        intro0:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" x2="1"><stop stop-color="#d8b260"/><stop offset="1" stop-color="#89abff"/></linearGradient></defs><rect width="320" height="140" rx="24" fill="#0d1830"/><circle cx="262" cy="34" r="26" fill="rgba(216,178,96,.25)"/><rect x="26" y="38" width="96" height="64" rx="18" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)"/><rect x="136" y="24" width="156" height="92" rx="24" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><circle cx="74" cy="70" r="22" fill="url(#g1)"/><path d="M52 96c9-13 35-13 44 0" fill="none" stroke="#f7f1df" stroke-width="6" stroke-linecap="round"/><rect x="162" y="44" width="76" height="10" rx="5" fill="#f6e7c3"/><rect x="162" y="63" width="108" height="10" rx="5" fill="rgba(255,255,255,.18)"/><rect x="162" y="82" width="88" height="10" rx="5" fill="rgba(137,171,255,.32)"/></svg>`,
+        intro1:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="24" y="28" width="84" height="84" rx="20" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)"/><rect x="118" y="20" width="178" height="100" rx="24" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="136" y="40" width="46" height="14" rx="7" fill="#d8b260"/><rect x="188" y="40" width="80" height="14" rx="7" fill="#89abff"/><rect x="136" y="68" width="122" height="10" rx="5" fill="rgba(255,255,255,.18)"/><rect x="136" y="88" width="92" height="10" rx="5" fill="rgba(255,255,255,.12)"/><path d="M46 70h40" stroke="#f7e7c1" stroke-width="8" stroke-linecap="round"/><path d="M66 50v40" stroke="#f7e7c1" stroke-width="8" stroke-linecap="round"/></svg>`,
+        intro2:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="28" y="28" width="120" height="84" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="166" y="28" width="126" height="84" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><circle cx="88" cy="70" r="26" fill="#89abff" opacity=".85"/><path d="M78 68c3-8 15-11 22-5 7 5 7 17-1 23-8 5-18 3-24-5" fill="none" stroke="#0e1830" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M196 78c24-40 48-40 72 0" fill="none" stroke="#d8b260" stroke-width="8" stroke-linecap="round"/><circle cx="228" cy="50" r="10" fill="#f7e7c1"/><rect x="184" y="92" width="88" height="10" rx="5" fill="rgba(255,255,255,.16)"/></svg>`,
+        account:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="24" y="20" width="128" height="100" rx="24" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="168" y="30" width="128" height="80" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><circle cx="74" cy="56" r="18" fill="#d8b260"/><rect x="52" y="84" width="44" height="10" rx="5" fill="#f7e7c1"/><rect x="188" y="50" width="84" height="12" rx="6" fill="#89abff"/><rect x="188" y="74" width="60" height="10" rx="5" fill="rgba(255,255,255,.16)"/></svg>`,
+        tutorial0:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="28" y="26" width="82" height="88" rx="20" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="126" y="26" width="164" height="88" rx="20" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><text x="59" y="79" font-size="36" fill="#d8b260" font-family="Arial" text-anchor="middle">1</text><rect x="146" y="48" width="102" height="12" rx="6" fill="#f7e7c1"/><rect x="146" y="74" width="84" height="10" rx="5" fill="rgba(255,255,255,.15)"/></svg>`,
+        tutorial1:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="34" y="32" width="252" height="76" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="56" y="54" width="44" height="12" rx="6" fill="#d8b260"/><rect x="110" y="54" width="64" height="12" rx="6" fill="#89abff"/><rect x="184" y="54" width="40" height="12" rx="6" fill="#d8b260"/><rect x="56" y="80" width="132" height="10" rx="5" fill="rgba(255,255,255,.16)"/></svg>`,
+        tutorial2:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="28" y="24" width="264" height="92" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><circle cx="72" cy="52" r="10" fill="#89abff"/><circle cx="72" cy="82" r="10" fill="#d8b260"/><rect x="96" y="46" width="136" height="12" rx="6" fill="#f7e7c1"/><rect x="96" y="76" width="92" height="10" rx="5" fill="rgba(255,255,255,.16)"/></svg>`,
+        tutorial3:`<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="140" rx="24" fill="#0d1830"/><rect x="34" y="22" width="116" height="96" rx="24" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><rect x="168" y="34" width="118" height="72" rx="22" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.08)"/><path d="M68 80c10-18 38-18 48 0" fill="none" stroke="#89abff" stroke-width="8" stroke-linecap="round"/><circle cx="92" cy="52" r="14" fill="#d8b260"/><rect x="188" y="54" width="62" height="12" rx="6" fill="#f7e7c1"/><rect x="188" y="78" width="46" height="10" rx="5" fill="rgba(255,255,255,.16)"/></svg>`
+      };
+      return arts[kind] || arts.intro0;
+    }
+
     function renderOnboarding(){
       const ob = state.onboarding;
       $('#onboardingOverlay').classList.toggle('hidden', !ob.open);
@@ -929,25 +1009,14 @@
 
       const introSlides = appCfg().introSlides || INTRO_SLIDES;
       const slide = introSlides[ob.introIndex] || introSlides[0];
-      $('#introSlideCard').innerHTML = `<div class="introIllu">${slide.emoji}</div><h3>${esc(slide.title)}</h3><p class="sub" style="margin-top:10px">${esc(slide.text)}</p>`;
+      $('#introSlideCard').innerHTML = `<div class="introVisual">${introArtwork('intro'+ob.introIndex)}</div><div class="introIllu">${slide.emoji}</div><h3>${esc(slide.title)}</h3><p class="sub" style="margin-top:10px">${esc(slide.text)}</p>`;
       $('#introPrevBtn').textContent = ob.introIndex === 0 ? 'Retour' : 'Précédent';
       $('#introNextBtn').textContent = ob.introIndex === introSlides.length - 1 ? 'Découvrir' : 'Suivant';
       $('#introGuestBtn').style.display = allowGuestMode() ? '' : 'none';
       $('#accountGuestBtn').style.display = allowGuestMode() ? '' : 'none';
-
-      const selected = ob.selectedProfileId;
-      const visibleProfiles = state.profiles.filter(p=>p.role!=='admin'); $('#profilesCountPill').textContent = `${visibleProfiles.length} ${visibleProfiles.length > 1 ? 'profils' : 'profil'}`;
-      $('#profilesStart').innerHTML = visibleProfiles.length ? visibleProfiles.map(p => `
-        <div class="profileCard ${selected===p.id ? 'active' : ''}" data-pick-profile="${p.id}">
-          <div class="name">${esc(p.name)}</div>
-          <div class="sub small" style="margin-top:4px">${esc(profileSummary(p))}</div>
-          <div class="profileMeta">
-            <span class="pill">${esc(p.quiz?.type || 'Solo')}</span>
-            <span class="pill">${esc(p.quiz?.goal || 'Équilibre')}</span>
-            <span class="pill">${esc(p.quiz?.style || 'Rapide')}</span>
-          </div>
-        </div>`).join('') : `<div class="empty">Aucun profil enregistré pour l’instant. Crée ton premier compte ou choisis le mode invité.</div>`;
-      $('#existingProfileActions').style.display = selected ? 'grid' : 'none';
+      $('#accountHeroVisual').innerHTML = introArtwork('account');
+      if($('#accountUsername')) $('#accountUsername').value = ob.prefillUsername || $('#accountUsername').value || '';
+      $('#existingLoginWrap').classList.toggle('hidden', !ob.showExistingLogin);
 
       $('#typeCards').innerHTML = PROFILE_TYPES.map(type => `
         <div class="typeCard ${ob.selectedType===type ? 'active' : ''}" data-type-card="${esc(type)}">
@@ -961,7 +1030,7 @@
       fillQuizFieldsFromDraft();
 
       const guide = TUTORIAL_SLIDES[ob.tutorialIndex];
-      $('#tutorialSlideCard').innerHTML = `<div class="introIllu">${guide.emoji}</div><h3>${esc(guide.title)}</h3><p class="sub" style="margin-top:10px">${esc(guide.text)}</p>`;
+      $('#tutorialSlideCard').innerHTML = `<div class="introVisual">${introArtwork('tutorial'+ob.tutorialIndex)}</div><div class="introIllu">${guide.emoji}</div><h3>${esc(guide.title)}</h3><p class="sub" style="margin-top:10px">${esc(guide.text)}</p>`;
       $('#tutorialNextBtn').textContent = ob.tutorialIndex === TUTORIAL_SLIDES.length - 1 ? 'Commencer' : 'Suivant';
     }
 
@@ -980,7 +1049,7 @@
       $('#qTime').value = q.time || '25';
       $('#qHeight').value = q.height || '';
       $('#qWeight').value = q.weight || '';
-      $('#qSport').value = q.sport || 'modere';
+      $('#qSport').value = q.sport || '1-2';
       $('#qNutrition').value = q.nutrition || 'equilibre';
       $('#qAllergies').value = q.allergies || '';
       $('#qLikes').value = q.likes || '';
@@ -1009,11 +1078,14 @@
     }
 
     function startCreateFlow(){
+      const prefill = ($('#accountUsername')?.value || '').trim();
+      state.onboarding.prefillUsername = prefill;
       state.onboarding.step = 'type';
+      state.onboarding.showExistingLogin = false;
       state.onboarding.selectedType = 'Solo';
       state.onboarding.editProfileId = null;
       state.onboarding.quizStep = 0;
-      state.onboarding.quizDraft = blankQuiz('Solo');
+      state.onboarding.quizDraft = {...blankQuiz('Solo'), name:prefill};
       renderOnboarding();
     }
 
@@ -1039,8 +1111,10 @@
         profile = {id:uid(), name:'', pin:'', isGuest:false, quiz:{}};
         state.profiles.push(profile);
       }
-      profile.name = q.name || (q.type === 'Famille' ? 'Profil famille' : q.type === 'Duo' ? 'Profil duo' : q.type === 'Sur mesure' ? 'Profil sur mesure' : 'Profil solo');
+      profile.name = q.name || (q.type === 'Famille' ? 'Mon profil famille' : q.type === 'Duo' ? 'Mon profil duo' : q.type === 'Sur mesure' ? 'Mon profil sur mesure' : 'Mon profil solo');
       profile.pin = q.pin || '';
+      profile.introSeen = true;
+      profile.tutorialSeen = false;
       profile.quiz = {
         type:q.type, persons:q.persons, age:q.age, height:q.height, weight:q.weight,
         allergies:q.allergies, likes:q.likes, dislikes:q.dislikes,
@@ -1687,43 +1761,34 @@ function bind(){
       };
 
       $('#startCreateBtn').onclick = startCreateFlow;
-      $('#accountGuestBtn').onclick = () => {
-        createGuestProfile();
-        state.onboarding.step = 'tutorial';
-        state.onboarding.tutorialIndex = 0;
-        renderOnboarding();
-        renderAll();
-      };
-      $('#profilesStart').onclick = e => {
-        const card = e.target.closest('[data-pick-profile]');
-        if(!card) return;
-        state.onboarding.selectedProfileId = card.dataset.pickProfile;
-        renderOnboarding();
-      };
-      $('#useSelectedProfileBtn').onclick = () => {
-        const profile = state.profiles.find(p => p.id === state.onboarding.selectedProfileId);
-        if(!profile) return toast('Sélectionne un profil');
-        if(profile.pin){
-          const entered = prompt(`Entre le code du profil ${profile.name}`);
-          if(entered !== profile.pin) return toast('Code incorrect');
-        }
+      $('#toggleExistingLoginBtn').onclick = () => { state.onboarding.showExistingLogin = true; renderOnboarding(); setTimeout(()=>$('#existingProfileName')?.focus(),60); };
+      $('#hideExistingLoginBtn').onclick = () => { state.onboarding.showExistingLogin = false; renderOnboarding(); };
+      $('#loginExistingProfileBtn').onclick = () => {
+        const name = ($('#existingProfileName')?.value || '').trim();
+        const pin = ($('#existingProfilePin')?.value || '').trim();
+        if(!name) return toast('Entre le nom du profil');
+        const profile = state.profiles.find(p => p.role!=='admin' && normalize(p.name)===normalize(name));
+        if(!profile) return toast('Profil introuvable');
+        if(profile.pin && pin !== profile.pin) return toast('Code incorrect');
         state.activeProfileId = profile.id;
-        state.onboarding.step = 'tutorial';
-        state.onboarding.tutorialIndex = 0;
+        if(profile.introSeen === false){ state.onboarding.step = 'intro'; state.onboarding.introIndex = 0; state.onboarding.open = true; }
+        else if(profile.tutorialSeen === false){ state.onboarding.step = 'tutorial'; state.onboarding.tutorialIndex = 0; state.onboarding.open = true; }
+        else { state.onboarding.open = false; }
         save();
         renderOnboarding();
         renderAll();
       };
-      $('#editSelectedProfileBtn').onclick = () => {
-        const profile = state.profiles.find(p => p.id === state.onboarding.selectedProfileId);
-        if(!profile) return toast('Sélectionne un profil');
-        state.activeProfileId = profile.id;
-        state.onboarding.editProfileId = profile.id;
-        state.onboarding.selectedType = profile.quiz?.type || 'Solo';
-        state.onboarding.quizStep = 0;
-        state.onboarding.quizDraft = {...blankQuiz(profile.quiz?.type || 'Solo'), ...profile.quiz, name:profile.name, pin:profile.pin || ''};
-        state.onboarding.step = 'quiz';
+      $('#existingProfilePin')?.addEventListener('keydown', e => { if(e.key==='Enter') $('#loginExistingProfileBtn')?.click(); });
+      $('#existingProfileName')?.addEventListener('keydown', e => { if(e.key==='Enter') $('#loginExistingProfileBtn')?.click(); });
+      $('#accountGuestBtn').onclick = () => {
+        if(!allowGuestMode()) return toast('Le mode invité est désactivé');
+        createGuestProfile();
+        state.onboarding.step = 'tutorial';
+        state.onboarding.tutorialIndex = 0;
+        state.onboarding.open = true;
+        save();
         renderOnboarding();
+        renderAll();
       };
 
       $('#typeCards').onclick = e => {
@@ -1734,7 +1799,8 @@ function bind(){
       };
       $('#typeBackBtn').onclick = () => { state.onboarding.step = 'account'; renderOnboarding(); };
       $('#typeNextBtn').onclick = () => {
-        state.onboarding.quizDraft = {...blankQuiz(state.onboarding.selectedType), type:state.onboarding.selectedType};
+        const prefill = state.onboarding.prefillUsername || ($('#accountUsername')?.value || '').trim();
+        state.onboarding.quizDraft = {...blankQuiz(state.onboarding.selectedType), type:state.onboarding.selectedType, name:prefill};
         state.onboarding.quizStep = 0;
         state.onboarding.step = 'quiz';
         renderOnboarding();
@@ -1794,6 +1860,8 @@ function bind(){
           state.onboarding.tutorialIndex++;
           renderOnboarding();
         }else{
+          const p = activeProfile();
+          if(p){ p.tutorialSeen = true; p.introSeen = true; }
           state.onboarding.open = false;
           save();
           renderOnboarding();
@@ -2252,6 +2320,7 @@ function bind(){
     });
   });
   if(state.profiles.length && state.activeProfileId) state.onboarding.open = false;
+  if(!state.activeProfileId){ state.onboarding.open = true; state.onboarding.step = 'intro'; }
 
   function currentRole(){ return activeProfile()?.role || 'standard'; }
   function appCfg(){ return state.appConfig || APP_DEFAULTS; }
@@ -2375,18 +2444,7 @@ function bind(){
     $('#qDislikes').value = state.onboarding.quizDraft.dislikes || '';
   }
   function installAccountPrivacyBox(){
-    const step = $('#step-account .grid');
-    if(!step) return;
-    $('#profilesStart').style.display = 'none';
-    $('#existingProfileActions').style.display = 'none';
-    if(!$('#privateLoginWrap')){
-      const wrap = document.createElement('div');
-      wrap.id = 'privateLoginWrap';
-      wrap.innerHTML = ACCOUNT_HTML;
-      const startBtn = $('#startCreateBtn')?.parentElement;
-      if(startBtn) step.insertBefore(wrap, startBtn);
-      else step.appendChild(wrap);
-    }
+    return;
   }
 
   const oldRenderOnboarding = renderOnboarding;
@@ -2399,21 +2457,6 @@ function bind(){
     }
     renderPrefPanel();
     const selectedName = state.onboarding.editProfileId ? (state.profiles.find(p=>p.id===state.onboarding.editProfileId)?.name||'') : '';
-    if($('#loginProfileName') && !$('#loginProfileName').dataset.bound){
-      $('#loginProfileName').dataset.bound = '1';
-      $('#loginProfileBtn').onclick = () => {
-        const name = normalize($('#loginProfileName').value.trim());
-        const pin = $('#loginProfilePin').value.trim();
-        const profile = state.profiles.find(p => p.role!=='admin' && normalize(p.name)===name);
-        if(!profile) return toast('Profil introuvable');
-        if(profile.pin && profile.pin !== pin) return toast('Code incorrect');
-        state.activeProfileId = profile.id;
-        state.onboarding.open = false;
-        save();
-        renderOnboarding();
-        renderAll();
-      };
-    }
     if($('#qName') && !$('#qName').value && selectedName) $('#qName').value = selectedName;
   };
 
@@ -2812,14 +2855,25 @@ function bind(){
   // Fix create flow labels
   if($('#homeHello')) $('#homeHello').textContent = appCfg().homePhrase || 'Tes repas, tes courses, ton rythme';
 
-  function openAdminAccess(){
-    const code = prompt('Accès Admin : entre le code');
+  function openAdminAccessModal(){
+    document.getElementById('adminModal').classList.add('open');
+    document.getElementById('adminCodeInput').value = '';
+    document.getElementById('adminProgressBar').style.width = '100%';
+    setTimeout(() => document.getElementById('adminCodeInput')?.focus(), 60);
+  }
+  function closeAdminAccessModal(){
+    document.getElementById('adminModal').classList.remove('open');
+    document.getElementById('adminProgressBar').style.width = '0%';
+  }
+  function submitAdminAccess(){
+    const code = (document.getElementById('adminCodeInput').value || '').trim();
     if(code !== '21') return toast('Code admin incorrect');
     const admin = state.profiles.find(p => p.role==='admin');
     if(!admin) return toast('Compte Admin introuvable');
     state.activeProfileId = admin.id;
     state.onboarding.open = false;
     save();
+    closeAdminAccessModal();
     renderOnboarding();
     renderAll();
     toast('Connexion Admin réussie');
@@ -2830,17 +2884,40 @@ function bind(){
       if(el.dataset.adminBound) return;
       el.dataset.adminBound = '1';
       let timer = null;
-      let warned = false;
-      const start = () => {
-        warned = true;
-        toast('Maintiens 2 secondes pour l’accès Admin');
-        timer = setTimeout(() => { timer = null; openAdminAccess(); }, 2000);
+      let progressTimer = null;
+      let active = false;
+      const progressBar = document.getElementById('adminProgressBar');
+      const clearAll = () => {
+        active = false;
+        if(timer){ clearTimeout(timer); timer = null; }
+        if(progressTimer){ clearInterval(progressTimer); progressTimer = null; }
+        if(progressBar && !document.getElementById('adminModal').classList.contains('open')) progressBar.style.width = '0%';
       };
-      const cancel = () => { if(timer){ clearTimeout(timer); timer = null; if(warned) toast('Accès Admin annulé'); } warned = false; };
-      el.addEventListener('mousedown', start);
-      el.addEventListener('touchstart', start, {passive:true});
-      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt => el.addEventListener(evt, cancel));
+      const start = (ev) => {
+        ev.preventDefault();
+        clearAll();
+        active = true;
+        let elapsed = 0;
+        if(progressBar) progressBar.style.width = '0%';
+        toast('Maintiens 2 secondes sur le logo Admin');
+        progressTimer = setInterval(() => {
+          if(!active) return;
+          elapsed += 50;
+          if(progressBar) progressBar.style.width = Math.min(100, (elapsed/2000)*100) + '%';
+        }, 50);
+        timer = setTimeout(() => {
+          clearAll();
+          openAdminAccessModal();
+        }, 2000);
+      };
+      const cancel = () => clearAll();
+      el.addEventListener('pointerdown', start);
+      ['pointerup','pointerleave','pointercancel'].forEach(evt => el.addEventListener(evt, cancel));
+      el.addEventListener('contextmenu', e => e.preventDefault());
     });
+    document.getElementById('submitAdminCodeBtn')?.addEventListener('click', submitAdminAccess);
+    document.getElementById('closeAdminModalBtn')?.addEventListener('click', closeAdminAccessModal);
+    document.getElementById('adminCodeInput')?.addEventListener('keydown', e => { if(e.key==='Enter') submitAdminAccess(); });
   }
 
   // === V11 refinements: home 5, provisions, recipes, shopping, admin extras ===

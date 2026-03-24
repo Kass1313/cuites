@@ -34,6 +34,12 @@
     .iconBtn,.circleBtn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
     .headerTitle{min-width:0}
     .headerTitle h1{margin:0;font-size:1rem;line-height:1.1}
+    .brandRow{display:flex;align-items:center;gap:8px;min-width:0}
+    .adminLogoBtn{width:34px;height:34px;border:none;cursor:pointer;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#d8b260,#98763a);box-shadow:0 6px 18px rgba(216,178,96,.22), inset 0 1px 0 rgba(255,255,255,.25);padding:0;flex:0 0 auto}
+    .adminLogoBtn svg{width:22px;height:22px;display:block}
+    .adminLogoBtn:active{transform:scale(.98)}
+    .adminLogoBtn.small{width:30px;height:30px;border-radius:10px}
+    .adminHint{font-size:.72rem;color:var(--muted);margin-top:6px}
     .headerMeta{margin-top:3px;color:var(--muted);font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:.76rem}
     .section{margin-top:14px}
@@ -380,7 +386,16 @@
     <header class="header">
       <button class="iconBtn" id="openDrawerBtn">☰</button>
       <div class="headerTitle">
-        <h1 id="appTitleHeader">Maison Gourmet</h1>
+        <div class="brandRow">
+          <h1 id="appTitleHeader">Maison Gourmet</h1>
+          <button class="adminLogoBtn" id="adminAccessBtn" aria-label="Accès admin" title="Accès admin">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="8" y="8" width="48" height="48" rx="16" fill="#10233f"></rect>
+              <path d="M21 18h4v9l3-3 4 7 4-7 3 3v-9h4v18c0 8-6 13-15 13s-15-5-15-13V18Z" fill="#f5e8c6"></path>
+              <circle cx="32" cy="42" r="3" fill="#d8b260"></circle>
+            </svg>
+          </button>
+        </div>
         <div class="headerMeta"><span id="headerPage">Accueil</span> · <span id="headerProfile">Invité</span></div>
       </div>
       <div class="badge" id="headerGoal">Découverte</div>
@@ -2810,18 +2825,403 @@ function bind(){
     toast('Connexion Admin réussie');
   }
   function bindAdminLongPress(){
-    const targets = [document.querySelector('.headerTitle h1'), document.getElementById('obTitle')].filter(Boolean);
+    const targets = [document.getElementById('adminAccessBtn'), document.getElementById('adminAccessBtnOnboarding')].filter(Boolean);
     targets.forEach(el => {
       if(el.dataset.adminBound) return;
       el.dataset.adminBound = '1';
       let timer = null;
-      const start = () => { timer = setTimeout(openAdminAccess, 800); };
-      const cancel = () => { if(timer){ clearTimeout(timer); timer = null; } };
+      let warned = false;
+      const start = () => {
+        warned = true;
+        toast('Maintiens 5 secondes pour l’accès Admin');
+        timer = setTimeout(() => { timer = null; openAdminAccess(); }, 5000);
+      };
+      const cancel = () => { if(timer){ clearTimeout(timer); timer = null; if(warned) toast('Accès Admin annulé'); } warned = false; };
       el.addEventListener('mousedown', start);
       el.addEventListener('touchstart', start, {passive:true});
       ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt => el.addEventListener(evt, cancel));
     });
   }
+
+  // === V11 refinements: home 5, provisions, recipes, shopping, admin extras ===
+  (function(){
+    const extraStyle = document.createElement('style');
+    extraStyle.textContent = `
+      .homeV11{display:grid;gap:14px}
+      .homeHeroV11{padding:18px;border-radius:26px;background:linear-gradient(135deg, rgba(216,178,96,.16), rgba(137,171,255,.12), rgba(255,255,255,.04));border:1px solid var(--line)}
+      .homeHeroV11 h2{font-size:1.22rem;line-height:1.18}
+      .homeHeroV11 p{margin-top:8px;color:var(--muted)}
+      .homeSummaryRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+      .miniStat{padding:12px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+      .miniStat .k{font-size:.72rem;color:var(--muted)}
+      .miniStat .v{margin-top:5px;font-weight:700;font-size:1rem}
+      .shortcutGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .shortcutTile{padding:14px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--line);text-align:left;display:grid;gap:8px}
+      .shortcutTile .t{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+      .shortcutTile strong{font-size:.98rem}
+      .resumeList{display:grid;gap:8px}
+      .resumeItem{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+      .softBanner{padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+      .globalBanner{padding:12px 14px;border-radius:18px;background:linear-gradient(135deg, rgba(216,178,96,.16), rgba(255,255,255,.04));border:1px solid rgba(216,178,96,.35)}
+      .maintenanceBanner{padding:12px 14px;border-radius:18px;background:linear-gradient(135deg, rgba(255,115,132,.16), rgba(255,255,255,.04));border:1px solid rgba(255,115,132,.35)}
+      .shoppingModeOn .shoppingRow{grid-template-columns:1fr;gap:12px}
+      .shoppingModeOn .check{width:42px;height:42px}
+      .shoppingModeOn .itemName{font-size:1.02rem;font-weight:700}
+      .shoppingQuick{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}
+      .recipeQuickFilters{display:flex;gap:8px;overflow:auto;padding-bottom:3px}
+      .recipeMetaLine{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+      .recipeMetaLine span{padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.7rem}
+      .flagBtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text)}
+      .flagBtn.active{background:linear-gradient(135deg, rgba(216,178,96,.22), rgba(137,171,255,.18));border-color:rgba(216,178,96,.38)}
+      .recipeStateLine{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+      .adminExtraGrid{display:grid;gap:10px;margin-top:12px}
+      .dragHint{font-size:.72rem;color:var(--muted);margin-top:6px}
+      .dragHandle{cursor:grab;font-size:1rem;opacity:.7}
+      .menuSortRow.dragging{opacity:.45}
+      .provisionDual{display:grid;gap:12px}
+      .tinyCaps{font-size:.7rem;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+      .homeActionRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+      .compactChips .chip{padding:8px 10px;font-size:.76rem}
+    `;
+    document.head.appendChild(extraStyle);
+
+    state.appConfig.globalMessage = state.appConfig.globalMessage || '';
+    state.appConfig.maintenanceMode = !!state.appConfig.maintenanceMode;
+    state.appConfig.maintenanceText = state.appConfig.maintenanceText || 'Certaines fonctions sont temporairement en maintenance.';
+    state.recipeQuickFilter = state.recipeQuickFilter || 'Toutes';
+    state.profiles.forEach(p => {
+      const b = ensureBucket(p.id);
+      if(!Array.isArray(b.favoriteRecipes)) b.favoriteRecipes = [];
+      if(!Array.isArray(b.testedRecipes)) b.testedRecipes = [];
+      if(!Array.isArray(b.recentRecipes)) b.recentRecipes = [];
+      if(typeof b.shoppingMode !== 'boolean') b.shoppingMode = false;
+    });
+
+    function bucket(){ return ensureBucket(state.activeProfileId || legacyPid); }
+    function listHas(arr, value){ return Array.isArray(arr) && arr.includes(value); }
+    function toggleListValue(arr, value){ return listHas(arr,value) ? arr.filter(x => x !== value) : [value, ...arr]; }
+    function rememberRecipeOpen(id){
+      const b = bucket();
+      b.recentRecipes = [id, ...(b.recentRecipes||[]).filter(x => x !== id)].slice(0,6);
+      save();
+    }
+    function toggleFavoriteRecipe(id){ const b = bucket(); b.favoriteRecipes = toggleListValue(b.favoriteRecipes||[], id); save(); renderRecipes(); renderRecipeModal(); }
+    function toggleTestedRecipe(id){ const b = bucket(); b.testedRecipes = toggleListValue(b.testedRecipes||[], id); save(); renderRecipes(); renderRecipeModal(); }
+    function isFavoriteRecipe(id){ return listHas(bucket().favoriteRecipes||[], id); }
+    function isTestedRecipe(id){ return listHas(bucket().testedRecipes||[], id); }
+    function ownedQty(name){ return (state.fridge||[]).filter(i => normalize(i.name) === normalize(name)).reduce((s,i) => s + Number(i.qty||0), 0); }
+    function missingIngredients(recipe, servings){
+      return (recipe.ingredients||[]).map(([name, qty, unit]) => {
+        const needed = scaleQty(qty, recipe.servings, servings);
+        const have = ownedQty(name);
+        return {name, unit, needed, have, missing: Math.max(0, Math.round((needed - have) * 100) / 100)};
+      }).filter(x => x.missing > 0.01);
+    }
+    function addMissingIngredientsToShopping(recipeId, servings){
+      const recipe = recipesDb().find(r => r.id === recipeId);
+      if(!recipe) return;
+      const missing = missingIngredients(recipe, servings);
+      if(!missing.length) return toast('Tu as déjà tout dans tes provisions');
+      missing.forEach(item => addShopping(item.name, item.missing, item.unit, findCatalogCategory(item.name), recipe.name));
+      toast('Seuls les ingrédients manquants ont été ajoutés');
+    }
+    function addItemsToProvisions(items){
+      (items||[]).forEach(it => {
+        const existing = state.fridge.find(x => normalize(x.name) === normalize(it.name) && x.unit === it.unit);
+        if(existing) existing.qty = Math.round((Number(existing.qty) + Number(it.qty||1))*100)/100;
+        else state.fridge.push({id:uid(), name:it.name, qty:Number(it.qty||1), unit:it.unit||'pièce', fast:false});
+      });
+      save(); renderFridge(); renderHome();
+    }
+    function pendingMealsCount(){ return DAYS.length * MEALS.length - state.weekPlan.reduce((acc, day) => acc + Object.values(day.meals).filter(Boolean).length, 0); }
+
+    const oldRenderHomeV11 = renderHome;
+    renderHome = function(){
+      const section = $('#view-home');
+      if(!section) return;
+      const p = activeProfile();
+      const visibleRecipes = filterRecipesByProfile(recipesDb());
+      const planned = state.weekPlan.reduce((acc, day) => acc + Object.values(day.meals).filter(Boolean).length, 0);
+      const shoppingPending = state.shopping.filter(i => !i.done).length;
+      const provisionsCount = state.fridge.length;
+      const recent = (bucket().recentRecipes||[]).map(id => recipesDb().find(r => r.id===id)).find(Boolean);
+      const suggestion = recent || visibleRecipes.find(r => r.goal === p.quiz?.goal) || visibleRecipes.find(r => r.meal === 'Repas du soir') || visibleRecipes[0];
+      const shortcuts = [
+        {view:'catalog', label:'Catalogue', hint:'ajouter et ajuster'},
+        {view:'shopping', label:'Liste', hint:'acheter facilement'},
+        {view:'week', label:'Programme', hint:'organiser la semaine'},
+        {view:'recipes', label:'Recettes', hint:'choisir et cuisiner'}
+      ];
+      section.innerHTML = `<div class="card homeV11">
+        ${appCfg().maintenanceMode ? `<div class="maintenanceBanner"><div class="tinyCaps">Maintenance</div><div style="margin-top:4px">${esc(appCfg().maintenanceText || 'Certaines fonctions sont temporairement en maintenance.')}</div></div>` : ''}
+        ${appCfg().globalMessage ? `<div class="globalBanner"><div class="tinyCaps">Message global</div><div style="margin-top:4px">${esc(appCfg().globalMessage)}</div></div>` : ''}
+        <div class="homeHeroV11">
+          <div class="between" style="align-items:flex-start">
+            <div>
+              <div class="tinyCaps">${esc(p.name || 'Profil actif')}</div>
+              <h2>${esc(appCfg().homePhrase || 'Tes repas, tes courses, ton rythme')}</h2>
+              <p>${p.isGuest ? 'Mode invité · découverte rapide de l’application' : `${esc(p.quiz?.type || 'Profil')} · ${esc(p.quiz?.goal || 'Équilibre')} · ${esc(p.quiz?.style || 'Rapide')} · ${Number(p.quiz?.persons || 1)} ${Number(p.quiz?.persons || 1) > 1 ? 'personnes' : 'personne'}`}</p>
+            </div>
+            <div class="badge">${esc(p.quiz?.type || 'Solo')}</div>
+          </div>
+          <div class="homeSummaryRow">
+            <div class="miniStat"><div class="k">Programme</div><div class="v">${planned}</div></div>
+            <div class="miniStat"><div class="k">Liste</div><div class="v">${shoppingPending}</div></div>
+            <div class="miniStat"><div class="k">Provisions</div><div class="v">${provisionsCount}</div></div>
+          </div>
+          <div class="homeActionRow">
+            <button class="btn" data-home-guide="intro">Guide</button>
+            <button class="btn" data-home-view="coach">Coach IA</button>
+            <button class="btn" data-home-view="fridge">Mes provisions</button>
+          </div>
+        </div>
+        <div>
+          <div class="tinyCaps" style="margin-bottom:8px">Raccourcis</div>
+          <div class="shortcutGrid">
+            ${shortcuts.map((item, idx) => `<button class="shortcutTile" data-home-view="${item.view}"><div class="t">Raccourci ${idx+1}</div><strong>${item.label}</strong><div class="small muted">${item.hint}</div></button>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="tinyCaps" style="margin-bottom:8px">À reprendre</div>
+          <div class="resumeList">
+            <div class="resumeItem"><div><strong>Programme semaine</strong><div class="small muted">${pendingMealsCount()} moment${pendingMealsCount()>1?'s':''} encore vide${pendingMealsCount()>1?'s':''}</div></div><button class="btn" data-home-view="week">continuer</button></div>
+            <div class="resumeItem"><div><strong>Liste de courses</strong><div class="small muted">${shoppingPending} article${shoppingPending>1?'s':''} prêt${shoppingPending>1?'s':''}</div></div><button class="btn" data-home-view="shopping">ouvrir</button></div>
+            <div class="resumeItem"><div><strong>${recent ? 'Recette récente' : 'Mes provisions'}</strong><div class="small muted">${recent ? esc(recent.name) : `${provisionsCount} produit${provisionsCount>1?'s':''} enregistré${provisionsCount>1?'s':''}`}</div></div><button class="btn" ${recent ? `data-open-recipe="${recent.id}"` : `data-home-view="fridge"`}>${recent ? 'refaire' : 'voir'}</button></div>
+          </div>
+        </div>
+        <div class="softBanner">
+          <div class="tinyCaps">Petite suggestion</div>
+          ${suggestion ? `<div class="between" style="margin-top:8px"><div><strong>${esc(suggestion.name)}</strong><div class="small muted">${esc(suggestion.meal)} · ${suggestion.time} min · ${suggestion.ingredients.length} ingrédients</div></div><div class="row"><button class="btn" data-open-recipe="${suggestion.id}">voir</button><button class="btn primary" data-suggest-add="${suggestion.id}">ajouter</button></div></div>` : `<div class="small muted" style="margin-top:8px">Ajoute quelques recettes ou complète ton profil pour obtenir une suggestion.</div>`}
+        </div>
+      </div>`;
+    };
+
+    renderShopping = function(){
+      autoArchiveShopping();
+      const filters = ['Tout','À acheter','Déjà pris'];
+      const card = $('#view-shopping .card');
+      if(!card) return;
+      const modeOn = bucket().shoppingMode;
+      card.className = `card ${modeOn ? 'shoppingModeOn' : ''}`;
+      card.innerHTML = `
+        <div class="between"><div><h2>Liste de courses</h2><p class="sub small">Pensée pour le supermarché, avec ajout rapide, mode courses et historique automatique.</p></div><div class="row"><button class="btn" id="shoppingModeBtn">${modeOn ? 'Mode normal' : 'Mode courses'}</button><button class="btn" id="shareShoppingBtn">Partager</button></div></div>
+        <div class="shoppingQuick"><input class="input" id="shoppingQuickInput" placeholder="Ajouter rapidement un article"><button class="btn primary" id="shoppingQuickAddBtn">Ajouter</button></div>
+        <div class="chips compactChips" id="shoppingFilters" style="margin-top:12px">${filters.map(f=>`<button class="chip ${state.shoppingFilter===f?'active':''}" data-shopping-filter="${esc(f)}">${esc(f)}</button>`).join('')}</div>
+        <div class="list" id="shoppingList" style="margin-top:12px"></div>
+        <div class="divider"></div>
+        <div class="between"><div><h3>Historique des achats</h3><p class="sub small">Quand toute la liste est cochée, elle part ici automatiquement avec la date.</p></div><button class="btn" id="clearDoneShoppingBtn">Retirer cochés</button></div>
+        <div class="historyList" id="shoppingHistoryList" style="margin-top:12px"></div>`;
+      let items = [...state.shopping];
+      if(state.shoppingFilter === 'À acheter') items = items.filter(i => !i.done);
+      if(state.shoppingFilter === 'Déjà pris') items = items.filter(i => i.done);
+      const byCat = {};
+      items.forEach(item => { const cat = item.category || 'Autres'; (byCat[cat] ||= []).push(item); });
+      const categories = Object.keys(byCat).sort();
+      $('#shoppingList').innerHTML = categories.length ? categories.map(cat => `<div class="item"><div class="sectionTitleRow"><h3>${esc(cat)}</h3><span class="pill">${byCat[cat].length} article${byCat[cat].length>1?'s':''}</span></div><div class="list" style="margin-top:10px">${byCat[cat].map(item => `<div class="shoppingRow ${item.done ? 'done' : ''}"><div class="row"><button class="check" data-toggle-shopping="${item.id}">✓</button><div><div class="itemName">${esc(item.name)}</div><div class="small muted">${formatQty(item.qty)} ${esc(item.unit)} · ${esc(item.source)}</div></div></div><div class="shoppingActions"><div class="qtyBox"><button class="qtyBtn" data-shopping-minus="${item.id}">−</button><span class="qtyValue">${formatQty(item.qty)}</span><button class="qtyBtn" data-shopping-plus="${item.id}">＋</button></div><button class="btn danger" data-remove-shopping="${item.id}">✕</button></div></div>`).join('')}</div></div>`).join('') : `<div class="empty">Ta liste est vide. Ajoute une recette, un article du catalogue ou un produit rapide.</div>`;
+      $('#shoppingHistoryList').innerHTML = state.shoppingHistory.length ? state.shoppingHistory.map(h => `<div class="item historyCard" data-history-card="${h.id}"><div class="between"><div><div>${esc(h.label || 'Ancienne liste')}</div><div class="small muted">${formatDate(h.date)} · ${h.items.length} article${h.items.length>1?'s':''}</div></div><div class="row"><button class="dotsBtn" data-history-menu="${h.id}">⋮</button></div></div><div id="history-actions-${h.id}" class="row hidden" style="margin-top:10px;flex-wrap:wrap"><button class="btn" data-history-restore="${h.id}">Remettre</button><button class="btn" data-history-duplicate="${h.id}">Dupliquer</button><button class="btn" data-history-to-provisions="${h.id}">Vers provisions</button><button class="btn danger" data-history-delete="${h.id}">Supprimer</button></div></div>`).join('') : `<div class="empty">Ton historique apparaîtra ici quand une liste complète sera cochée.</div>`;
+      if(typeof bindHistorySwipe === 'function') bindHistorySwipe();
+    };
+
+    renderRecipes = function(){
+      const tabs = ['Toutes', ...MEALS, 'Pâtes'];
+      const quicks = ['Toutes','−20 min','5 ingrédients max','Favoris','Déjà testées'];
+      if(!quicks.includes(state.recipeQuickFilter)) state.recipeQuickFilter = 'Toutes';
+      $('#recipeTabs').innerHTML = tabs.map(tab => `<button class="chip ${state.recipeFilter===tab ? 'active':''}" data-recipe-filter="${esc(tab)}">${esc(tab)}</button>`).join('');
+      let list = filterRecipesByProfile(recipesDb());
+      const search = normalize($('#recipeSearch').value || '');
+      if(state.recipeFilter !== 'Toutes') list = list.filter(r => r.meal === state.recipeFilter || recipeFamily(r) === state.recipeFilter);
+      if(search) list = list.filter(r => normalize(`${r.name} ${recipeFamily(r)} ${r.meal} ${(r.tags||[]).join(' ')}`).includes(search));
+      if(state.recipeQuickFilter === '−20 min') list = list.filter(r => Number(r.time) <= 20);
+      if(state.recipeQuickFilter === '5 ingrédients max') list = list.filter(r => (r.ingredients||[]).length <= 5);
+      if(state.recipeQuickFilter === 'Favoris') list = list.filter(r => isFavoriteRecipe(r.id));
+      if(state.recipeQuickFilter === 'Déjà testées') list = list.filter(r => isTestedRecipe(r.id));
+      $('#recipesList').insertAdjacentHTML ? null : null;
+      const host = $('#recipesList');
+      const quickWrap = `<div class="recipeQuickFilters">${quicks.map(f => `<button class="chip ${state.recipeQuickFilter===f?'active':''}" data-recipe-quick="${esc(f)}">${esc(f)}</button>`).join('')}</div>`;
+      host.parentElement.querySelector('#recipeQuickFiltersHost')?.remove();
+      const quickHost = document.createElement('div'); quickHost.id='recipeQuickFiltersHost'; quickHost.style.marginTop='10px'; quickHost.innerHTML = quickWrap;
+      host.parentElement.insertBefore(quickHost, host);
+      host.innerHTML = list.length ? list.map(r => {
+        const missing = missingIngredients(r, getRecipeServings(r)).length;
+        return `<div class="recipeCard" data-open-recipe="${r.id}">
+          <img src="${recipeImage(r)}" alt="${esc(r.name)}" class="recipeImg">
+          <div class="between" style="margin-top:10px;align-items:flex-start"><div><div class="itemName">${esc(r.name)}</div><div class="small muted">${esc(recipeFamily(r))} · ${r.time} min</div></div><div class="row"><button class="flagBtn ${isFavoriteRecipe(r.id)?'active':''}" data-toggle-fav="${r.id}" title="favori">★</button><button class="flagBtn ${isTestedRecipe(r.id)?'active':''}" data-toggle-tested="${r.id}" title="testée">✓</button></div></div>
+          <div class="recipeMetaLine"><span>${(r.ingredients||[]).length} ingrédients</span><span>${missing ? `${missing} manquant${missing>1?'s':''}` : 'j’ai tout'}</span>${(r.tags||[]).slice(0,2).map(t => `<span>${esc(t)}</span>`).join('')}</div>
+          <div class="grid2" style="margin-top:12px"><button class="btn primary" data-open-recipe="${r.id}">Voir</button><button class="btn danger" data-hide-recipe="${r.id}">Masquer</button></div>
+        </div>`;
+      }).join('') : `<div class="empty">Aucune recette pour ce filtre.</div>`;
+      $('#hiddenRecipesList').innerHTML = state.hiddenRecipes.length ? state.hiddenRecipes.map(id => { const r = recipesDb().find(x=>x.id===id); return r ? `<div class="item"><div class="between"><div><div>${esc(r.name)}</div><div class="small muted">${esc(recipeFamily(r))}</div></div><button class="btn" data-restore-recipe="${r.id}">Remettre</button></div></div>` : ''; }).join('') : `<div class="empty">Aucune recette masquée.</div>`;
+    };
+
+    renderRecipeModal = function(){
+      const modal = $('#recipeModal');
+      const r = recipesDb().find(x => x.id === state.openRecipeId);
+      if(!r){ modal.classList.remove('open'); return; }
+      modal.classList.add('open');
+      const servings = getRecipeServings(r);
+      const detailed = detailedRecipeSteps(r);
+      const missing = missingIngredients(r, servings);
+      $('#recipeModalContent').innerHTML = `<div class="between"><div><div class="badge">${esc(recipeFamily(r))}</div><h2 style="margin-top:10px">${esc(r.name)}</h2><p class="sub small" style="margin-top:6px">${r.time} min · ${r.ingredients.length} ingrédients · ${esc(r.meal)} · ${esc(r.goal)}</p></div><button class="iconBtn" data-close="recipeModal">✕</button></div>
+      <div class="recipeHero"><img src="${recipeImage(r)}" alt="${esc(r.name)}"></div>
+      <div class="recipeStateLine"><button class="btn ${isFavoriteRecipe(r.id)?'primary':''}" data-recipe-fav="${r.id}">${isFavoriteRecipe(r.id)?'Retirer des favoris':'Ajouter aux favoris'}</button><button class="btn ${isTestedRecipe(r.id)?'primary':''}" data-recipe-tested="${r.id}">${isTestedRecipe(r.id)?'Déjà testée':'Marquer testée'}</button><span class="shareTag">sans porc</span><span class="shareTag">sans alcool</span></div>
+      <div class="between" style="margin-top:14px"><div><h3>Nombre de personnes</h3><p class="sub small">Les quantités s’ajustent automatiquement.</p></div><div class="qtyBox"><button class="qtyBtn" data-recipe-servings-minus="${r.id}">−</button><span class="qtyValue">${formatQty(servings)}</span><button class="qtyBtn" data-recipe-servings-plus="${r.id}">＋</button></div></div>
+      <div class="divider"></div>
+      <div><h3>Ingrédients</h3><div class="small muted" style="margin-top:4px">${r.ingredients.length} ingrédients au total${missing.length ? ` · ${missing.length} manquant${missing.length>1?'s':''}` : ' · tu as tout à la maison'}</div><div class="list" style="margin-top:10px">${r.ingredients.map(([name,qty,unit])=>{ const need = scaleQty(qty, r.servings, servings); const have = ownedQty(name); const miss = Math.max(0, Math.round((need-have)*100)/100); return `<div class="item small"><div class="between"><span>${esc(name)} · ${formatQty(need)} ${esc(unit)}</span><span class="small ${miss>0?'muted':''}">${miss>0?`manque ${formatQty(miss)} ${esc(unit)}`:'j’ai déjà'}</span></div></div>`; }).join('')}</div></div>
+      <div class="divider"></div>
+      <div><h3>Préparation détaillée</h3><div class="list" style="margin-top:10px">${detailed.map((s,i)=>`<div class="item small"><span class="badge">${i+1}</span> ${esc(s)}</div>`).join('')}</div></div>
+      <div class="grid2" style="margin-top:14px"><button class="btn primary" data-recipe-add-list="${r.id}">Ajouter toute la recette</button><button class="btn" data-recipe-add-missing="${r.id}">${missing.length ? 'Ajouter seulement ce qu’il manque' : 'J’ai tout'}</button></div>
+      <div class="grid2" style="margin-top:10px"><button class="btn" data-recipe-add-week="${r.id}">Ajouter au jour choisi</button><button class="btn" data-share-recipe="${r.id}">Partager</button></div>
+      <div class="grid2" style="margin-top:10px"><button class="btn danger" data-hide-recipe="${r.id}">Masquer</button><button class="btn ghost" data-close="recipeModal">Fermer</button></div>`;
+    };
+
+    const baseRenderSettingsV11 = renderSettings;
+    function bindSettingsEnhancements(){
+      const p = activeProfile();
+      if(p.role !== 'admin') return;
+      const card = $('#view-settings .card');
+      if(!card) return;
+      let host = $('#adminExtraConfig');
+      if(!host){
+        host = document.createElement('div');
+        host.id = 'adminExtraConfig';
+        host.className = 'adminOnly';
+        host.style.marginTop = '12px';
+        card.appendChild(host);
+      }
+      host.innerHTML = `<div class="groupTitle">Options globales supplémentaires</div>
+        <div class="adminExtraGrid">
+          <div><div class="small muted">Message global sur l’accueil</div><textarea class="textarea" id="adminGlobalMessage" style="margin-top:8px">${esc(appCfg().globalMessage || '')}</textarea></div>
+          <label class="shareTarget"><span>Mode maintenance</span><input type="checkbox" id="adminMaintenanceMode" ${appCfg().maintenanceMode ? 'checked' : ''}></label>
+          <div><div class="small muted">Texte maintenance</div><input class="input" id="adminMaintenanceText" value="${esc(appCfg().maintenanceText || '')}" style="margin-top:8px"></div>
+          <div class="small muted">Astuce : tu peux changer l’ordre du menu avec les flèches ci-dessus, ou glisser-déposer les lignes ci-dessous.</div>
+        </div>`;
+      const saveBtn = $('#saveAdminConfigBtn');
+      if(saveBtn && !saveBtn.dataset.v11Bound){
+        saveBtn.dataset.v11Bound = '1';
+        const oldClick = saveBtn.onclick;
+        saveBtn.onclick = () => {
+          state.appConfig.globalMessage = $('#adminGlobalMessage')?.value.trim() || '';
+          state.appConfig.maintenanceMode = !!$('#adminMaintenanceMode')?.checked;
+          state.appConfig.maintenanceText = $('#adminMaintenanceText')?.value.trim() || 'Certaines fonctions sont temporairement en maintenance.';
+          if(oldClick) oldClick();
+        };
+      }
+      const rows = $$('.menuSortRow');
+      rows.forEach(row => {
+        const view = row.querySelector('[data-menu-up]')?.dataset.menuUp || row.querySelector('[data-menu-down]')?.dataset.menuDown;
+        if(!view) return;
+        row.dataset.menuView = view;
+        row.draggable = true;
+        if(!row.querySelector('.dragHandle')) row.insertAdjacentHTML('afterbegin', `<span class="dragHandle">⋮⋮</span>`);
+        row.ondragstart = () => row.classList.add('dragging');
+        row.ondragend = () => row.classList.remove('dragging');
+        row.ondragover = e => e.preventDefault();
+        row.ondrop = e => {
+          e.preventDefault();
+          const dragging = document.querySelector('.menuSortRow.dragging');
+          if(!dragging || dragging === row) return;
+          const from = dragging.dataset.menuView;
+          const to = row.dataset.menuView;
+          const arr = state.menuOrder.slice();
+          const fromIdx = arr.indexOf(from); const toIdx = arr.indexOf(to);
+          if(fromIdx < 0 || toIdx < 0) return;
+          arr.splice(toIdx, 0, arr.splice(fromIdx,1)[0]);
+          state.menuOrder = arr; save(); renderDrawerLinks(); renderSettings(); toast('Ordre du menu mis à jour');
+        };
+      });
+    }
+    renderSettings = function(){ baseRenderSettingsV11(); bindSettingsEnhancements(); };
+
+    function bindInteractionOverrides(){
+      const filters = document.getElementById('shoppingFilters');
+      if(filters) filters.onclick = e => { const b = e.target.closest('[data-shopping-filter]'); if(!b) return; state.shoppingFilter = b.dataset.shoppingFilter; save(); renderShopping(); };
+      const clearBtn = document.getElementById('clearDoneShoppingBtn');
+      if(clearBtn) clearBtn.onclick = () => { state.shopping = state.shopping.filter(i => !i.done); save(); renderShopping(); renderHome(); toast('Articles cochés retirés'); };
+      const shareBtn = document.getElementById('shareShoppingBtn');
+      if(shareBtn) shareBtn.onclick = () => openShare('shopping', {items: state.shopping.filter(i => !i.done)});
+      const recipesList = document.getElementById('recipesList');
+      if(recipesList) recipesList.onclick = e => {
+        const fav = e.target.closest('[data-toggle-fav]');
+        if(fav){ e.stopPropagation(); toggleFavoriteRecipe(fav.dataset.toggleFav); return; }
+        const tested = e.target.closest('[data-toggle-tested]');
+        if(tested){ e.stopPropagation(); toggleTestedRecipe(tested.dataset.toggleTested); return; }
+        const hide = e.target.closest('[data-hide-recipe]');
+        if(hide){ e.stopPropagation(); hideRecipe(hide.dataset.hideRecipe); return; }
+        const open = e.target.closest('[data-open-recipe]');
+        if(open){ state.openRecipeId = open.dataset.openRecipe; save(); renderRecipeModal(); rememberRecipeOpen(open.dataset.openRecipe); }
+      };
+      const modal = document.getElementById('recipeModalContent');
+      if(modal) modal.onclick = e => {
+        const minus = e.target.closest('[data-recipe-servings-minus]');
+        const plus = e.target.closest('[data-recipe-servings-plus]');
+        const addList = e.target.closest('[data-recipe-add-list]');
+        const addMissing = e.target.closest('[data-recipe-add-missing]');
+        const addWeek = e.target.closest('[data-recipe-add-week]');
+        const share = e.target.closest('[data-share-recipe]');
+        const fav = e.target.closest('[data-recipe-fav]');
+        const tested = e.target.closest('[data-recipe-tested]');
+        const hide = e.target.closest('[data-hide-recipe]');
+        if(minus){ const id = minus.dataset.recipeServingsMinus; const r = recipesDb().find(x => x.id === id); state.recipeServings[id] = Math.max(1, (state.recipeServings[id] || getRecipeServings(r)) - 1); save(); renderRecipeModal(); return; }
+        if(plus){ const id = plus.dataset.recipeServingsPlus; const r = recipesDb().find(x => x.id === id); state.recipeServings[id] = (state.recipeServings[id] || getRecipeServings(r)) + 1; save(); renderRecipeModal(); return; }
+        if(addList){ const id = addList.dataset.recipeAddList; const r = recipesDb().find(x => x.id === id); addRecipeIngredientsToShopping(id, state.recipeServings[id] || getRecipeServings(r)); return; }
+        if(addMissing){ const id = addMissing.dataset.recipeAddMissing; const r = recipesDb().find(x => x.id === id); addMissingIngredientsToShopping(id, state.recipeServings[id] || getRecipeServings(r)); return; }
+        if(addWeek){ addRecipeToWeek(addWeek.dataset.recipeAddWeek, state.selectedDay); renderHome(); return; }
+        if(share){ openShare('recipe', {recipeId: share.dataset.shareRecipe}); return; }
+        if(fav){ toggleFavoriteRecipe(fav.dataset.recipeFav); return; }
+        if(tested){ toggleTestedRecipe(tested.dataset.recipeTested); return; }
+        if(hide){ hideRecipe(hide.dataset.hideRecipe); closeModal('recipeModal'); return; }
+      };
+    }
+
+    const baseRenderAllV11 = renderAll;
+    renderAll = function(){ baseRenderAllV11(); bindSettingsEnhancements(); bindInteractionOverrides(); };
+
+    document.addEventListener('click', e => {
+      const homeView = e.target.closest('[data-home-view]');
+      if(homeView){ switchView(homeView.dataset.homeView); return; }
+      const homeGuide = e.target.closest('[data-home-guide]');
+      if(homeGuide){ state.onboarding.open = true; state.onboarding.step = homeGuide.dataset.homeGuide === 'tutorial' ? 'tutorial' : 'intro'; state.onboarding.introIndex = 0; state.onboarding.tutorialIndex = 0; renderOnboarding(); return; }
+      const quickAdd = e.target.closest('#shoppingQuickAddBtn');
+      if(quickAdd){
+        const input = $('#shoppingQuickInput');
+        const name = input?.value.trim();
+        if(!name) return toast('Entre un article');
+        addShopping(name, 1, 'pièce', findCatalogCategory(name), 'manuel');
+        input.value = '';
+        renderShopping();
+        return;
+      }
+      const modeBtn = e.target.closest('#shoppingModeBtn');
+      if(modeBtn){ bucket().shoppingMode = !bucket().shoppingMode; save(); renderShopping(); return; }
+      const histProv = e.target.closest('[data-history-to-provisions]');
+      if(histProv){ const h = state.shoppingHistory.find(x => x.id === histProv.dataset.historyToProvisions); if(!h) return; addItemsToProvisions(h.items); toast('Historique envoyé dans Mes provisions'); return; }
+      const fav = e.target.closest('[data-toggle-fav],[data-recipe-fav]');
+      if(fav){ e.stopPropagation(); toggleFavoriteRecipe(fav.dataset.toggleFav || fav.dataset.recipeFav); return; }
+      const tested = e.target.closest('[data-toggle-tested],[data-recipe-tested]');
+      if(tested){ e.stopPropagation(); toggleTestedRecipe(tested.dataset.toggleTested || tested.dataset.recipeTested); return; }
+      const missingBtn = e.target.closest('[data-recipe-add-missing]');
+      if(missingBtn){ const r = recipesDb().find(x => x.id === missingBtn.dataset.recipeAddMissing); addMissingIngredientsToShopping(missingBtn.dataset.recipeAddMissing, state.recipeServings[r.id] || getRecipeServings(r)); return; }
+      const quickFilter = e.target.closest('[data-recipe-quick]');
+      if(quickFilter){ state.recipeQuickFilter = quickFilter.dataset.recipeQuick; save(); renderRecipes(); return; }
+    });
+
+    document.addEventListener('input', e => {
+      if(e.target.id === 'shoppingQuickInput' && e.target.form===null && e instanceof InputEvent===false){}
+    });
+    document.addEventListener('keydown', e => {
+      if(e.target && e.target.id === 'shoppingQuickInput' && e.key === 'Enter'){
+        e.preventDefault();
+        document.getElementById('shoppingQuickAddBtn')?.click();
+      }
+    });
+
+    const oldBodyClickV11 = document.body.onclick;
+    document.body.onclick = function(ev){
+      if(oldBodyClickV11) oldBodyClickV11.call(this, ev);
+    };
+
+  })();
+
   // Final render
   save();
   renderAll();

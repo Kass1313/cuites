@@ -461,7 +461,7 @@ document.addEventListener('touchend',function(){if(!_sw.w)return;_sw.inn.classLi
 function swR(h,a){return '<div class="swipe-wrap"><div class="swipe-del" onclick="'+a+'">🗑️</div><div class="swipe-inner">'+h+'</div></div>';}
 
 /* ===== VIEW STATE ===== */
-const VIEW={page:DB.currentProfileId?'home':'profiles',introIndex:0,setupStep:0,recipeFilter:'Toutes',recipeSearch:'',recipeLess5:false,recipeFast:false,recipeFaisable:false,recipe2ing:false,recipeServings:null,productTab:'Tout',productSearch:'',shoppingSearch:'',shoppingMode:false,provisionTab:'Tout',provisionSearch:'',weekTag:'Tous',coachInput:''};
+const VIEW={page:DB.currentProfileId?'home':'profiles',introIndex:0,setupStep:0,recipeFilter:'Toutes',recipeSearch:'',recipeLess5:false,recipeFast:false,recipeFaisable:false,recipe2ing:false,recipeAirFryer:false,recipeCopie:false,recipeProteine:false,recipeServings:null,productTab:'Tout',productSearch:'',shoppingSearch:'',shoppingMode:false,provisionTab:'Tout',provisionSearch:'',weekTag:'Tous',coachInput:''};
 const view=()=>VIEW;
 function setView(patch){Object.assign(VIEW,patch);render();}
 let _searchTimer;
@@ -549,46 +549,99 @@ function homeScreen(){
   const listCount=p.shopping.length,provCount=p.provisions.filter(i=>i.qty>0).length;
   const faisable=faisableRecipes(),suggestion=getSuggestionRecipe(),season=currentSeason();
   const goalPct=p.goals.target>0?Math.min(100,Math.round((p.goals.done||0)/p.goals.target*100)):0;
+  const cooked=p.stats.recipesCooked||0;
+  const copieRecipes=allRecipes().filter(r=>(r.tags||[]).includes('Copie ta commande'));
+  const airFryerRecipes=allRecipes().filter(r=>(r.tags||[]).includes('Air Fryer'));
+  const flemmeRecipes=allRecipes().filter(r=>r.time<=15);
+  const postTraining=allRecipes().filter(r=>(r.tags||[]).includes('Post-training')||(r.tags||[]).includes('Protéiné'));
+  
+  // Calculate savings from cooking history
+  const savings=p.cookingHistory.reduce((s,h)=>{const r=allRecipes().find(x=>x.id===h.recipeId);if(r&&r.priceLivraison>0)return s+(r.priceLivraison-r.priceMaison);return s;},0);
+  
+  // Badges
+  const badges=[];
+  if(cooked>=1)badges.push('🥚 Premier plat');
+  if(cooked>=5)badges.push('🍳 Apprenti');
+  if(cooked>=15)badges.push('👨‍🍳 Cuistot');
+  if(cooked>=30)badges.push('⭐ Chef');
+  if(cooked>=50)badges.push('👑 Master Chef');
+  if(savings>=50)badges.push('💰 Économe');
+  if(savings>=200)badges.push('🏦 Banquier');
+  if(p.cookingHistory.length>=7){const last7=p.cookingHistory.slice(0,7).every(h=>h.date>Date.now()-7*86400000);if(last7)badges.push('🔥 7 jours streak');}
 
   return appHeader()+'<div class="screen">'+
     '<div class="hero"><h2>Salut '+esc(fp.name)+' 👋</h2><p>'+esc(p.objective)+' · '+esc(p.style)+' · '+esc(p.cookTime)+'</p>'+
     '<div class="kpis"><div class="kpi"><div class="n">'+planCount+'</div><div class="l">planifiés</div></div>'+
     '<div class="kpi"><div class="n">'+listCount+'</div><div class="l">en liste</div></div>'+
-    '<div class="kpi"><div class="n">'+provCount+'</div><div class="l">provisions</div></div></div></div>'+
+    '<div class="kpi"><div class="n">'+cooked+'</div><div class="l">cuisinés</div></div></div></div>'+
+
+    // Savings banner
+    (savings>0?'<div class="mini-card mt" style="background:var(--green-bg);border-color:var(--green-border)"><div class="row"><div style="font-size:24px">💰</div><div class="item-meta"><b style="color:var(--green)">'+Math.round(savings)+'€ économisés vs livraison</b><small>En cuisinant toi-même !</small></div></div></div>':'')+
+
+    // Badges
+    (badges.length?'<div class="mini-card mt"><b>🏆 Badges</b><div class="chips mt">'+badges.map(b=>'<span class="badge gold">'+b+'</span>').join('')+'</div></div>':'')+
 
     // Astuce du jour
     '<div class="mini-card mt"><div class="small bold text-gold">💡 Astuce du jour</div><div class="small mt">'+esc(todayTip())+'</div></div>'+
 
     // Objectif hebdo
-    '<div class="mini-card mt"><div class="row"><div class="item-meta"><b>🎯 Objectif : '+p.goals.target+' repas maison</b><small>'+(p.goals.done||0)+'/'+p.goals.target+' cette semaine</small></div></div><div class="progress-bar mt"><div class="fill" style="width:'+goalPct+'%"></div></div></div>'+
+    '<div class="mini-card mt"><div class="row"><div class="item-meta"><b>🎯 '+p.goals.target+' repas maison / semaine</b><small>'+(p.goals.done||0)+'/'+p.goals.target+'</small></div></div><div class="progress-bar mt"><div class="fill" style="width:'+goalPct+'%"></div></div></div>'+
+
+    // === BIG BUTTONS ===
+    '<div class="shortcuts mt">'+
+    '<div class="shortcut" style="background:linear-gradient(135deg,rgba(232,97,110,0.15),rgba(232,179,58,0.08));border-color:var(--red-border)" onclick="showFlemme()"><div class="ico" style="background:var(--red-bg)">😴</div><div><b>J\'ai la flemme</b><div class="small">≤15 min, ultra facile</div></div></div>'+
+    '<div class="shortcut" style="background:var(--gold-bg);border-color:var(--gold-border)" onclick="quickMealTonight()"><div class="ico" style="background:var(--gold-bg)">✨</div><div><b>Repas ce soir</b><div class="small">Le coach propose</div></div></div>'+
+    '<div class="shortcut" onclick="showCopieCommande()"><div class="ico">🏠</div><div><b>Copie ta commande</b><div class="small">'+copieRecipes.length+' recettes resto</div></div></div>'+
+    '<div class="shortcut" onclick="showAirFryer()"><div class="ico">🍟</div><div><b>Air Fryer</b><div class="small">'+airFryerRecipes.length+' recettes</div></div></div>'+
+    '</div>'+
+
+    // Post-training shortcut
+    '<div class="shortcut mt" style="background:var(--blue-bg);border-color:var(--blue-border)" onclick="showPostTraining()"><div class="ico" style="background:var(--blue-bg)">💪</div><div><b>Repas post-training</b><div class="small">Protéiné, rapide, parfait après le sport</div></div></div>'+
+
+    // Navigation shortcuts
+    '<div class="shortcuts mt">'+
+    [['catalogue','📦','Catalogue'],['shopping','🛒','Ma liste'],['week','🗓️','Semaine'],['recipes','🍝','Recettes']].map(([k,i,t])=>'<div class="shortcut" onclick="setView({page:\''+k+'\'})"><div class="ico">'+i+'</div><div><b>'+t+'</b><div class="small">Ouvrir</div></div></div>').join('')+'</div>'+
 
     // Saison
     '<div class="mini-card mt"><b>'+season.emoji+' De saison ('+season.name+')</b><div class="chips mt">'+season.produce.slice(0,8).map(p=>'<span class="badge">'+esc(p)+'</span>').join('')+'</div></div>'+
 
-    // Shortcuts
-    '<div class="shortcuts">'+
-    [['catalogue','📦','Catalogue'],['shopping','🛒','Ma liste'],['week','🗓️','Semaine'],['recipes','🍝','Recettes']].map(([k,i,t])=>'<div class="shortcut" onclick="setView({page:\''+k+'\'})"><div class="ico">'+i+'</div><div><b>'+t+'</b><div class="small">Ouvrir</div></div></div>').join('')+'</div>'+
-
-    // Repas d'urgence
-    '<div class="shortcut mt" style="background:linear-gradient(135deg,rgba(232,97,110,0.12),rgba(232,179,58,0.08));border-color:var(--red-border)" onclick="emergencyMeal()"><div class="ico" style="background:var(--red-bg)">🚨</div><div><b>Repas d\'urgence</b><div class="small">≤15 min avec tes provisions</div></div></div>'+
-
-    '<div class="shortcut mt" style="background:linear-gradient(135deg,var(--gold-bg),rgba(109,160,240,0.08));border-color:var(--gold-border)" onclick="quickMealTonight()"><div class="ico" style="background:var(--gold-bg)">✨</div><div><b>Repas ce soir ?</b><div class="small">Le coach te propose une idée</div></div></div>'+
-
     // Faisable maintenant
-    (faisable.length>0?'<div class="section-title"><h3>🏠 Faisable maintenant</h3><span>'+faisable.length+'</span></div><div class="card-list">'+faisable.slice(0,3).map(r=>'<div class="item-row" style="cursor:pointer" onclick="openRecipe('+r.id+')"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.time+' min · '+r.cost+'</small></div><button class="btn sm secondary" onclick="event.stopPropagation();addRecipeMissing('+r.id+')">+ Liste</button></div>').join('')+'</div>':'')+
+    (faisable.length>0?'<div class="section-title"><h3>🏠 Faisable maintenant</h3><span>'+faisable.length+'</span></div><div class="card-list">'+faisable.slice(0,3).map(r=>'<div class="item-row" style="cursor:pointer" onclick="openRecipe('+r.id+')"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.time+' min · '+(r.protein||'?')+'g prot.'+(r.priceLivraison>0?' · <span style="color:var(--green)">'+r.priceMaison+'€ vs '+r.priceLivraison+'€</span>':'')+'</small></div></div>').join('')+'</div>':'')+
 
     // Suggestion
-    (suggestion?'<div class="section-title"><h3>Suggestion du jour</h3><span>💡</span></div><div class="mini-card"><div class="row"><div style="font-size:36px">'+suggestion.emoji+'</div><div class="item-meta"><b>'+esc(suggestion.name)+'</b><small>'+suggestion.time+' min · '+suggestion.ingredients.length+' ing.</small></div></div>'+starsHtml(p.ratings[suggestion.id]||0,suggestion.id)+'<div class="row mt"><button class="btn primary sm" onclick="openRecipe('+suggestion.id+')">Voir</button><button class="btn secondary sm" onclick="addRecipeMissing('+suggestion.id+')">+ Liste</button><button class="btn secondary sm" onclick="markCooked('+suggestion.id+')">🍳 Cuisiné</button></div></div>':'')+
+    (suggestion?'<div class="section-title"><h3>Suggestion du jour</h3></div><div class="mini-card"><div class="row"><div style="font-size:36px">'+suggestion.emoji+'</div><div class="item-meta"><b>'+esc(suggestion.name)+'</b><small>'+suggestion.time+' min · '+(suggestion.protein||'?')+'g prot.'+(suggestion.priceLivraison>0?' · '+suggestion.priceMaison+'€ vs '+suggestion.priceLivraison+'€':'')+'</small></div></div>'+starsHtml(p.ratings[suggestion.id]||0,suggestion.id)+'<div class="row mt"><button class="btn primary sm" onclick="openRecipe('+suggestion.id+')">Voir</button><button class="btn secondary sm" onclick="addRecipeMissing('+suggestion.id+')">+ Liste</button><button class="btn secondary sm" onclick="markCooked('+suggestion.id+')">🍳 Cuisiné</button></div></div>':'')+
 
     (DB.config.messageGlobal?'<div class="mini-card mt"><b>📢</b> <span class="small">'+esc(DB.config.messageGlobal)+'</span></div>':'')+
     '</div>';
 }
+
+// New filter functions
+function showFlemme(){const list=allRecipes().filter(r=>r.time<=15);showRecipeSheet("😴 J\'ai la flemme — ≤15 min",list);}
+function showCopieCommande(){const list=allRecipes().filter(r=>(r.tags||[]).includes('Copie ta commande'));showRecipeSheet("🏠 Copie ta commande — Version maison",list);}
+function showAirFryer(){const list=allRecipes().filter(r=>(r.tags||[]).includes('Air Fryer'));showRecipeSheet("🍟 Recettes Air Fryer",list);}
+function showPostTraining(){const list=allRecipes().filter(r=>r.protein>=25).sort((a,b)=>(b.protein||0)-(a.protein||0));showRecipeSheet("💪 Post-training — Riches en protéines",list);}
+function showRecipeSheet(title,list){openSheet('<div class="section-title"><h3>'+title+'</h3><span>'+list.length+'</span></div><div class="card-list">'+list.map(r=>'<div class="item-row" style="cursor:pointer" onclick="closeSheet();openRecipe('+r.id+')"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.time+' min · '+(r.protein||'?')+'g prot.'+(r.priceLivraison>0?' · <span style="color:var(--green)">'+r.priceMaison+'€ vs '+r.priceLivraison+'€</span>':'')+'</small></div></div>').join('')+'</div>');}
+
+// Themed weeks
+function showThemedWeeks(){openSheet('<div class="section-title"><h3>🌍 Semaines thématiques</h3></div><div class="card-list">'+[['🇮🇳 Semaine indienne','Indien'],['🇲🇽 Semaine mexicaine','Mexicain'],['🍔 Semaine américaine','Confort'],['🇯🇵 Semaine japonaise','Japonais'],['🇹🇭 Semaine thaï','Thaï'],['💪 Semaine protéinée','Protéiné'],['😴 Semaine flemme','Rapide']].map(([label,tag])=>'<div class="item-row" style="cursor:pointer" onclick="fillThemedWeek('+js(tag)+')"><div class="item-meta"><b>'+label+'</b><small>Planning auto + liste de courses</small></div></div>').join('')+'</div>');}
+
+function fillThemedWeek(tag){
+  const recipes=allRecipes().filter(r=>(r.tags||[]).includes(tag));
+  if(recipes.length<4){toast('Pas assez de recettes pour ce thème');return;}
+  const p=current();
+  const shuffled=[...recipes].sort(()=>Math.random()-0.5);
+  p.weekPlan.forEach((d,i)=>{
+    d.slots['Dîner']=shuffled[i%shuffled.length].id;
+  });
+  save();closeSheet();render();toast('Semaine '+tag+' remplie ✓');
+}
+
 function getSuggestionRecipe(){const a=allRecipes();return a[Math.floor((Date.now()/86400000)%a.length)]||a[0];}
 function quickMealTonight(){setView({page:'coach'});setTimeout(()=>coachAsk("Propose-moi un repas rapide et simple pour ce soir avec ce que j'ai dans mes provisions"),200);}
 function emergencyMeal(){const f=faisableRecipes().filter(r=>r.time<=15);if(f.length){openSheet('<div class="section-title"><h3>🚨 Repas d\'urgence</h3><span>≤15 min + provisions</span></div><div class="card-list">'+f.map(r=>'<div class="item-row" style="cursor:pointer" onclick="closeSheet();openRecipe('+r.id+')"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.time+' min</small></div></div>').join('')+'</div>');}else toast('Aucune recette ≤15 min avec tes provisions');}
 
 /* ===== MORE SHEET ===== */
-function openMoreSheet(){openSheet('<div class="section-title"><h3>Navigation</h3><span>Plus</span></div><div class="card-list">'+[['week','🗓️','Semaine','Programme de la semaine'],['coach','🤖','Coach IA','Ton expert personnel'],['provisions','🏠','Provisions','Ce que tu as chez toi'],['settings','⚙️','Paramètres','Profil et réglages']].map(([k,ico,t,sub])=>'<div class="item-row" style="cursor:pointer" onclick="closeSheet();setView({page:\''+k+'\'})"><div class="item-emoji">'+ico+'</div><div class="item-meta"><b>'+t+'</b><small>'+sub+'</small></div></div>').join('')+'<div class="item-row" style="cursor:pointer" onclick="closeSheet();logout()"><div class="item-emoji">🚪</div><div class="item-meta"><b>Changer de profil</b><small>Retour à la sélection</small></div></div></div>');}
+function openMoreSheet(){openSheet('<div class="section-title"><h3>Navigation</h3><span>Plus</span></div><div class="card-list">'+[['week','🗓️','Semaine','Programme de la semaine'],['techniques','📚','Techniques','Apprends les bases'],['coach','🤖','Coach IA','Ton expert personnel'],['provisions','🏠','Provisions','Ce que tu as chez toi'],['settings','⚙️','Paramètres','Profil et réglages']].map(([k,ico,t,sub])=>'<div class="item-row" style="cursor:pointer" onclick="closeSheet();setView({page:\''+k+'\'})"><div class="item-emoji">'+ico+'</div><div class="item-meta"><b>'+t+'</b><small>'+sub+'</small></div></div>').join('')+'<div class="item-row" style="cursor:pointer" onclick="closeSheet();logout()"><div class="item-emoji">🚪</div><div class="item-meta"><b>Changer de profil</b><small>Retour à la sélection</small></div></div></div>');}
 
 /* ===== CATALOGUE ===== */
 function catalogueScreen(){
@@ -673,6 +726,9 @@ function recipesScreen(){
   if(VIEW.recipeFast)list=list.filter(r=>r.time<=20);
   if(VIEW.recipe2ing)list=list.filter(r=>r.ingredients.length<=3);
   if(VIEW.recipeFaisable){const f=faisableRecipes();list=list.filter(r=>f.some(x=>x.id===r.id));}
+  if(VIEW.recipeAirFryer)list=list.filter(r=>(r.tags||[]).includes('Air Fryer'));
+  if(VIEW.recipeCopie)list=list.filter(r=>(r.tags||[]).includes('Copie ta commande'));
+  if(VIEW.recipeProteine)list=list.filter(r=>(r.protein||0)>=25);
   const favs=p?.favorites?.recipes||[];
 
   return appHeader(list.length+' recettes')+'<div class="screen"><div class="panel col"><div class="search"><input type="text" id="inp-rs" value="'+esc(VIEW.recipeSearch)+'" oninput="setSearchDebounced(\'recipeSearch\',this.value)" placeholder="Rechercher..."></div><div class="tabs">'+
@@ -681,8 +737,11 @@ function recipesScreen(){
   '<div class="chip'+(VIEW.recipeFast?' active':'')+'" onclick="setView({recipeFast:!view().recipeFast})">≤20 min</div>'+
   '<div class="chip'+(VIEW.recipe2ing?' active':'')+'" onclick="setView({recipe2ing:!view().recipe2ing})">≤3 ing.</div>'+
   '<div class="chip'+(VIEW.recipeFaisable?' active':'')+'" onclick="setView({recipeFaisable:!view().recipeFaisable})">🏠 Faisable</div>'+
+  '<div class="chip'+(VIEW.recipeAirFryer?' active':'')+'" onclick="setView({recipeAirFryer:!view().recipeAirFryer})">🍟 Air Fryer</div>'+
+  '<div class="chip'+(VIEW.recipeCopie?' active':'')+'" onclick="setView({recipeCopie:!view().recipeCopie})">🏠 Copie commande</div>'+
+  '<div class="chip'+(VIEW.recipeProteine?' active':'')+'" onclick="setView({recipeProteine:!view().recipeProteine})">💪 Protéiné</div>'+
   '</div></div><div class="card-list mt">'+(list.length?list.map(r=>
-    '<div class="item-row"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.category+' · '+r.time+' min · '+r.cost+'</small></div>'+
+    '<div class="item-row"><div class="item-emoji">'+r.emoji+'</div><div class="item-meta"><b>'+esc(r.name)+'</b><small>'+r.category+' · '+r.time+' min · '+(r.protein?r.protein+'g prot. · ':'')+r.cost+'</small></div>'+
     '<button class="icon-btn" style="font-size:16px" onclick="toggleFavRecipe('+r.id+')">'+(favs.includes(r.id)?'★':'☆')+'</button>'+
     '<button class="btn sm secondary" onclick="openRecipe('+r.id+')">Voir</button></div>'
   ).join(''):'<div class="empty-state"><div class="empty-emoji">🍝</div><div class="empty-title">Aucune recette</div></div>')+'</div>'+
@@ -695,7 +754,7 @@ function openRecipe(id){
   const serv=VIEW.recipeServings||r.servings||2,f=serv/(r.servings||2),p=current();
   openModal(
     '<div class="section-title"><h3>'+esc(r.name)+'</h3><span>'+r.category+'</span></div><div class="recipe-cover">'+r.emoji+'</div>'+
-    '<div class="row wrap mt"><span class="badge">'+r.time+' min</span><span class="badge">'+r.difficulty+'</span><span class="badge">'+r.cost+'</span></div>'+
+    '<div class="row wrap mt"><span class="badge">'+r.time+' min</span><span class="badge">'+r.difficulty+'</span><span class="badge">'+r.cost+'</span>'+(r.protein?'<span class="badge blue">'+(r.protein*f)+'g prot.</span>':'')+'</div>'+(r.priceLivraison>0?'<div class="mini-card mt" style="background:var(--green-bg);border-color:var(--green-border)"><b style="color:var(--green)">💰 '+r.priceMaison+'€ maison vs '+r.priceLivraison+'€ en livraison</b><div class="small">Tu économises '+(r.priceLivraison-r.priceMaison)+'€ !</div></div>':'')+
     '<div class="row mt">'+starsHtml(p.ratings[r.id]||0,r.id)+'</div>'+
     '<div class="row mt"><span class="lbl" style="margin:0">Portions :</span><div class="qty"><button onclick="VIEW.recipeServings=Math.max(1,(VIEW.recipeServings||'+(r.servings||2)+')-1);openRecipe('+r.id+')">−</button><div class="val">'+serv+'</div><button onclick="VIEW.recipeServings=(VIEW.recipeServings||'+(r.servings||2)+')+1;openRecipe('+r.id+')">+</button></div></div>'+
     '<div class="section-title"><h3>Ingrédients</h3><span>'+r.ingredients.length+'</span></div><div class="card-list">'+
@@ -758,6 +817,22 @@ function coachAsk(text){
   callGemini(ctx).then(ans=>{const d=document.getElementById('typDots');if(d)d.remove();p.coachHistory.unshift({id:uid(),role:'assistant',text:ans});save();render();});
 }
 async function callGemini(prompt){const key=getApiKey();if(!key)return 'Clé API non configurée.';try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:1500,temperature:0.75}})});if(!r.ok)throw new Error(await r.text());const d=await r.json();return d.candidates?.[0]?.content?.parts?.[0]?.text||'Pas de réponse.';}catch(e){return 'Erreur API.';}}
+
+
+function techniquesScreen(){
+  const techniques=[
+    {emoji:'🍚',title:'Cuire du riz basmati parfait',steps:['Rince 3 fois à l\'eau froide','1 volume riz = 1.5 volumes eau + sel','Feu fort sans couvercle jusqu\'à ébullition','Couvercle + feu minimum 12 min','NE JAMAIS OUVRIR. 5 min repos. Aérer.']},
+    {emoji:'🍗',title:'Mariner du poulet',steps:['Coupe en morceaux réguliers','Yaourt + épices + huile + sel dans un bol','Mélange bien, chaque morceau doit être enrobé','Minimum 20 min au frigo (idéal : toute la nuit)','Le yaourt attendrit la viande, les épices pénètrent']},
+    {emoji:'🍅',title:'Sauce tomate maison',steps:['Oignon émincé dans huile d\'olive 5 min','Ajoute ail pressé 1 min','Verse coulis de tomate + sel + sucre (1 pincée)','Basilic, paprika, herbes de Provence','Mijote 15 min feu doux. Plus ça mijote, meilleur c\'est.']},
+    {emoji:'🥩',title:'Cuire un steak parfait',steps:['Sors la viande du frigo 30 min avant','Poêle TRÈS chaude + filet d\'huile','Dépose le steak, NE TOUCHE PAS pendant 2 min','Retourne 1 seule fois. 2 min de l\'autre côté (à point)','Laisse reposer 2 min dans une assiette avant de servir']},
+    {emoji:'🥚',title:'Œuf mollet parfait',steps:['Eau bouillante à gros bouillons','Plonge l\'œuf délicatement avec une cuillère','CHRONO : 6 min 30 exactement','Plonge immédiatement dans l\'eau glacée','Épluche doucement. Jaune coulant garanti.']},
+    {emoji:'🫓',title:'Pâte à naan express',steps:['300g farine + levure + sel + 150g yaourt','Pétris 3-4 min jusqu\'à boule souple','Divise en boules, repose 10 min','Aplatis au rouleau, cuis à la poêle très chaude','Beurre fondu immédiatement à la sortie']},
+    {emoji:'🔪',title:'Couper vite et bien',steps:['Couteau bien aiguisé = sécurité','Main en griffe : doigts repliés, pousse avec les phalanges','Le couteau glisse contre les phalanges, jamais les doigts','Planche stable : torchon humide dessous','Petits morceaux = cuisson plus rapide et uniforme']},
+    {emoji:'🍳',title:'Omelette baveuse',steps:['Bats les œufs + sel + 1 càs d\'eau (légèreté)','Poêle beurrée à feu MOYEN (pas fort !)','Verse les œufs, laisse prendre 1 min','Garniture quand le dessous est pris, dessus baveux','Plie, 30 sec, sers. Le centre finit dans l\'assiette.']}
+  ];
+  return appHeader('Fiches techniques')+'<div class="screen"><div class="section-title"><h3>📚 Techniques de base</h3><span>'+techniques.length+' fiches</span></div><div class="card-list">'+
+    techniques.map(t=>'<div class="panel" style="margin-bottom:8px"><div class="row"><div style="font-size:28px">'+t.emoji+'</div><b>'+esc(t.title)+'</b></div><div class="col mt">'+t.steps.map((s,i)=>'<div class="small"><b>'+(i+1)+'.</b> '+esc(s)+'</div>').join('')+'</div></div>').join('')+'</div>';
+}
 
 /* ===== SETTINGS ===== */
 function settingsScreen(){
